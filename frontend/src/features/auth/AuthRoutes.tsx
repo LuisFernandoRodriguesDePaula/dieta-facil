@@ -18,6 +18,7 @@ import "./auth.css";
 import { useSession, sessionKey } from "./session";
 import type { Profile } from "./session";
 import FoodsPage from "../foods/FoodsPage";
+import PlansPage from "../plans/PlansPage";
 
 const timezone = () =>
   Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Sao_Paulo";
@@ -65,6 +66,8 @@ export default function AuthRoutes() {
       <Route path="/cadastro" element={<AccessPage registerMode />} />
       <Route path="/conta" element={<AccountPage />} />
       <Route path="/conta/alimentos" element={<FoodsPage />} />
+      <Route path="/conta/dieta" element={<PlansPage />} />
+      <Route path="/conta/agenda" element={<PlansPage agenda />} />
       <Route path="*" element={<App />} />
     </Routes>
   );
@@ -468,11 +471,15 @@ function AccountForm({ user }: { user: Profile }) {
         {loggingOut ? "Saindo…" : "Sair da conta"}
       </button>
       <div className="account-next">
-        <strong>Comece pelos seus alimentos.</strong>
+        <strong>Organize sua rotina.</strong>
+        <p>
+          <Link to="/conta/dieta">Minha dieta</Link> ·{" "}
+          <Link to="/conta/agenda">Agenda de refeições</Link>
+        </p>
         <p>
           Seu catálogo pessoal já está disponível. Cadastre os alimentos que
-          fazem parte da sua rotina; as refeições serão conectadas na próxima
-          etapa.
+          fazem parte da sua rotina; organize suas refeições e acompanhe a
+          agenda nesta etapa.
         </p>
         <Link to="/conta/alimentos">
           Abrir meu catálogo <ArrowRight size={15} />

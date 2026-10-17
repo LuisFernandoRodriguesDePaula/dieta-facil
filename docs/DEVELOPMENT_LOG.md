@@ -57,3 +57,9 @@ Limites: ainda não existe estoque, dieta pessoal nem receitas. Nomes repetidos 
 Migração V4 e API autenticada para plano com revisões por data, refeições recorrentes por dia da semana, itens com quantidades exatas e agenda no fuso do perfil. Revisões usam versão global para evitar sobrescrita; refeições mantêm identidade lógica entre revisões. Refeições puladas preservam snapshot e não movimentam estoque. A edição começa hoje ou no futuro; dados de outra conta e alimentos arquivados são rejeitados.
 
 Decisão ADR-002 registra JDBC no novo domínio, compartilhando transações com JPA, e a estratégia de bloqueio por conta para as próximas operações de estoque. Validação: 16 testes Java passaram no PostgreSQL local (incluindo três novos testes de planos); migração V4 aplicada. A base de estoque ainda será implementada.
+
+## 2026-10-17 — E04: telas de dieta e agenda
+
+Rotas pessoais /conta/dieta e /conta/agenda conectadas à API: refeições com horário/dias, duplicação, itens do catálogo, quantidades, unidades e referência; consulta por data e marcação/desmarcação de refeição pulada. Refeições vazias e dias ausentes são bloqueados. A conta oferece acesso às novas telas.
+
+Validação: build TypeScript/Vite e 13 testes de interface aprovados, incluindo criação de revisão e refeição pulada sem chamada de estoque. A revisão visual em navegador e a jornada integrada serão realizadas antes de declarar a versão demonstrável concluída. Recuperação de senha e abertura pública continuam fora desta entrega.
