@@ -51,3 +51,9 @@ Interface: página pessoal em /conta/alimentos, formulário com validação, bus
 Validação: conjunto completo de 13 testes Java e 11 testes de interface aprovado; os 7 testes de alimentos/conversões também passaram no PostgreSQL local, incluindo V3. Build TypeScript/Vite aprovado. No navegador, conta fictícia cadastrou Arroz integral e Banana, arquivou/restaurou Banana e converteu 1,5 kg em 1500 g com referência RAW. Catálogo/formulário revisados em frame de 390 px, sem aparelho físico. Página temporária de QA removida.
 
 Limites: ainda não existe estoque, dieta pessoal nem receitas. Nomes repetidos são permitidos; busca não normaliza acentos. Sem teste de carga ou corrida real de threads nesta entrega; versão desatualizada foi exercitada por HTTP. Próxima tarefa: E04 — plano alimentar, revisões, refeições, itens e agenda por dia.
+
+## 2026-10-17 — E04: API de dieta e agenda
+
+Migração V4 e API autenticada para plano com revisões por data, refeições recorrentes por dia da semana, itens com quantidades exatas e agenda no fuso do perfil. Revisões usam versão global para evitar sobrescrita; refeições mantêm identidade lógica entre revisões. Refeições puladas preservam snapshot e não movimentam estoque. A edição começa hoje ou no futuro; dados de outra conta e alimentos arquivados são rejeitados.
+
+Decisão ADR-002 registra JDBC no novo domínio, compartilhando transações com JPA, e a estratégia de bloqueio por conta para as próximas operações de estoque. Validação: 16 testes Java passaram no PostgreSQL local (incluindo três novos testes de planos); migração V4 aplicada. A base de estoque ainda será implementada.
