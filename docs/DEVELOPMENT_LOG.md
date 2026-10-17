@@ -37,3 +37,13 @@ Validação: seis testes Java passaram no fluxo padrão; cinco testes de interfa
 No navegador, login com conta fictícia criada pelos testes, atualização de nome e logout funcionaram. Formulário de cadastro revisado no desktop e em frame com viewport de 390 px, sem aparelho físico. Conta fictícia usa domínio example.invalid; screenshots não contêm dados pessoais reais. Nenhuma senha/cookie foi adicionada ao repositório.
 
 Limites: sem recuperação de senha, verificação de e-mail ou mitigação completa de abuso para abertura pública. Sessões em memória são perdidas ao reiniciar. Catálogo/dieta/estoque pessoais ainda não existem. Próxima entrega: E03, catálogo pessoal e conversões de unidades.
+
+## 2026-10-16 — E03: catálogo pessoal e unidades
+
+Implementado: migração V3 foods, consultas paginadas por usuário, busca literal sem distinguir caixa, criação/edição com categoria e frequência, arquivamento/restauração e bloqueio de alteração da dimensão. Atualizações usam versão para evitar sobrescrita. APIs de leitura/escrita/arquivamento/conversão verificam o proprietário. Quantidades são convertidas com BigDecimal; o endpoint preserva a referência e rejeita dimensões incompatíveis ou contagem fracionada.
+
+Interface: página pessoal em /conta/alimentos, formulário com validação, busca, abas de ativos/arquivados, confirmação de arquivamento com foco e teclado, restauração, conversor e estados vazio/carregando/erro. Falha por sessão expirada remove a área pessoal; conflito de versão mantém o formulário e oferece recarga explícita. Hook de sessão compartilhado com a área de acesso.
+
+Validação: conjunto completo de 13 testes Java e 11 testes de interface aprovado; os 7 testes de alimentos/conversões também passaram no PostgreSQL local, incluindo V3. Build TypeScript/Vite aprovado. No navegador, conta fictícia cadastrou Arroz integral e Banana, arquivou/restaurou Banana e converteu 1,5 kg em 1500 g com referência RAW. Catálogo/formulário revisados em frame de 390 px, sem aparelho físico. Página temporária de QA removida.
+
+Limites: ainda não existe estoque, dieta pessoal nem receitas. Nomes repetidos são permitidos; busca não normaliza acentos. Sem teste de carga ou corrida real de threads nesta entrega; versão desatualizada foi exercitada por HTTP. Próxima tarefa: E04 — plano alimentar, revisões, refeições, itens e agenda por dia.

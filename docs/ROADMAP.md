@@ -17,8 +17,8 @@ Revisão de 2026-10-16. Este backlog substitui a ordem genérica da especificaç
 | E01 | Base React + API Java + PostgreSQL + CI | — | Concluída, demonstração local |
 | P01 | Regras, modelo e plano revisados com estoque | E01 | Documentado nesta revisão |
 | E02 | Conta, login, logout e isolamento | P01 | Concluída, ambiente local |
-| E03 | Catálogo pessoal e unidades | E02 | Próxima |
-| E04 | Dieta manual e agenda recorrente | E03 | Pendente |
+| E03 | Catálogo pessoal e unidades | E02 | Concluída, ambiente local |
+| E04 | Dieta manual e agenda recorrente | E03 | Próxima |
 | E05 | Estoque inicial, lotes e ajustes | E03 | Pendente |
 | E06 | Demanda, cobertura e lista de compras | E04 + E05 | Pendente |
 | E07 | Confirmação de compras parciais | E06 | Pendente |
@@ -47,10 +47,10 @@ Aceite: cadastro/login/logout funcionam; sessão expirada retorna ao acesso; esc
 
 ## E03 — Alimentos e unidades
 
-- [ ] CRUD pessoal com categoria e frequência; arquivamento em vez de apagar histórico.
-- [ ] Dimensões e conversões exatas kg/g, L/ml; contagem inteira e referência separada.
-- [ ] Validação e isolamento por usuário, inclusive vínculos entre entidades.
-- [ ] Formulário simples com busca, estados vazio/erro e confirmação de arquivamento.
+- [x] CRUD pessoal com categoria e frequência; arquivamento em vez de apagar histórico.
+- [x] Dimensões e conversões exatas kg/g, L/ml; contagem inteira e referência separada.
+- [x] Validação e isolamento por usuário, inclusive vínculos entre entidades.
+- [x] Formulário simples com busca, estados vazio/erro e confirmação de arquivamento.
 
 Aceite: alimento criado reaparece após login; não há soma de dimensões incompatíveis; outra conta não vê nem usa seu ID. Embalagem comercial opcional pode ser adicionada em E06.
 
@@ -129,4 +129,4 @@ Uma sessão deve ter um objetivo, uma verificação proporcional e um registro d
 
 ## Decisões assumidas, revisáveis sem bloquear o início
 
-Interface pt-BR; estoque individual; entrada manual da dieta; ciclo sugerido de sete dias; validade opcional; aviso de proximidade padrão três dias; sem rendimento automático; sem funções pagas de terceiros. Preferências serão ajustáveis pelo usuário. E02 concluída. Não há dúvida de produto bloqueando E03.
+Interface pt-BR; estoque individual; entrada manual da dieta; ciclo sugerido de sete dias; validade opcional; aviso de proximidade padrão três dias; sem rendimento automático; sem funções pagas de terceiros. Preferências serão ajustáveis pelo usuário. E03 concluída. Próxima entrega: E04, dieta manual e agenda recorrente.

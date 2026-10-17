@@ -402,6 +402,9 @@ export default function App() {
                     title="O que faz parte do seu dia."
                     text="Itens utilizados no plano fictício, consultados no back-end."
                   />
+                  <NavLink className="catalog-cta" to="/conta/alimentos">
+                    Abrir meu catálogo pessoal <ArrowRight size={16} />
+                  </NavLink>
                   <div className="food-grid">
                     {[...new Set(meals.flatMap((meal) => meal.items))].map(
                       (item) => (

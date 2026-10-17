@@ -30,3 +30,11 @@ O fluxo planejado é dieta -> projeção de demanda com estoque -> lista -> rece
 Migração V2 cria users. AuthService valida fuso e limite em bytes da senha, normaliza e-mail e retorna somente DTOs de perfil. Spring Security usa BCrypt, sessão em memória e proteção CSRF. O login JSON autentica pelo AuthenticationManager, executa a estratégia de renovação de sessão/CSRF e salva explicitamente o SecurityContext. O logout usa o filtro do Spring Security.
 
 A interface usa React Hook Form/Zod e cliente HTTP compartilhado com obtenção de CSRF antes de mutações. Erros de conexão não são tratados como ausência de sessão. Dados da conta são removidos do cache ao sair ou receber 401 em alteração de perfil. Cadastro não inicia sessão automaticamente. /api/me sempre deriva a identidade da sessão; não oferece consulta por ID fornecido pelo cliente. Revalidar autorização ao criar novos módulos.
+
+## E03 implementada
+
+Módulo foods usa consultas por id + user_id, sem aceitar proprietário do navegador. Migração V3 cria a chave estrangeira de usuário e uma chave única (user_id, id) para futuros vínculos de domínio. Unidade preferida pode mudar apenas dentro da mesma dimensão. Arquivamento mantém o registro; não há exclusão definitiva.
+
+Versão explícita no DTO + @Version no JPA evitam sobrescrita de alterações concorrentes. A conversão de unidades é domínio Java puro com BigDecimal, sem assumir rendimento cru/cozido. A API devolve quantidades como strings. Referência de quantidade é separada do alimento; futuros meal_items/lotes guardarão seu próprio basis.
+
+Frontend separa tipos, página de catálogo, formulário e conversor. A consulta é vinculada ao ID da conta no cache. O módulo usa o mesmo hook de sessão da área pessoal, limpa cache em 401 e distingue erro de conexão de catálogo vazio. Detalhes de contrato em FOODS_API.md.

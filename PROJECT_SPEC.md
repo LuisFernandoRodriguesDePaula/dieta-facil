@@ -181,7 +181,7 @@ O checklist abaixo registra as fases originais. A sequência executável revisad
 ### Fase 2 — Back-end e persistência
 - [ ] Criar esquema do banco com Flyway.
 - [x] Implementar autenticação e isolamento de dados (perfil pessoal; validar propriedade novamente em cada novo módulo).
-- [ ] Implementar CRUD de alimentos e planos/refeições.
+- [ ] Implementar CRUD de alimentos e planos/refeições (alimentos concluídos na E03; planos/refeições pendentes).
 - [ ] Documentar API e criar testes.
 
 ### Fase 3 — Integração e regras de negócio
@@ -244,4 +244,4 @@ O MVP está concluído quando um usuário consegue criar uma conta, cadastrar su
 
 ---
 
-**Status:** base demonstrativa e E02 (cadastro, login, logout e perfil isolado) implementadas localmente. Estoque ainda planejado. Próxima entrega: E03 — catálogo pessoal e unidades.
+**Status:** base demonstrativa, E02 (acesso pessoal) e E03 (catálogo pessoal/unidades) implementadas localmente. Estoque ainda planejado. Próxima entrega: E04 — dieta manual e agenda recorrente.

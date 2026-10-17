@@ -10,6 +10,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.dao.OptimisticLockingFailureException;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -20,7 +23,17 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     ResponseEntity<?> conflict(DataIntegrityViolationException exception) {
-        return ResponseEntity.status(409).body(Map.of("code", "CONFLICT", "message", "Não foi possível cadastrar com este e-mail. Tente entrar ou use outro e-mail."));
+        return ResponseEntity.status(409).body(Map.of("code", "CONFLICT", "message", "Os dados entram em conflito com um registro existente. Confira os dados ou tente entrar na sua conta."));
+    }
+
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    ResponseEntity<?> concurrentUpdate(OptimisticLockingFailureException exception) {
+        return ResponseEntity.status(409).body(Map.of("code", "VERSION_CONFLICT", "message", "O registro foi alterado em outra sessão. Recarregue antes de editar."));
+    }
+
+    @ExceptionHandler({ConstraintViolationException.class, MethodArgumentTypeMismatchException.class})
+    ResponseEntity<?> invalidParameter(Exception exception) {
+        return ResponseEntity.badRequest().body(Map.of("code", "INVALID_PARAMETER", "message", "Confira os filtros e parâmetros informados."));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

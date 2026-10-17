@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Link,
   Navigate,
@@ -15,14 +15,10 @@ import { ArrowLeft, ArrowRight, LogOut, Sprout } from "lucide-react";
 import { ApiError, api } from "../../lib/api";
 import App from "../../App";
 import "./auth.css";
+import { useSession, sessionKey } from "./session";
+import type { Profile } from "./session";
+import FoodsPage from "../foods/FoodsPage";
 
-export type Profile = {
-  id: string;
-  name: string;
-  email: string;
-  timezone: string;
-};
-const sessionKey = ["session"];
 const timezone = () =>
   Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Sao_Paulo";
 const emailField = z
@@ -62,28 +58,13 @@ const profileSchema = z.object({
   timezone: z.string().min(1, "Informe seu fuso horário.").max(100),
 });
 
-function useSession() {
-  return useQuery<Profile | null>({
-    queryKey: sessionKey,
-    queryFn: async () => {
-      try {
-        return await api<Profile>("/api/me");
-      } catch (error) {
-        if (error instanceof ApiError && error.status === 401) return null;
-        throw error;
-      }
-    },
-    retry: false,
-    staleTime: 0,
-  });
-}
-
 export default function AuthRoutes() {
   return (
     <Routes>
       <Route path="/entrar" element={<AccessPage registerMode={false} />} />
       <Route path="/cadastro" element={<AccessPage registerMode />} />
       <Route path="/conta" element={<AccountPage />} />
+      <Route path="/conta/alimentos" element={<FoodsPage />} />
       <Route path="*" element={<App />} />
     </Routes>
   );
@@ -487,13 +468,14 @@ function AccountForm({ user }: { user: Profile }) {
         {loggingOut ? "Saindo…" : "Sair da conta"}
       </button>
       <div className="account-next">
-        <strong>O próximo passo é sua dieta.</strong>
+        <strong>Comece pelos seus alimentos.</strong>
         <p>
-          O cadastro de alimentos e refeições pessoais será adicionado nas
-          próximas entregas. A demonstração permanece separada da sua conta.
+          Seu catálogo pessoal já está disponível. Cadastre os alimentos que
+          fazem parte da sua rotina; as refeições serão conectadas na próxima
+          etapa.
         </p>
-        <Link to="/">
-          Explorar demonstração <ArrowRight size={15} />
+        <Link to="/conta/alimentos">
+          Abrir meu catálogo <ArrowRight size={15} />
         </Link>
       </div>
       <p className="access-note">

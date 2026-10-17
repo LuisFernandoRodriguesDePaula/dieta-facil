@@ -1,4 +1,6 @@
-# API da primeira entrega
+# API do Dieta Fácil
+
+Atualização E03: o catálogo pessoal está implementado e documentado em [FOODS_API.md](FOODS_API.md). Estoque, listas reais de compra e preparo ainda não existem.
 
 ## GET /api/demo/schedule
 

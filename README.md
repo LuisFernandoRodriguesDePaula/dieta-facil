@@ -2,7 +2,7 @@
 
 Planejamento alimentar que transforma um plano já definido em uma rotina de refeições, compras e preparo. Projeto de portfólio Full Stack construído em entregas pequenas e documentadas.
 
-**Status: base local funcional com cadastro, login e perfil pessoal.** Ainda não é o MVP completo. Os dados são fictícios e não constituem recomendação alimentar.
+**Status: base local funcional com acesso pessoal e catálogo de alimentos.** Ainda não é o MVP completo. Os dados são fictícios e não constituem recomendação alimentar.
 
 ![Painel da primeira entrega](docs/images/dashboard.png)
 
@@ -15,7 +15,7 @@ Planejamento alimentar que transforma um plano já definido em uma rotina de ref
 - Páginas explicativas para compras e preparo, ainda sem cálculos.
 - Migração Flyway, persistência JPA, teste de integração e verificação de saúde.
 
-A entrega E02 adiciona cadastro, login, logout e edição do próprio perfil, com sessão HttpOnly, CSRF e hash de senha. A demonstração continua pública e separada da conta. O catálogo pessoal, dieta e estoque ainda não estão implementados. Use dados de teste: recuperação de acesso e preparação para produção serão tratadas antes da abertura pública.
+A entrega E02 adiciona cadastro, login, logout e edição do próprio perfil, com sessão HttpOnly, CSRF e hash de senha. A demonstração continua pública e separada da conta. O catálogo pessoal já está implementado; dieta e estoque pessoais ainda não. Use dados de teste: recuperação de acesso e preparação para produção serão tratadas antes da abertura pública.
 
 ## Tecnologias
 
@@ -77,7 +77,7 @@ Veja [arquitetura](docs/ARCHITECTURE.md), [API](docs/API.md) e [diário](docs/DE
 
 O planejamento foi revisado para incluir estoque, lotes, reposição por cobertura e validade informada no MVP. Esses recursos ainda não estão implementados. Consulte [plano de evolução](docs/ROADMAP.md), [regras de estoque e compras](docs/INVENTORY_RULES.md), [modelo de domínio](docs/DOMAIN_MODEL.md) e [decisão de autenticação](docs/decisions/ADR-001-auth-and-modules.md).
 
-Próxima entrega: E03 — catálogo pessoal e unidades. Depois: dieta, estoque, compras, consumo/preparo e alertas. A aplicação não usará IA para calcular quantidades ou estimar prazos de conservação.
+Próxima entrega: E04 — dieta manual e agenda recorrente. Depois: estoque, compras, consumo/preparo e alertas. A aplicação não usará IA para calcular quantidades ou estimar prazos de conservação.
 
 ## Acesso pessoal (E02)
 
@@ -88,3 +88,12 @@ A sessão expira após 30 minutos sem atividade e é perdida ao reiniciar o back
 ![Tela de acesso](docs/images/login.png)
 
 Validação E02: seis testes Java no fluxo padrão, cinco testes de interface e quatro testes HTTP de autenticação executados também no PostgreSQL local. Os testes de interface usam respostas simuladas; os testes Java iniciam servidor HTTP real. O teste do cookie de produção verifica os atributos Secure/HttpOnly/SameSite, sem simular um deploy TLS. Login, edição e logout foram conferidos no navegador; cadastro foi exercitado pelos testes HTTP e de interface. Layout de cadastro revisado em viewport de 390 pixels, sem teste em aparelho físico.
+## Catálogo pessoal (E03)
+
+Após entrar, abra `/conta/alimentos` ou use o atalho do perfil. Você pode cadastrar alimentos, definir categoria/frequência/unidade, buscar pelo nome, editar, arquivar e restaurar. O catálogo começa vazio; os exemplos da demonstração não são importados automaticamente.
+
+Arquivamento preserva o cadastro; não há exclusão definitiva. A dimensão do alimento não pode mudar após criação, mas a unidade pode mudar de kg para g ou de L para ml. O conversor aceita vírgula decimal, preserva referência cru/cozido/como vendido e não altera estoque. Contagem aceita somente inteiros. Catálogo de alimentos não significa quantidade disponível em casa.
+
+![Catálogo pessoal de alimentos](docs/images/foods.png)
+
+Contrato e regras em [FOODS_API.md](docs/FOODS_API.md). Validação E03: 13 testes Java e 11 testes de interface passaram; os 7 testes de alimentos/conversões também passaram em PostgreSQL 17 local. Build de produção aprovado. No navegador, cadastro, arquivamento/restauração e conversão foram conferidos com conta fictícia. Catálogo e formulário revisados em largura de 390 px, sem teste em aparelho físico.

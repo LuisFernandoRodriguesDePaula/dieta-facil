@@ -2,6 +2,8 @@
 
 Planejado em 2026-10-16; não representa tabelas já implementadas. Criar migrações apenas na entrega correspondente. `demo_meals` permanece isolada e nunca vira dados pessoais automaticamente.
 
+Estado atual: users implementada na V2; foods implementada na V3 com unidade preferida, categoria, frequência, versão e arquivamento. Dimensão/base são derivadas da unidade. As demais tabelas desta proposta continuam futuras.
+
 ## Estrutura
 
 | Agregado/tabelas previstas | Responsabilidade e campos principais |
