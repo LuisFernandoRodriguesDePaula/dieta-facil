@@ -1,5 +1,7 @@
 # Dieta Fácil
 
+**Para continuar o desenvolvimento:** leia o [ponto de retorno](docs/RETOMADA.md). A próxima entrega é a E04.
+
 Planejamento alimentar que transforma um plano já definido em uma rotina de refeições, compras e preparo. Projeto de portfólio Full Stack construído em entregas pequenas e documentadas.
 
 **Status: base local funcional com acesso pessoal e catálogo de alimentos.** Ainda não é o MVP completo. Os dados são fictícios e não constituem recomendação alimentar.

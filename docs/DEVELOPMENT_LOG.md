@@ -1,5 +1,9 @@
 # Diário de desenvolvimento
 
+## Ponto de retorno ao encerrar a sessão
+
+Em 2026-10-16, o usuário encerrou após E03 e solicitou retomada no dia seguinte. Estado, ambiente, preferências e primeira tarefa da E04 estão em [RETOMADA.md](RETOMADA.md). Nenhuma funcionalidade nova foi implementada neste checkpoint; mudança somente de documentação.
+
 ## 2026-10-16 — Entrega 01: base local
 
 Objetivo: iniciar interface, API e PostgreSQL com uma demonstração integrada e documentar como reproduzir.
