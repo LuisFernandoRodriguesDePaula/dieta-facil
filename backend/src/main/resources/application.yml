@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: dieta-facil
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/dieta_facil}
+    username: ${DB_USER:dieta_facil}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+server:
+  address: 127.0.0.1
+  port: 8080
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
