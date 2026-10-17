@@ -74,4 +74,6 @@ PROJECT_SPEC.md  Documento mestre
 
 Veja [arquitetura](docs/ARCHITECTURE.md), [API](docs/API.md) e [diário](docs/DEVELOPMENT_LOG.md). O escopo completo está em [PROJECT_SPEC.md](PROJECT_SPEC.md).
 
-Próxima entrega: definir autenticação por sessão/cookie HttpOnly e modelo definitivo de alimentos, planos e refeições, antes do CRUD pessoal. Compras e preparo ficam para a etapa de regras de negócio.
+O planejamento foi revisado para incluir estoque, lotes, reposição por cobertura e validade informada no MVP. Esses recursos ainda não estão implementados. Consulte [plano de evolução](docs/ROADMAP.md), [regras de estoque e compras](docs/INVENTORY_RULES.md), [modelo de domínio](docs/DOMAIN_MODEL.md) e [decisão de autenticação](docs/decisions/ADR-001-auth-and-modules.md).
+
+Próxima entrega: E02 — cadastro, login, logout e isolamento de dados por usuário. Depois: catálogo, dieta, estoque, compras, consumo/preparo e alertas. A aplicação não usará IA para calcular quantidades ou estimar prazos de conservação.

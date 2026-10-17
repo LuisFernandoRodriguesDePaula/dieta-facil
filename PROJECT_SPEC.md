@@ -4,7 +4,9 @@
 
 ## 1. Visão do produto
 
-O **Dieta Fácil** é uma aplicação de planejamento alimentar que transforma uma dieta cadastrada pelo usuário em uma rotina prática: refeições com horários, quantidades para cozinhar e listas de compras organizadas por frequência (semanal e mensal).
+O **Dieta Fácil** é uma aplicação de planejamento alimentar que conecta uma dieta já definida ao estoque doméstico, à previsão de consumo, às compras e ao preparo. O usuário vê o que precisa, o que tem registrado e o que pode faltar até a próxima compra.
+
+**Revisão de escopo — 2026-10-16:** estoque, lotes, validade informada e reposição por cobertura passam a integrar o MVP, entregues em etapas. Esta decisão substitui a classificação anterior de estoque como evolução futura. Regras detalhadas em [regras de estoque e compras](docs/INVENTORY_RULES.md), [modelo de domínio](docs/DOMAIN_MODEL.md) e [plano de evolução](docs/ROADMAP.md).
 
 **Objetivo inicial:** construir um projeto de portfólio Full Stack que demonstre domínio de React, APIs REST, Java/Spring Boot, PostgreSQL, autenticação, testes e deploy. **Visão futura:** evoluir para produto comercial com assinatura premium, sem implementar pagamentos no MVP.
 
@@ -21,14 +23,18 @@ Pessoas que já possuem um plano alimentar e querem organizá-lo. O sistema **n�
 ### Funcionalidades obrigatórias
 
 1. **Conta e autenticação:** cadastro, login, logout e proteção dos dados por usuário.
-2. **Perfil e preferências:** nome, unidade de medida e quantidade padrão de dias para compras.
+2. **Perfil e preferências:** nome, fuso horário, unidades e ciclo de compras (semanal, mensal ou período manual); dia da semana ou dia do mês configurável.
 3. **Alimentos:** catálogo pessoal com nome, unidade (g, kg, ml, L, unidade) e categoria de compra.
-4. **Plano alimentar:** criar refeições com nome, horário, dias da semana e alimentos/quantidades por refeição.
+4. **Plano alimentar:** criar refeições com nome, horário, dias da semana e alimentos/quantidades; duplicar refeições e copiar dias para facilitar o cadastro manual.
 5. **Visão diária:** exibir refeições em ordem cronológica, com itens e quantidades.
-6. **Lista de compras:** calcular quantidades agregadas para um período escolhido (ex.: 7 ou 30 dias), agrupadas por categoria; permitir marcar itens como comprados.
+6. **Lista de compras:** calcular demanda por data e descontar estoque compatível e utilizável; mostrar faltas e incertezas por categoria; preservar cálculo e ajustes; registrar compras parciais sem duplicar entradas.
 7. **Frequência de compra:** classificar itens como semanais ou mensais, com possibilidade de ajuste manual.
 8. **Planejamento do preparo:** somar quantidades por alimento para um intervalo de dias e apresentar o total a preparar.
 9. **Interface responsiva:** boa experiência em celular e desktop, com estados de carregamento, vazio e erro.
+10. **Estoque:** cadastro inicial com quantidade conhecida, zero confirmado ou desconhecida; lotes e histórico de compras, consumo, descarte e correção.
+11. **Cobertura:** prever o que pode faltar até a próxima compra, sem confundir previsão com quantidade registrada.
+12. **Validade e armazenamento:** datas informadas pelo usuário/rótulo, local e estado do lote; avisos dentro do aplicativo e prioridade aos lotes que vencem primeiro. Validade desconhecida deve aparecer explicitamente.
+13. **Consumo e preparo confirmado:** baixar ingredientes uma única vez; preparo antecipado gera saldo de alimento preparado, vinculado à origem, para evitar nova baixa dos ingredientes ao marcar refeições.
 
 ### Fora do MVP
 
@@ -37,6 +43,8 @@ Pessoas que já possuem um plano alimentar e querem organizá-lo. O sistema **n�
 - Integrações com supermercados, preços em tempo real e delivery.
 - Pagamentos, assinatura, notificações push e aplicativo nativo.
 - Recursos de IA generativa dentro do produto.
+- Importação de dieta por foto/PDF, leitura de código de barras e preços automáticos.
+- Sugestões automáticas de prazos de conservação; conteúdo de orientação requer fonte e revisão antes de entrar no produto.
 
 ## 3. Regras de negócio fundamentais
 
@@ -50,6 +58,10 @@ Pessoas que já possuem um plano alimentar e querem organizá-lo. O sistema **n�
 - Cada usuário acessa somente seus próprios dados. IDs recebidos em APIs devem ser verificados quanto à propriedade.
 - Datas devem usar fuso horário configurado pelo usuário; horários de refeição são horários locais.
 - Permitir edição manual da lista gerada, preservando rastreabilidade entre quantidade calculada e ajuste manual.
+- Gerar/aceitar uma lista não altera o estoque; somente confirmar quantidades realmente compradas cria entradas.
+- Uma refeição agendada não altera o saldo. Registro de consumo/preparo é uma ação explícita, separada de marcação visual.
+- Não converter automaticamente peso cru em cozido nem presumir validade desconhecida. Dados insuficientes geram uma previsão incompleta, identificada ao usuário.
+- Compras, consumo e estornos devem ser transacionais e idempotentes; saldos nunca podem ficar negativos. Ver regras e cenários em `docs/INVENTORY_RULES.md`.
 
 ## 4. Stack recomendada
 
@@ -84,6 +96,8 @@ Pessoas que já possuem um plano alimentar e querem organizá-lo. O sistema **n�
 
 **Observação:** validar cardinalidade, exclusão e integridade referencial antes de gerar as entidades. Evitar duplicação de informações deriváveis, exceto quando necessário para manter o histórico da lista.
 
+**Extensão aprovada:** o modelo acima era a proposta inicial. Lotes, movimentos, revisões de plano, compras e preparo estão especificados em [DOMAIN_MODEL.md](docs/DOMAIN_MODEL.md), que passa a ser a referência para as próximas migrações. A tabela atual `demo_meals` continua exclusivamente demonstrativa.
+
 ## 6. API REST proposta
 
 | Método | Rota | Função |
@@ -113,6 +127,8 @@ As rotas são **propostas iniciais**, sujeitas a refinamento. Padronizar erros, 
 5. **Lista de compras** — escolher período, gerar lista, filtrar semanal/mensal, marcar comprados.
 6. **Preparo** — consultar totais a preparar por período, com indicação de unidade e base crua/cozida.
 7. **Configurações** — preferências e fuso horário.
+8. **Meu estoque** — saldos registrados, desconhecidos, lotes, validade e ajustes.
+9. **Confirmar compra** — quantidades realmente compradas e dados dos lotes.
 
 ### Direção visual
 
@@ -149,6 +165,8 @@ Dieta Fácil/
 
 ## 9. Etapas de desenvolvimento
 
+O checklist abaixo registra as fases originais. A sequência executável revisada, incluindo estoque no MVP, está em [ROADMAP.md](docs/ROADMAP.md). Uma entrega só é concluída após cumprir seus critérios de aceite; demonstrar uma tela não conclui uma funcionalidade.
+
 ### Fase 0 — Planejamento e ambiente
 - [x] Revisar escopo e regras de negócio.
 - [x] Criar repositório Git e README.
@@ -184,7 +202,7 @@ Dieta Fácil/
 
 ## 10. Critérios de aceite do MVP
 
-O MVP está concluído quando um usuário consegue criar uma conta, cadastrar alimentos, configurar refeições recorrentes, visualizar a agenda de um dia, gerar uma lista de compras para um período, conferir os totais de preparo, marcar itens como comprados e acessar seus dados em outro dispositivo após login. Os cálculos devem passar nos testes de unidade e o sistema deve impedir acesso aos dados de outros usuários.
+O MVP está concluído quando um usuário consegue criar uma conta, cadastrar sua dieta, informar o estoque, ver a demanda até a próxima compra, gerar uma lista com faltas justificadas, confirmar compras parciais, registrar preparo/consumo sem baixa duplicada e consultar lotes e alertas de validade. Os dados devem persistir entre dispositivos após login. Devem passar os cenários de `docs/INVENTORY_RULES.md`, inclusive autorização, concorrência e quantidades desconhecidas.
 
 ### Testes essenciais de cálculo
 
@@ -199,7 +217,7 @@ O MVP está concluído quando um usuário consegue criar uma conta, cadastrar al
 
 - Aplicativo mobile (React Native/Expo, a avaliar).
 - Compartilhamento de listas e planejamento familiar.
-- Estoque doméstico e desconto automático de itens disponíveis.
+- Compartilhamento do estoque entre membros da família e planejamento conjunto.
 - Preços de supermercados e estimativa de custo.
 - Integração com profissionais de nutrição, mediante consentimento.
 - Importação de dietas, receitas e equivalências nutricionais verificadas.
@@ -222,8 +240,8 @@ O MVP está concluído quando um usuário consegue criar uma conta, cadastrar al
 
 ### Prompt para iniciar um novo chat do projeto
 
-> Quero desenvolver o **Dieta Fácil** como projeto de portfólio Full Stack e possível produto futuro. Leia integralmente o arquivo `PROJECT_SPEC.md` anexado e trate-o como documento mestre. Meu nível é básico em React e Java/Spring Boot; tenho cerca de 2 horas por dia e quero usar IA para gerar código enquanto aprendo a explicar e testar o que construo. Comece pela **Fase 0**: revise rapidamente os riscos da especificação, proponha a primeira tarefa prática e me oriente passo a passo. Não gere o projeto inteiro de uma vez. Para cada etapa, informe comandos, arquivos, código e como verificar se funcionou.
+> Continue o **Dieta Fácil**. Leia `PROJECT_SPEC.md`, `docs/ROADMAP.md` e `docs/DEVELOPMENT_LOG.md`. Verifique o estado do código e selecione a primeira entrega pendente, respeitando suas dependências. Quero entregas funcionais com uma explicação breve para aprender React e Java/Spring Boot. Não implemente todo o backlog de uma vez. Informe alterações, validações e limitações reais.
 
 ---
 
-**Status:** especificação inicial — pronta para ser revisada e implementada incrementalmente.
+**Status:** base demonstrativa implementada; evolução com estoque planejada, ainda não implementada. Próxima entrega: E02 — autenticação e isolamento.

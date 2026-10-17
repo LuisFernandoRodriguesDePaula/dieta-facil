@@ -17,4 +17,10 @@ O navegador executa React e consulta `/api/demo/schedule`. Durante o desenvolvim
 
 `demo_meals` é uma tabela de exemplo, não o modelo definitivo do domínio. Seus itens são textos para apresentação; não são usados para cálculo. O modelo normalizado de usuários, alimentos, planos, dias e itens será implementado em migrações posteriores. Não calcular compras a partir desses textos.
 
-Antes de CRUD pessoal: Spring Security, sessão com cookie HttpOnly, CSRF, validação e autorização de propriedade. A escolha exata será documentada em uma decisão própria antes da implementação. A API atual não está pronta para exposição pública.
+Antes de CRUD pessoal: Spring Security, sessão com cookie HttpOnly, CSRF, validação e autorização de propriedade. A decisão para implementação está em ADR-001, abaixo. A API atual não está pronta para exposição pública.
+
+## Evolução planejada em 2026-10-16
+
+A decisão de acesso está em [ADR-001](decisions/ADR-001-auth-and-modules.md). O back-end evoluirá como monólito modular, sem IA nos cálculos, conforme [modelo de domínio](DOMAIN_MODEL.md). O banco atual ainda não contém essas entidades.
+
+O fluxo planejado é dieta -> projeção de demanda com estoque -> lista -> recebimento real -> lote/movimento -> preparo/consumo. Projeções nunca alteram saldos. Idempotência, transações e histórico de movimentos evitam duplicidade. Detalhes e cenários de teste estão em [INVENTORY_RULES.md](INVENTORY_RULES.md); a ordem de implementação está em [ROADMAP.md](ROADMAP.md).
