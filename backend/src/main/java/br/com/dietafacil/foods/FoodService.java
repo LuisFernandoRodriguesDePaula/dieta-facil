@@ -14,7 +14,8 @@ import org.springframework.web.server.ResponseStatusException;
 public class FoodService {
     private final FoodRepository foods;
     private final AuthService users;
-    public FoodService(FoodRepository foods, AuthService users) { this.foods = foods; this.users = users; }
+    private final br.com.dietafacil.domain.DomainAccess access;
+    public FoodService(FoodRepository foods, AuthService users, br.com.dietafacil.domain.DomainAccess access) { this.foods = foods; this.users = users; this.access=access; }
     private UUID owner(String email) { return users.currentUser(email).getId(); }
     private Food owned(String email, UUID id) {
         return foods.findByIdAndUserId(id, owner(email)).orElseThrow(() ->
@@ -38,12 +39,13 @@ public class FoodService {
 
     @Transactional
     public FoodDtos.View create(String email, FoodDtos.Create input) {
-        var food = new Food(owner(email), name(input.name()), input.unit(), input.category(), input.purchaseFrequency());
+        var food = new Food(access.lock(email), name(input.name()), input.unit(), input.category(), input.purchaseFrequency());
         return FoodDtos.View.from(foods.saveAndFlush(food));
     }
 
     @Transactional
     public FoodDtos.View update(String email, UUID id, FoodDtos.Update input) {
+        access.lock(email);
         var food = owned(email, id);
         checkVersion(food, input.version());
         if (food.getArchivedAt() != null) throw new ResponseStatusException(HttpStatus.CONFLICT, "Restaure o alimento antes de editar.");
@@ -55,6 +57,7 @@ public class FoodService {
 
     @Transactional
     public FoodDtos.View archive(String email, UUID id, FoodDtos.Archive input) {
+        access.lock(email);
         var food = owned(email, id);
         checkVersion(food, input.version());
         if ((food.getArchivedAt() != null) != input.archived()) food.setArchived(input.archived());
@@ -73,3 +76,4 @@ public class FoodService {
         }
     }
 }
+

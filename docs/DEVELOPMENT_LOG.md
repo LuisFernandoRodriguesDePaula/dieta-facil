@@ -63,3 +63,9 @@ Decisão ADR-002 registra JDBC no novo domínio, compartilhando transações com
 Rotas pessoais /conta/dieta e /conta/agenda conectadas à API: refeições com horário/dias, duplicação, itens do catálogo, quantidades, unidades e referência; consulta por data e marcação/desmarcação de refeição pulada. Refeições vazias e dias ausentes são bloqueados. A conta oferece acesso às novas telas.
 
 Validação: build TypeScript/Vite e 13 testes de interface aprovados, incluindo criação de revisão e refeição pulada sem chamada de estoque. A revisão visual em navegador e a jornada integrada serão realizadas antes de declarar a versão demonstrável concluída. Recuperação de senha e abertura pública continuam fora desta entrega.
+
+## 2026-10-17 — E05/E08: estoque transacional
+
+Migração V5, lotes por alimento/estado, saldo conhecido/parcial/desconhecido, armazenamento, validade com origem e datas de abertura/preparo. Entradas, descartes, preparo medido RAW → COOKED, consumo de ocorrência e estorno geram movimentos imutáveis. Repetição de chave com os mesmos dados retorna a operação existente; dados diferentes são rejeitados. Escritas são serializadas por conta, incluindo alterações do catálogo. Não há prazo de conservação inventado nem conversão automática de rendimento.
+
+Validação: quatro testes de estoque passaram no PostgreSQL e no H2. Cobrem repetição, conflito de chave, preparo seguido de consumo sem nova baixa do cru, reversão bloqueada por saldo insuficiente, reversão após estornar consumo, isolamento entre contas, rollback integral e FEFO com lotes vencidos/sem validade. Interface ainda em integração; validação HTTP completa e navegador ficam para a conclusão da jornada demonstrável.
