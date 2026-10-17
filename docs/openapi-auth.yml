@@ -1,0 +1,135 @@
+openapi: 3.0.3
+info:
+  title: Dieta Fácil — Acesso e perfil
+  version: 0.2.0
+  description: >-
+    Contrato E02. Antes de cada escrita, consultar /api/auth/csrf,
+    manter o cookie de sessão e enviar o token no cabeçalho informado.
+    Cadastro não autentica. Login/logout invalidam o token CSRF anterior.
+servers:
+  - url: http://127.0.0.1:8080
+paths:
+  /api/auth/csrf:
+    get:
+      summary: Obter token CSRF vinculado à sessão
+      responses:
+        '200':
+          description: Token para X-CSRF-TOKEN; resposta pode criar cookie JSESSIONID
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [token, headerName]
+                properties:
+                  token: {type: string}
+                  headerName: {type: string, example: X-CSRF-TOKEN}
+  /api/auth/register:
+    post:
+      summary: Criar conta sem iniciar sessão autenticada
+      security: [{csrf: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password, timezone]
+              properties:
+                name: {type: string, minLength: 1, maxLength: 100}
+                email: {type: string, format: email, maxLength: 254}
+                password:
+                  type: string
+                  format: password
+                  minLength: 10
+                  maxLength: 72
+                  description: Máximo adicional de 72 bytes UTF-8; nunca truncada
+                timezone: {type: string, maxLength: 100, example: America/Sao_Paulo}
+      responses:
+        '201': {$ref: '#/components/responses/Profile'}
+        '400': {$ref: '#/components/responses/Error'}
+        '403': {$ref: '#/components/responses/Error'}
+        '409': {$ref: '#/components/responses/Error'}
+  /api/auth/login:
+    post:
+      summary: Autenticar e renovar sessão
+      security: [{csrf: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: {type: string, format: email, maxLength: 254}
+                password: {type: string, format: password, minLength: 1, maxLength: 72}
+      responses:
+        '200': {$ref: '#/components/responses/Profile'}
+        '400': {$ref: '#/components/responses/Error'}
+        '401': {$ref: '#/components/responses/Error'}
+        '403': {$ref: '#/components/responses/Error'}
+  /api/auth/logout:
+    post:
+      summary: Invalidar sessão e remover cookie
+      security: [{csrf: []}]
+      responses:
+        '204': {description: Sessão encerrada; corpo vazio}
+        '403': {$ref: '#/components/responses/Error'}
+  /api/me:
+    get:
+      summary: Consultar somente o próprio perfil
+      security: [{session: []}]
+      responses:
+        '200': {$ref: '#/components/responses/Profile'}
+        '401': {$ref: '#/components/responses/Error'}
+    patch:
+      summary: Atualizar nome e fuso do próprio perfil
+      security: [{session: [], csrf: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, timezone]
+              properties:
+                name: {type: string, minLength: 1, maxLength: 100}
+                timezone: {type: string, maxLength: 100, example: America/Manaus}
+      responses:
+        '200': {$ref: '#/components/responses/Profile'}
+        '400': {$ref: '#/components/responses/Error'}
+        '401': {$ref: '#/components/responses/Error'}
+        '403': {$ref: '#/components/responses/Error'}
+components:
+  securitySchemes:
+    session: {type: apiKey, in: cookie, name: JSESSIONID}
+    csrf: {type: apiKey, in: header, name: X-CSRF-TOKEN}
+  schemas:
+    Profile:
+      type: object
+      required: [id, name, email, timezone]
+      properties:
+        id: {type: string, format: uuid}
+        name: {type: string}
+        email: {type: string, format: email}
+        timezone: {type: string}
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code: {type: string}
+        message: {type: string}
+        fields:
+          type: object
+          additionalProperties: {type: string}
+  responses:
+    Profile:
+      description: Perfil público da própria conta; nunca contém senha ou hash
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Profile'}
+    Error:
+      description: Erro de validação, credenciais, CSRF ou conflito
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Error'}

@@ -2,7 +2,7 @@
 
 Planejamento alimentar que transforma um plano já definido em uma rotina de refeições, compras e preparo. Projeto de portfólio Full Stack construído em entregas pequenas e documentadas.
 
-**Status: base local funcional.** Ainda não é o MVP completo. Os dados são fictícios e não constituem recomendação alimentar.
+**Status: base local funcional com cadastro, login e perfil pessoal.** Ainda não é o MVP completo. Os dados são fictícios e não constituem recomendação alimentar.
 
 ![Painel da primeira entrega](docs/images/dashboard.png)
 
@@ -15,7 +15,7 @@ Planejamento alimentar que transforma um plano já definido em uma rotina de ref
 - Páginas explicativas para compras e preparo, ainda sem cálculos.
 - Migração Flyway, persistência JPA, teste de integração e verificação de saúde.
 
-Não há autenticação, cadastro, edição nem isolamento por usuário nesta etapa. A API só oferece leitura de dados fictícios e escuta em loopback. Não utilizar com dados pessoais nem expor como aplicação de produção.
+A entrega E02 adiciona cadastro, login, logout e edição do próprio perfil, com sessão HttpOnly, CSRF e hash de senha. A demonstração continua pública e separada da conta. O catálogo pessoal, dieta e estoque ainda não estão implementados. Use dados de teste: recuperação de acesso e preparação para produção serão tratadas antes da abertura pública.
 
 ## Tecnologias
 
@@ -56,6 +56,7 @@ Alternativa com Docker instalado: copie `.env.example` para `.env`, defina sua s
 ```powershell
 cd frontend
 npm.cmd run build
+npm.cmd test
 cd ..\backend
 .\mvnw.cmd -B -ntp test
 ```
@@ -76,4 +77,14 @@ Veja [arquitetura](docs/ARCHITECTURE.md), [API](docs/API.md) e [diário](docs/DE
 
 O planejamento foi revisado para incluir estoque, lotes, reposição por cobertura e validade informada no MVP. Esses recursos ainda não estão implementados. Consulte [plano de evolução](docs/ROADMAP.md), [regras de estoque e compras](docs/INVENTORY_RULES.md), [modelo de domínio](docs/DOMAIN_MODEL.md) e [decisão de autenticação](docs/decisions/ADR-001-auth-and-modules.md).
 
-Próxima entrega: E02 — cadastro, login, logout e isolamento de dados por usuário. Depois: catálogo, dieta, estoque, compras, consumo/preparo e alertas. A aplicação não usará IA para calcular quantidades ou estimar prazos de conservação.
+Próxima entrega: E03 — catálogo pessoal e unidades. Depois: dieta, estoque, compras, consumo/preparo e alertas. A aplicação não usará IA para calcular quantidades ou estimar prazos de conservação.
+
+## Acesso pessoal (E02)
+
+Abra `/cadastro` para criar uma conta de teste, depois `/entrar` para autenticar. `/conta` permite alterar nome e fuso horário ou sair. O e-mail não é editável nesta entrega. Senha: mínimo de 10 caracteres, máximo de 72 bytes UTF-8 (limite do BCrypt). A API aceita fusos reconhecidos pelo Java, por exemplo America/Sao_Paulo.
+
+A sessão expira após 30 minutos sem atividade e é perdida ao reiniciar o back-end. Em produção, ativar o perfil `prod` e servir por HTTPS: o cookie passa a exigir Secure. Isso ainda não é uma implantação de produção, nem um sistema completo de gestão de contas (sem recuperação de senha/verificação de e-mail nesta etapa).
+
+![Tela de acesso](docs/images/login.png)
+
+Validação E02: seis testes Java no fluxo padrão, cinco testes de interface e quatro testes HTTP de autenticação executados também no PostgreSQL local. Os testes de interface usam respostas simuladas; os testes Java iniciam servidor HTTP real. O teste do cookie de produção verifica os atributos Secure/HttpOnly/SameSite, sem simular um deploy TLS. Login, edição e logout foram conferidos no navegador; cadastro foi exercitado pelos testes HTTP e de interface. Layout de cadastro revisado em viewport de 390 pixels, sem teste em aparelho físico.

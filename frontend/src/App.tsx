@@ -146,6 +146,13 @@ export default function App() {
             </NavLink>
           ))}
         </nav>
+        <NavLink
+          className="mobile-account-link"
+          to="/conta"
+          onClick={() => setMenuOpen(false)}
+        >
+          Minha conta <ArrowRight size={16} />
+        </NavLink>
         <div className="sidebar-note">
           <Leaf size={22} />
           <strong>Um passo de cada vez.</strong>
@@ -162,10 +169,15 @@ export default function App() {
       <div className="main-shell">
         <header className="topbar">
           <span>Seu planejamento alimentar, mais simples.</span>
-          <NavLink to="/sobre">
-            <CircleHelp size={18} />
-            Sobre a demonstração
-          </NavLink>
+          <div className="session-links">
+            <NavLink to="/sobre">
+              <CircleHelp size={18} />
+              Sobre a demonstração
+            </NavLink>
+            <NavLink className="account-link" to="/conta">
+              Minha conta <ArrowRight size={16} />
+            </NavLink>
+          </div>
         </header>
         <main>
           <div className="demo-banner">
@@ -458,8 +470,9 @@ export default function App() {
                     <p>
                       {schedule.data?.notice ??
                         "Todos os alimentos e refeições são exemplos de demonstração."}{" "}
-                      Não cadastre dados pessoais nesta versão. Ela ainda não
-                      possui autenticação.
+                      A área Minha conta já permite cadastro e acesso pessoal.
+                      Este plano de demonstração é público e continua separado
+                      da sua conta.
                     </p>
                   </div>
                 </>

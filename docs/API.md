@@ -20,11 +20,11 @@ O exemplo abrevia a lista. Não recebe parâmetros de data: o plano é fixo e de
 
 Verifica a aplicação e sua conexão com o banco. Retorna `status: UP` quando saudável. Não expõe detalhes de conexão.
 
-As demais rotas do documento mestre são propostas futuras. Não existem endpoints de escrita, login ou geração de compras nesta entrega.
+A E02 adicionou os endpoints de autenticação e perfil descritos abaixo. Geração de compras, estoque e preparo permanecem propostas futuras.
 
-## Contratos planejados — não implementados
+## Autenticação implementada (E02) e próximos contratos
 
-As rotas abaixo orientam as próximas entregas. Contratos JSON completos e OpenAPI serão adicionados junto com a implementação e seus testes.
+As rotas E02 abaixo estão implementadas. As rotas E05 em diante ainda não existem. O contrato OpenAPI de acesso está em [openapi-auth.yml](openapi-auth.yml).
 
 | Entrega | Método/rota propostos | Efeito |
 |---|---|---|
@@ -43,8 +43,8 @@ As rotas abaixo orientam as próximas entregas. Contratos JSON completos e OpenA
 | E08 | POST /api/preparations | Transformar lotes de entrada em lote preparado |
 | E07–E08 | POST /api/stock-operations/{id}/reversal | Estorno validado, sem apagar histórico |
 
-E02: cadastro recebe nome/e-mail/senha/fuso e retorna 201 sem sessão automática; login recebe credenciais e retorna 200 com perfil e cookie, nunca senha/hash; logout retorna 204; sessão ausente em recurso protegido retorna 401, CSRF inválido retorna 403. Duplicidade de e-mail e conflito de versão retornam 409; validação retorna 400. Erros de propriedade não revelam dados do outro usuário. Confirmar detalhes contra Spring Security durante E02.
+E02: cadastro recebe nome/e-mail/senha/fuso e retorna 201 sem sessão automática; login recebe credenciais e retorna 200 com perfil e cookie, nunca senha/hash; logout retorna 204; sessão ausente em recurso protegido retorna 401, CSRF inválido retorna 403. Duplicidade de e-mail e conflito de versão retornam 409; validação retorna 400. Erros de propriedade não revelam dados do outro usuário. CSRF é obtido por GET /api/auth/csrf; enviar o campo token no cabeçalho indicado por headerName. Após login/logout, obter um novo token. Requisições devem manter o cookie da sessão.
 
 Compras, ajustes, consumo, preparo e estorno exigem `Idempotency-Key`; mesma chave/payload reproduz o resultado, payload diferente retorna 409. Versão do recurso é revalidada antes da mutação. Quantidades decimais serão transmitidas como strings para evitar perda de precisão no JavaScript e normalizadas no servidor. Datas de calendário usam ISO YYYY-MM-DD; instantes usam UTC com offset explícito.
 
-Erros usarão formato consistente com código de negócio, mensagem, campos inválidos e identificador de correlação, sem stack trace/segredos. A autorização é sempre derivada da sessão, inclusive para relações entre IDs presentes no corpo.
+Erros E02 usam code/message e, quando aplicável, fields, sem stack trace ou senha/hash. Identificador de correlação permanece pendente para observabilidade antes da abertura pública. A autorização é sempre derivada da sessão, inclusive para relações entre IDs presentes no corpo.

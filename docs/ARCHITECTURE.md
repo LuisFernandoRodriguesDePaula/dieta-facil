@@ -24,3 +24,9 @@ Antes de CRUD pessoal: Spring Security, sessão com cookie HttpOnly, CSRF, valid
 A decisão de acesso está em [ADR-001](decisions/ADR-001-auth-and-modules.md). O back-end evoluirá como monólito modular, sem IA nos cálculos, conforme [modelo de domínio](DOMAIN_MODEL.md). O banco atual ainda não contém essas entidades.
 
 O fluxo planejado é dieta -> projeção de demanda com estoque -> lista -> recebimento real -> lote/movimento -> preparo/consumo. Projeções nunca alteram saldos. Idempotência, transações e histórico de movimentos evitam duplicidade. Detalhes e cenários de teste estão em [INVENTORY_RULES.md](INVENTORY_RULES.md); a ordem de implementação está em [ROADMAP.md](ROADMAP.md).
+
+## E02 implementada
+
+Migração V2 cria users. AuthService valida fuso e limite em bytes da senha, normaliza e-mail e retorna somente DTOs de perfil. Spring Security usa BCrypt, sessão em memória e proteção CSRF. O login JSON autentica pelo AuthenticationManager, executa a estratégia de renovação de sessão/CSRF e salva explicitamente o SecurityContext. O logout usa o filtro do Spring Security.
+
+A interface usa React Hook Form/Zod e cliente HTTP compartilhado com obtenção de CSRF antes de mutações. Erros de conexão não são tratados como ausência de sessão. Dados da conta são removidos do cache ao sair ou receber 401 em alteração de perfil. Cadastro não inicia sessão automaticamente. /api/me sempre deriva a identidade da sessão; não oferece consulta por ID fornecido pelo cliente. Revalidar autorização ao criar novos módulos.

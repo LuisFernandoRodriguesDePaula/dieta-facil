@@ -27,3 +27,13 @@ Decisões: cadastrar dieta manualmente; diferenciar saldo conhecido/zero/desconh
 Esta etapa altera apenas documentação. Nenhuma tabela, API ou funcionalidade de estoque/autenticação foi implementada. Validação: revisão de consistência e links locais, diff sem erros de whitespace; não é necessário repetir build/testes da aplicação por mudança exclusiva de Markdown.
 
 Próxima tarefa executável: E02, começando pela migração de usuário/perfil e pelo contrato HTTP de autenticação. Detalhes em ROADMAP.md.
+
+## 2026-10-16 — E02: cadastro, acesso e perfil
+
+Implementado: migração users; cadastro com e-mail normalizado, senha BCrypt e validação de fuso; login JSON, renovação de sessão/CSRF, logout e perfil GET/PATCH vinculado à sessão. Cookie HttpOnly/SameSite=Lax; perfil prod exige Secure. Interface de cadastro/login/conta com formulários validados, erros, sessão ausente/expirada e limpeza do cache pessoal.
+
+Validação: seis testes Java passaram no fluxo padrão; cinco testes de interface passaram; build de produção passou. Quatro testes HTTP de autenticação passaram também com PostgreSQL 17 local, aplicando V2. Casos incluem duas contas, persistência entre logins, senha em hash, CSRF ausente/antigo, login inválido, e-mail duplicado, fuso inválido, senha Unicode acima de 72 bytes, logout e cookie de sessão inválido. A expiração temporal de 30 minutos não foi aguardada: o tratamento foi testado por 401 e cookie inválido. Perfil prod validou flags de cookie, não TLS real.
+
+No navegador, login com conta fictícia criada pelos testes, atualização de nome e logout funcionaram. Formulário de cadastro revisado no desktop e em frame com viewport de 390 px, sem aparelho físico. Conta fictícia usa domínio example.invalid; screenshots não contêm dados pessoais reais. Nenhuma senha/cookie foi adicionada ao repositório.
+
+Limites: sem recuperação de senha, verificação de e-mail ou mitigação completa de abuso para abertura pública. Sessões em memória são perdidas ao reiniciar. Catálogo/dieta/estoque pessoais ainda não existem. Próxima entrega: E03, catálogo pessoal e conversões de unidades.

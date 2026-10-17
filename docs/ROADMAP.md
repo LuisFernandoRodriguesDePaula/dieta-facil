@@ -16,8 +16,8 @@ Revisão de 2026-10-16. Este backlog substitui a ordem genérica da especificaç
 |---|---|---|---|
 | E01 | Base React + API Java + PostgreSQL + CI | — | Concluída, demonstração local |
 | P01 | Regras, modelo e plano revisados com estoque | E01 | Documentado nesta revisão |
-| E02 | Conta, login, logout e isolamento | P01 | Próxima |
-| E03 | Catálogo pessoal e unidades | E02 | Pendente |
+| E02 | Conta, login, logout e isolamento | P01 | Concluída, ambiente local |
+| E03 | Catálogo pessoal e unidades | E02 | Próxima |
 | E04 | Dieta manual e agenda recorrente | E03 | Pendente |
 | E05 | Estoque inicial, lotes e ajustes | E03 | Pendente |
 | E06 | Demanda, cobertura e lista de compras | E04 + E05 | Pendente |
@@ -34,12 +34,12 @@ Objetivo: uma conta acessa apenas seu perfil e futuras informações pessoais.
 
 Tarefas em ordem:
 
-- [ ] Criar migração de users e camada de perfil, com e-mail único e fuso válido.
-- [ ] Configurar Spring Security, hash de senha, sessão, CSRF e respostas JSON; seguir ADR-001.
-- [ ] Implementar register/login/logout/me/csrf e validações; não devolver hash nem dados internos.
-- [ ] Implementar telas de acesso, estados de erro e rota protegida; tratar sessão expirada.
-- [ ] Testar autenticação HTTP real, CSRF, logout, cookie e acesso com duas contas.
-- [ ] Atualizar documentação, validar build/CI e registrar entrega.
+- [x] Criar migração de users e camada de perfil, com e-mail único e fuso válido.
+- [x] Configurar Spring Security, hash de senha, sessão, CSRF e respostas JSON; seguir ADR-001.
+- [x] Implementar register/login/logout/me/csrf e validações; não devolver hash nem dados internos.
+- [x] Implementar telas de acesso, estados de erro e rota protegida; tratar sessão expirada.
+- [x] Testar autenticação HTTP real, CSRF, logout, cookie e acesso com duas contas.
+- [x] Atualizar documentação, validar build/CI e registrar entrega.
 
 Arquivos previstos: migração V2, módulo `auth`/`profile`, configuração de segurança, cliente HTTP React e telas/formulários. Introduzir somente dependências necessárias: Spring Security, React Hook Form/Zod e ferramentas de teste de interface quando houver comportamento a validar.
 
@@ -129,4 +129,4 @@ Uma sessão deve ter um objetivo, uma verificação proporcional e um registro d
 
 ## Decisões assumidas, revisáveis sem bloquear o início
 
-Interface pt-BR; estoque individual; entrada manual da dieta; ciclo sugerido de sete dias; validade opcional; aviso de proximidade padrão três dias; sem rendimento automático; sem funções pagas de terceiros. Preferências serão ajustáveis pelo usuário. Não há dúvida de produto bloqueando E02.
+Interface pt-BR; estoque individual; entrada manual da dieta; ciclo sugerido de sete dias; validade opcional; aviso de proximidade padrão três dias; sem rendimento automático; sem funções pagas de terceiros. Preferências serão ajustáveis pelo usuário. E02 concluída. Não há dúvida de produto bloqueando E03.

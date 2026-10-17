@@ -1,6 +1,6 @@
 # ADR-001 — Sessão e monólito modular
 
-Data: 2026-10-16. Estado: decisão de projeto para E02, ainda não implementada.
+Data: 2026-10-16. Estado: implementada na E02, ambiente local; revisão de produção permanece na E10.
 
 ## Contexto
 
