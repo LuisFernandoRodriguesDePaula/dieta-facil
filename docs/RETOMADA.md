@@ -43,3 +43,15 @@ Regras podem ficar bloqueadas. A porção original faz parte da configuração: 
 42 testes Java passaram no PostgreSQL de testes separado dieta_facil_test; não executar testes de API contra o banco pessoal nem em paralelo usando a mesma base da demonstração. 18 testes da interface, build e lint passaram. A jornada de navegador foi ampliada para 12 casos em computador/viewport móvel, incluindo troca e desfazer; consultar a CI do último push para a validação final H2/PostgreSQL/navegador/Docker.
 
 O script demo:hypertrophy adicionou três regras ilustrativas ausentes à conta fictícia já existente. Nenhuma dieta, refeição ou quantidade de estoque foi alterada nessa conta. As credenciais permanecem no arquivo privado anterior. A publicação externa segue pendente das contas gratuitas do proprietário; o Portfólio continua separado.
+
+## Atualização prioritária — modelo 1.0 com acompanhamento profissional (V11)
+
+A orientação mais recente é preparar uma primeira versão para um nutricionista testar com dados fictícios e devolver feedback. O cliente consulta dieta/horários e alternativas autorizadas, sem montar refeições ou preencher avaliações. Registrar Já comi é opcional. O nutricionista vinculado edita a dieta, o catálogo e as alternativas do cliente e registra avaliações mensais.
+
+Rotas: /profissional (clientes), /profissional/clientes/:id (catálogo, dieta e avaliações), /conta/dieta, /conta/resultados, /conta/nutricionista (convite/aceite/revogação), /conta/premium (plano/estoque opcional). O cliente não pode habilitar edição por query string. Restrições também valem na API. Convites são internos, sem envio de e-mail, por sete dias; exigem conta do cliente no mesmo e-mail e aceite. Revogação preserva dieta e resultados. Perfis profissionais ainda são autodeclarados na demonstração.
+
+Contas novas: CLIENT por padrão, BASIC e estoque desativado. Migração preservou Premium/estoque das contas antigas sem zerar saldos. Apenas a conta fictícia de hipertrofia foi explicitamente colocada no Básico. Ativar estoque exige conferência; desativar congela saldos. Não há baixa retroativa. Check-ins guardam modo ONLY/INVENTORY, repetição segura e estorno compatível com o modo original. Simular plano é permitido apenas fora de prod e não contrata nada.
+
+Execute `npm run demo:care` (demo:hypertrophy é um alias). Cliente reutilizado: `.local/demo-hypertrophy.json`; profissional separado: `.local/demo-professional.json`. O script preserva dieta, estoque, regras e avaliações já existentes e só completa exemplos ausentes. Foram cadastradas duas avaliações fictícias em meses distintos. Não modificar o projeto Portfólio. Roteiro para o teste: V1_VALIDATION.md.
+
+Validação desta etapa: 45 testes Java aprovados no PostgreSQL isolado, 18 testes da interface, build/lint e jornada nova em computador/celular. A suíte de navegador foi ampliada para 14 casos. Conferir a CI do commit final para o resultado completo H2/PostgreSQL/navegador/Docker. Credenciais, arquivos de e-mail, banco e capturas privadas continuam somente em .local/.

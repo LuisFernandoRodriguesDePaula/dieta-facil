@@ -42,3 +42,13 @@ O editor de revisões fica separado dos cartões de uso diário. SubstitutionSer
 Exceções por dia ficam em meal_overrides e são mescladas à dieta vigente antes dos snapshots consumidos/pulados. A projeção usa essas ocorrências e inclui as exceções no hash de origem. Troca recorrente salva revisão; revisões futuras previamente agendadas mantêm prioridade. Desfazer verifica estado atual/versão e não movimenta estoque; estorno de consumo mantém a exceção de refeição.
 
 Não há comparação automática de calorias/proteína nem equivalência entre alimentos. Saldos exibidos são registros por alimento/estado, sem reserva e sem garantir conservação.
+
+## Modelo profissional e recursos (V11)
+
+CLIENT consulta seu plano e resultados; NUTRITIONIST opera sobre clientes com vínculo aceito e ativo. O profissional não assume a sessão do cliente: endpoints com clientId verificam a relação e executam os serviços existentes sobre o proprietário correto. Escritas e revogação bloqueiam a mesma conta do cliente. Projeções de estoque não são expostas ao profissional por esses endpoints.
+
+Permissão de plano e ativação efetiva do estoque são estados separados. O filtro HTTP bloqueia recursos desativados e edições do cliente. Escritas de estoque/compras verificam novamente a ativação dentro da transação, sob o bloqueio da conta. Migração preserva saldos e acesso dos usuários antigos; novos usuários começam no Básico.
+
+Check-ins persistem o modo ONLY/INVENTORY. ONLY grava snapshot de refeição sem qualquer movimento; INVENTORY usa o serviço existente de consumo. O estorno respeita o modo original. Ativação não reconcilia ou baixa refeições antigas e exige conferência explícita dos saldos.
+
+Avaliações pertencem ao cliente, com autor e versão; um registro por mês. Revogar acesso profissional preserva os dados. Remover profissional anula a referência do autor e preserva o nome; remover cliente elimina suas avaliações. Não há auditoria clínica completa ou verificação de registro profissional nesta versão de validação.

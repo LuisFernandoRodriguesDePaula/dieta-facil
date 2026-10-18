@@ -146,3 +146,15 @@ Interface pt-BR; estoque individual; entrada manual da dieta; ciclo sugerido de 
 - [x] Desfazer com validação de estado e versão; confirmação/estorno de consumo.
 - [x] Exceções refletidas na demanda e na sinalização de compras desatualizadas.
 - [x] Painel lateral/inferior, teclado, verificações axe e jornadas em dois tamanhos de tela.
+
+## Entrega de validação 1.0
+
+- [x] Área de nutricionista e área de cliente; convites internos, aceite e revogação.
+- [x] Catálogo, plano e alternativas editados pelo profissional vinculado; consulta pelo cliente.
+- [x] Resultados mensais registrados pelo profissional, com medidas opcionais e histórico.
+- [x] Básico sem estoque; Premium com controle opcional, saldos preservados e conferência ao reativar.
+- [x] Registro opcional de refeição separado da baixa de estoque, sem desconto retroativo.
+- [x] Duas contas fictícias e roteiro V1_VALIDATION.md para feedback.
+- [ ] Receber feedback de um nutricionista e priorizar a próxima revisão.
+- [ ] Antes de uso clínico real: identidade profissional, auditoria e operação/retenção de dados definidas.
+

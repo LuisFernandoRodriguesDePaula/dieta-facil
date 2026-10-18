@@ -107,3 +107,13 @@ V10 adiciona regras por refeição/alimento/estado/porção, exceções por dia 
 Exceções atualizam a demanda de compras e a sinalização de lista desatualizada. O estoque muda somente na confirmação de consumo; estorno devolve os lotes e preserva a exceção. Exclusão de conta remove também as novas tabelas. Regras ilustrativas foram adicionadas somente à conta fictícia existente, sem trocar alimentos ou movimentar estoque; dados pessoais preservados.
 
 Validação: 42 testes Java aprovados no PostgreSQL isolado; 18 testes de interface, build e lint aprovados. Jornada nova validada em computador e viewport móvel, incluindo configuração, troca única/recorrente, desfazer e consumo. Verificação axe nos painéis de configuração/escolha sem violações nos critérios automatizados; sem auditoria completa ou aparelho físico. A CI do commit final executa as suítes completas e o pacote Docker.
+
+## 2026-10-18 — Modelo 1.0: nutricionista prepara, cliente consulta
+
+O usuário aprovou a primeira versão para avaliação por um nutricionista. V11 separa CLIENT/NUTRITIONIST, Básico/Premium e ativação efetiva do estoque. Contas novas começam em Básico com estoque desativado. A migração preserva o acesso Premium e os saldos das contas preexistentes; nenhum saldo é zerado. A conta fictícia foi colocada explicitamente no Básico para demonstrar a nova experiência.
+
+Implementados convites internos por e-mail de cadastro, aceite e revogação pelo cliente, um vínculo profissional ativo por cliente e escopo por cliente em todas as operações profissionais. O cliente não edita dieta, catálogo ou regras e só pode escolher substituições ONCE. O nutricionista vinculado monta catálogo, dieta, alternativas e avaliações mensais com peso, medidas opcionais e observações. Resultados são somente leitura para o cliente. Acesso profissional não inclui estoque ou diário de compras.
+
+O registro opcional Já comi usa as porções do plano, sem formulário no Básico. Sem estoque ativo, persiste o registro e não movimenta ingredientes. Com estoque ativo, exige confirmação e realiza a baixa; o modo fica registrado para o estorno não criar saldo indevido após uma mudança de plano. Reativação exige conferência de saldos e não baixa refeições retroativamente. Escritas antigas de estoque/compras também conferem a permissão sob o bloqueio transacional da conta, além do filtro HTTP.
+
+Simulação de plano e cargas fictícias existem somente fora de prod. Nenhum checkout, cobrança ou serviço externo foi contratado. Cadastro profissional é um perfil autodeclarado para a demonstração; não foi implementada verificação de registro profissional. O roteiro de avaliação está em V1_VALIDATION.md. A publicação externa e o projeto Portfólio continuam separados.

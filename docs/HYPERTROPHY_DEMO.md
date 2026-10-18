@@ -29,3 +29,7 @@ Para entrar, abra esse arquivo local e copie o e-mail e a senha para a tela /ent
 ## Alternativas para demonstrar a interface
 
 O script de carga acrescenta somente regras ainda ausentes na conta fictícia: no café, ovos podem ser trocados por 90 g de frango preparado; no almoço, frango por 90 g de carne preparada; no jantar, carne por 90 g de frango preparado. Esses pares e porções servem para experimentar a funcionalidade; não são equivalências nutricionais calculadas ou recomendações individuais. Regras existentes são preservadas.
+
+## Atualização 1.0
+
+O comando demo:hypertrophy é um alias de demo:care. Além de reutilizar a conta fictícia anterior, prepara um nutricionista separado e duas avaliações ilustrativas. O cliente de demonstração fica no Básico e consulta a dieta; o profissional vinculado configura as opções. Saldos e dieta existentes são preservados. Veja V1_VALIDATION.md.

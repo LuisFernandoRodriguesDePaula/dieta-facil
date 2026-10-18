@@ -56,3 +56,11 @@ Em Trocar alimento, escolha o ingrediente e uma alternativa previamente cadastra
 Escolha Só nesta refeição ou Nesta e nas próximas (até a próxima revisão agendada). A mensagem de sucesso oferece Desfazer. Confirmar consumo abre a conferência de porções e só então baixa o estoque; o Desfazer desse registro devolve o estoque.
 
 No exemplo de hipertrofia, executar `npm run demo:hypertrophy` também cadastra alternativas ilustrativas que ainda não existem nessa conta separada: ovos → frango no café, frango → carne no almoço e carne → frango no jantar. São porções de demonstração, sem afirmar equivalência nutricional. Não substitui regras já configuradas nem altera estoque/dieta pessoal.
+
+## Versão 1.0 para feedback profissional
+
+O fluxo principal mudou para nutricionista → convite/aceite → catálogo/dieta/alternativas → consulta pelo cliente → avaliações mensais. Ver V1_VALIDATION.md. O cliente não usa mais o editor de dieta ou catálogo. O registro opcional Já comi no Básico não pede porções nem movimenta estoque.
+
+`npm run demo:care` prepara as duas contas de exemplo. `demo:hypertrophy` é um alias para o mesmo roteiro. A conta fictícia anterior e seus saldos são preservados; é explicitamente colocada no Básico, com estoque congelado. Credenciais do profissional ficam em .local/demo-professional.json. Use perfis de navegador separados para testar simultaneamente.
+
+Os recursos Premium podem ser simulados somente na demonstração local; não há cobrança. Ao ativar controle, confirme os saldos preservados. Não são descontadas refeições anteriores. A publicação pública continua pendente da configuração externa.

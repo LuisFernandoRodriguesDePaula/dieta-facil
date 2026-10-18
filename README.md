@@ -2,12 +2,16 @@
 
 Aplicativo de planejamento alimentar que conecta uma dieta já definida ao estoque doméstico, às compras e ao preparo. Interface em português para computador e celular, com React, Java/Spring Boot e PostgreSQL.
 
-**Versão demonstrável local.** O fluxo pessoal já funciona: cadastro → catálogo → dieta → agenda → estoque → compras → preparo e consumo. A demonstração usa dados fictícios e não prescreve alimentação. Publicação preparada em Docker/Render, aguardando ativação das contas externas. Veja docs/DEPLOYMENT.md; a integração com o Portfólio fica após validar a URL real.
+**Versão 1.0 demonstrável local para feedback de um nutricionista.** O profissional convida o cliente, aguarda o aceite, prepara dieta/alternativas e registra avaliações mensais. O cliente consulta o plano e acompanha os resultados; registrar “Já comi” é opcional. Básico funciona sem estoque; Premium acrescenta estoque, compras e preparo com ativação explícita e preservação de saldos. Sem cobrança real. A demonstração usa dados fictícios e não prescreve alimentação. Publicação preparada em Docker/Render, aguardando ativação das contas externas. Veja docs/DEPLOYMENT.md; a integração com o Portfólio fica após validar a URL real.
+
+Comece pelo [roteiro da versão 1.0](docs/V1_VALIDATION.md). `npm run demo:care` em frontend prepara as contas fictícias de cliente e nutricionista; credenciais ficam exclusivamente em `.local/`.
 
 ![Painel pessoal com cenário fictício](docs/images/demo-personal-desktop.png)
 
 ## O que funciona
 
+- Perfis de cliente/nutricionista, convite interno, aceite e revogação de acesso. Dieta e alternativas são configuradas pelo profissional vinculado.
+- Avaliações mensais com peso, medidas opcionais, objetivo, observações e histórico de resultados somente para consulta pelo cliente.
 - Conta com sessão HttpOnly, CSRF, senha BCrypt e dados separados por usuário.
 - Recuperação de senha, confirmação de e-mail e exclusão da conta; envio local por arquivo ou produção pela API HTTPS do Brevo.
 - Catálogo pessoal, busca, arquivamento e conversões exatas de unidades.

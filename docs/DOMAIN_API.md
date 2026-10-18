@@ -76,3 +76,38 @@ Trocas só são permitidas hoje ou no futuro em refeições pendentes. Alimentos
 Exceções entram na projeção de compras e no hash que sinaliza listas desatualizadas. Trocar/configurar/desfazer troca não movimenta estoque. O consumo confirma os alimentos efetivamente previstos após a troca. Estornar consumo devolve os lotes e mantém a exceção do dia. A exclusão da conta remove também regras, exceções e ações.
 
 O saldo mostrado considera alimento, estado, data de recebimento e vencimento conhecido. Não é reserva nem garantia de conservação; saldo desconhecido/parcial é identificado e validade desconhecida precisa ser conferida.
+
+## Contrato da versão 1.0 — V11
+
+Cadastro aceita role CLIENT (padrão) ou NUTRITIONIST. GET /api/me retorna role. PATCH /api/me não altera o papel, o e-mail ou o plano. Profissionais são autodeclarados nesta demonstração, sem verificação de registro profissional.
+
+### Acompanhamento
+
+- GET /api/care: vínculos e convites destinados ao cliente autenticado.
+- POST /api/care/{id}/accept: aceita convite pendente não expirado destinado ao próprio e-mail. No máximo um vínculo ativo por cliente.
+- POST /api/care/{id}/revoke: cliente ou profissional participante revoga/recusa o vínculo; resposta 204. Dieta e resultados permanecem com o cliente.
+- GET /api/results: avaliações do próprio cliente, somente leitura.
+- GET/POST /api/professional/clients: lista vínculos próprios ou cria convite (name, email). Convites internos duram sete dias e não enviam e-mail.
+- GET /api/professional/clients/{client}/profile: id, nome e fuso do cliente com vínculo ativo.
+- GET/PUT /api/professional/clients/{client}/plan: mesmo contrato de revisão de dieta, sempre com vínculo ativo.
+- GET/POST /api/professional/clients/{client}/foods: catálogo do cliente; escrita recebe name, unit, category, purchaseFrequency.
+- GET /api/professional/clients/{client}/schedule?date=AAAA-MM-DD: refeições do cliente.
+- GET/PUT /api/professional/clients/{client}/plan/substitutions: mesmo contrato de alternativas. Saldos de estoque não são expostos ao profissional.
+- GET/PUT /api/professional/clients/{client}/results: avaliação por mês (date, version, weight, height e waist opcionais, goal, notes). Peso em kg e medidas em cm. Datas futuras são rejeitadas. Um mês existente exige sua versão atual. Autor registrado em cada avaliação.
+
+Toda leitura/escrita profissional verifica vínculo ativo e proprietário. Escritas bloqueiam a conta do cliente e revalidam o vínculo sob o bloqueio; a revogação usa o mesmo bloqueio. Um profissional não pode acessar clientes de outro profissional nem vincular sem aceite. Excluir a conta profissional remove vínculos e preserva avaliações do cliente com nome do autor; excluir o cliente remove seu histórico.
+
+Cliente não pode escrever /api/plan, /api/foods ou /api/plan/substitutions. Substituições do cliente são somente ONCE e apenas entre opções liberadas; NEXT e desfazer de revisão recorrente exigem perfil profissional. O cliente não edita avaliações. Regras também são verificadas na API, independentemente da tela ou query string.
+
+### Recursos e registro opcional de refeições
+
+- GET /api/features: role, tier BASIC/PREMIUM, inventoryAllowed, inventoryEnabled, reviewRequired.
+- POST /api/features/inventory: enabled, reviewed. Ativar exige Premium e confirmação de conferência de saldos. Desativar não zera ou movimenta saldos.
+- GET /api/features/inventory-review: saldos da própria conta Premium para conferência, inclusive com controle desativado.
+- POST /api/demo/features: tier BASIC/PREMIUM, apenas ambiente não prod e usuário autenticado. Simula plano, sem pagamento. Não disponível em produção.
+- POST /api/meals/checkins: requestId UUID, date, mealId, items (foodId, quantity, unit, basis das porções exibidas). Divergência com a dieta atual retorna conflito, sem baixa. Resposta id/mode/message. Repetição do mesmo requestId/corpo não duplica.
+- POST /api/meals/checkins/undo: id do registro próprio. Modo ONLY remove apenas o registro, mesmo após ativar estoque. Modo INVENTORY estorna a operação original e exige estoque ativo/conferido se houve desativação posterior.
+
+BASIC ou controle desativado bloqueia /api/inventory e /api/shopping, incluindo preparo, entradas e estornos. Escritas também revalidam a ativação dentro da transação sob o bloqueio da conta. ONLY não consulta/exige/baixa estoque; INVENTORY usa as porções e os lotes existentes. Nenhuma ativação baixa refeições retroativamente. Não registrar uma refeição não significa que ela não foi realizada.
+
+Contas novas iniciam em CLIENT/BASIC com estoque desativado. A migração preserva Premium e ativação dos usuários preexistentes para não apagar acesso/saldos. O script da demonstração muda apenas seu cliente fictício para Básico; nunca a conta pessoal.
