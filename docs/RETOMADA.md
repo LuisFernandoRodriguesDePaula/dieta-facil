@@ -55,3 +55,7 @@ Contas novas: CLIENT por padrão, BASIC e estoque desativado. Migração preserv
 Execute `npm run demo:care` (demo:hypertrophy é um alias). Cliente reutilizado: `.local/demo-hypertrophy.json`; profissional separado: `.local/demo-professional.json`. O script preserva dieta, estoque, regras e avaliações já existentes e só completa exemplos ausentes. Foram cadastradas duas avaliações fictícias em meses distintos. Não modificar o projeto Portfólio. Roteiro para o teste: V1_VALIDATION.md.
 
 Validação desta etapa: 45 testes Java aprovados no PostgreSQL isolado, 18 testes da interface, build/lint e jornada nova em computador/celular. A suíte de navegador foi ampliada para 14 casos. Conferir a CI do commit final para o resultado completo H2/PostgreSQL/navegador/Docker. Credenciais, arquivos de e-mail, banco e capturas privadas continuam somente em .local/.
+
+## Ajuste de acesso
+
+Login e sessão já aberta em /entrar encaminham para /conta/inicio (destino de acordo com o perfil). /conta é a configuração pessoal, na navegação do aplicativo, sem o bloco antigo de atalhos. Saída em Conta → Deslogar. Gerenciar senha e conta mantém acesso à recuperação, verificação e exclusão. O tempo de sessão permanece inalterado.

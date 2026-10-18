@@ -12,6 +12,7 @@ const profile = {
   name: "Pessoa Teste",
   email: "test@example.invalid",
   timezone: "America/Sao_Paulo",
+  role: "CLIENT",
 };
 let signedIn = false;
 let expiredOnSave = false;
@@ -34,6 +35,16 @@ beforeEach(() => {
       if (serviceUnavailable) throw new TypeError("offline");
       if (url === "/api/auth/csrf")
         return response({ token: "csrf-fixture", headerName: "X-CSRF-TOKEN" });
+      if (url === "/api/features")
+        return response({
+          role: "CLIENT",
+          tier: "BASIC",
+          inventoryAllowed: false,
+          inventoryEnabled: false,
+          reviewRequired: true,
+        });
+      if (url.startsWith("/api/schedule?"))
+        return response({ timezone: profile.timezone, meals: [] });
       if (url === "/api/auth/login") {
         const input = JSON.parse(options?.body as string);
         if (input.password !== "senha-de-teste")
@@ -93,13 +104,29 @@ describe("Acesso pessoal", () => {
     await user.type(screen.getByLabelText("Senha"), "senha-de-teste");
     await user.click(screen.getByRole("button", { name: "Entrar" }));
     expect(
+      await screen.findByRole("heading", { name: "Minha dieta" }),
+    ).toBeVisible();
+    expect(screen.queryByText("Organize sua rotina.")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("link", { name: "Conta" }));
+    expect(
       await screen.findByRole("heading", { name: "Olá, Pessoa." }),
     ).toBeVisible();
-    await user.click(screen.getByRole("button", { name: "Sair da conta" }));
+    await user.click(screen.getByRole("button", { name: "Deslogar" }));
     expect(
       await screen.findByRole("heading", { name: "Entre na sua conta." }),
     ).toBeVisible();
     expect(signedIn).toBe(false);
+  });
+
+  it("leva uma sessão já aberta diretamente ao painel ao visitar entrar", async () => {
+    signedIn = true;
+    mount("/entrar");
+    expect(
+      await screen.findByRole("heading", { name: "Minha dieta" }),
+    ).toBeVisible();
+    expect(
+      screen.queryByLabelText("Senha", { exact: true }),
+    ).not.toBeInTheDocument();
   });
 
   it("bloqueia senhas diferentes antes do cadastro e encaminha ao login após criar conta", async () => {

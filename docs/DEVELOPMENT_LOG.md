@@ -117,3 +117,9 @@ Implementados convites internos por e-mail de cadastro, aceite e revogação pel
 O registro opcional Já comi usa as porções do plano, sem formulário no Básico. Sem estoque ativo, persiste o registro e não movimenta ingredientes. Com estoque ativo, exige confirmação e realiza a baixa; o modo fica registrado para o estorno não criar saldo indevido após uma mudança de plano. Reativação exige conferência de saldos e não baixa refeições retroativamente. Escritas antigas de estoque/compras também conferem a permissão sob o bloqueio transacional da conta, além do filtro HTTP.
 
 Simulação de plano e cargas fictícias existem somente fora de prod. Nenhum checkout, cobrança ou serviço externo foi contratado. Cadastro profissional é um perfil autodeclarado para a demonstração; não foi implementada verificação de registro profissional. O roteiro de avaliação está em V1_VALIDATION.md. A publicação externa e o projeto Portfólio continuam separados.
+
+## 2026-10-18 — Login direto ao painel e Conta simplificada
+
+Login bem-sucedido e visita a Entrar com sessão ativa agora encaminham para /conta/inicio, que mantém o destino apropriado ao perfil. Conta usa a navegação pessoal, sem a moldura de login. Removidos o bloco Organize sua rotina, os atalhos de catálogo/estoque/compras/preparo e a nota técnica de sessão. A saída fica em Conta → Deslogar; gerenciamento de senha/exclusão continua acessível por Gerenciar senha e conta.
+
+Validação: testes de interface para login, sessão já aberta, retorno à Conta e logout; jornada de recuperação/exclusão atualizada para passar pelo painel. Nenhuma mudança na duração ou segurança das sessões.

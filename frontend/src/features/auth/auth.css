@@ -4,6 +4,9 @@
   grid-template-columns: minmax(300px, 42%) 1fr;
   background: #fff;
 }
+.account-page .access-card {
+  max-width: 560px;
+}
 .access-intro {
   background: #e9f0e0;
   padding: 48px 56px;

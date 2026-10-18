@@ -213,8 +213,14 @@ test("sessão encerrada impede continuar na área pessoal", async ({ page }) => 
   await expect(
     page.getByRole("heading", { name: "Olá, Pessoa." }),
   ).toBeVisible();
-  expect((await post(page.request, "/api/auth/logout", {})).status()).toBe(204);
-  await page.getByRole("link", { name: "Estoque", exact: true }).click();
+  await page.getByRole("link", { name: "Conta", exact: true }).click();
+  await expect(
+    page.getByText("Organize sua rotina.", { exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "Deslogar", exact: true }).click();
+  await expect(page).toHaveURL(/\/entrar$/);
+  expect((await page.request.get("/api/me")).status()).toBe(401);
+  await page.goto("/conta/estoque");
   await expect(page).toHaveURL(/\/entrar$/);
   await expect(
     page.getByRole("button", { name: "Entrar", exact: true }),
@@ -329,8 +335,9 @@ test("recuperação de senha por e-mail local e exclusão da conta fictícia", a
   await page.getByLabel("E-mail", { exact: true }).fill(profile.email);
   await page.getByLabel("Senha", { exact: true }).fill("Senha-alterada-2026!");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await expect(page).toHaveURL(/\/conta$/);
-  await page.getByRole("link", { name: "Segurança e privacidade" }).click();
+  await expect(page).toHaveURL(/\/conta\/inicio$/);
+  await page.getByRole("link", { name: "Conta", exact: true }).click();
+  await page.getByRole("link", { name: "Gerenciar senha e conta" }).click();
   await page.getByRole("button", { name: "Quero excluir minha conta" }).click();
   await page.getByLabel("Senha atual").fill("Senha-alterada-2026!");
   await page.getByLabel("Digite EXCLUIR para confirmar").fill("EXCLUIR");

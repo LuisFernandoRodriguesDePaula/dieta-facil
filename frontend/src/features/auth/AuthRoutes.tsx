@@ -17,6 +17,7 @@ import App from "../../App";
 import "./auth.css";
 import { useSession, sessionKey } from "./session";
 import type { Profile } from "./session";
+import { PersonalNav } from "../personal";
 import FoodsPage from "../foods/FoodsPage";
 
 const RecoveryPage = lazy(() => import("./RecoveryPage"));
@@ -218,7 +219,7 @@ function AccessPage({ registerMode }: { registerMode: boolean }) {
         <ServiceError retry={() => session.refetch()} />
       </AuthFrame>
     );
-  if (session.data) return <Navigate to="/conta" replace />;
+  if (session.data) return <Navigate to="/conta/inicio" replace />;
   return (
     <AuthFrame>{registerMode ? <RegisterForm /> : <LoginForm />}</AuthFrame>
   );
@@ -239,7 +240,7 @@ function LoginForm() {
       const user = await api<Profile>("/api/auth/login", "POST", values);
       client.clear();
       client.setQueryData(sessionKey, user);
-      navigate("/conta", { replace: true });
+      navigate("/conta/inicio", { replace: true });
     } catch (failure) {
       setError(message(failure));
     }
@@ -485,9 +486,11 @@ function AccountPage() {
   if (!session.data)
     return <Navigate to="/entrar" replace state={{ requiresLogin: true }} />;
   return (
-    <AuthFrame>
+    <main className="plan-page account-page">
+      <PersonalNav />
+      <h1>Minha conta</h1>
       <AccountForm key={session.data.id} user={session.data} />
-    </AuthFrame>
+    </main>
   );
 }
 
@@ -588,42 +591,17 @@ function AccountForm({ user }: { user: Profile }) {
           <CheckIcon />
         </button>
       </form>
+      <p>
+        <Link to="/conta/seguranca">Gerenciar senha e conta</Link>
+      </p>
       <button
         className="logout-button"
         onClick={logout}
         disabled={loggingOut || form.formState.isSubmitting}
       >
         <LogOut size={17} />
-        {loggingOut ? "Saindo…" : "Sair da conta"}
+        {loggingOut ? "Saindo…" : "Deslogar"}
       </button>
-      <div className="account-next">
-        <strong>Organize sua rotina.</strong>
-        <p>
-          <Link to="/conta/seguranca">Segurança e privacidade</Link>
-        </p>
-        <p>
-          <Link to="/conta/inicio">Abrir meu painel</Link> ·{" "}
-          <Link to="/conta/estoque">Estoque</Link> ·{" "}
-          <Link to="/conta/compras">Compras</Link> ·{" "}
-          <Link to="/conta/preparo">Preparo</Link>
-        </p>
-        <p>
-          <Link to="/conta/dieta">Minha dieta</Link> ·{" "}
-          <Link to="/conta/agenda">Agenda de refeições</Link>
-        </p>
-        <p>
-          Seu catálogo pessoal já está disponível. Cadastre os alimentos que
-          fazem parte da sua rotina; organize suas refeições e acompanhe a
-          agenda nesta etapa.
-        </p>
-        <Link to="/conta/alimentos">
-          Abrir meu catálogo <ArrowRight size={15} />
-        </Link>
-      </div>
-      <p className="access-note">
-        A sessão termina após 30 minutos sem atividade ou quando o servidor
-        reinicia.
-      </p>
     </section>
   );
 }
