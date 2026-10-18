@@ -10,9 +10,11 @@ import { units, bases } from "../foods/food-types";
 import type { Stock } from "../inventory/InventoryPage";
 import type { Basis } from "../foods/food-types";
 import "../plans/plans.css";
+import { useFeatures } from "../care/features";
 export default function DashboardPage() {
   const session = useSession();
-  if (session.isPending)
+  const features = useFeatures();
+  if (session.isPending || features.isPending)
     return (
       <main className="plan-page" role="status">
         Verificando sessão…
@@ -27,6 +29,10 @@ export default function DashboardPage() {
     );
   if (!session.data)
     return <Navigate to="/entrar" replace state={{ requiresLogin: true }} />;
+  if (session.data.role === "CLIENT")
+    return <Navigate to="/conta/dieta" replace />;
+  if (!features.data?.inventoryEnabled)
+    return <Navigate to="/profissional" replace />;
   return (
     <Dashboard
       key={session.data.id}

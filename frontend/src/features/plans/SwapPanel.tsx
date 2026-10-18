@@ -7,10 +7,12 @@ import type { Food, Basis, Unit } from "../foods/food-types";
 import { useFoods } from "../foods/useFoods";
 import type { Item, Occurrence } from "./PlansPage";
 import MealDialog from "./MealDialog";
+import { useDietApi } from "./DietApi";
+import { useSession } from "../auth/session";
 
 type Alternative = {
   item: Item;
-  available: string;
+  available: string | null;
   knowledge: string;
   selectable: boolean;
   blockedReason?: string;
@@ -48,6 +50,10 @@ export default function SwapPanel({
   onClose: () => void;
   onSaved: (id: string, message: string) => void;
 }) {
+  const prefix = useDietApi();
+  const session = useSession();
+  const canConfigure = session.data?.role === "NUTRITIONIST";
+  const configurationOnly = prefix !== "/api";
   const [index, setIndex] = useState(0);
   const [editing, setEditing] = useState(configure);
   const [busy, setBusy] = useState(false);
@@ -55,7 +61,7 @@ export default function SwapPanel({
     queryKey: ["substitutions", userId, date, meal.mealId, index],
     queryFn: () =>
       api<Options>(
-        `/api/plan/substitutions?date=${date}&mealId=${meal.mealId}&itemIndex=${index}`,
+        `${prefix}/plan/substitutions?date=${date}&mealId=${meal.mealId}&itemIndex=${index}`,
       ),
     retry: false,
   });
@@ -100,9 +106,10 @@ export default function SwapPanel({
           onBusy={setBusy}
           onSaved={async () => {
             await options.refetch();
-            setEditing(false);
+            if (configurationOnly) onClose();
+            else setEditing(false);
           }}
-          onCancel={() => setEditing(false)}
+          onCancel={() => (configurationOnly ? onClose() : setEditing(false))}
         />
       ) : (
         <Choice
@@ -114,6 +121,7 @@ export default function SwapPanel({
           onConfigure={() => setEditing(true)}
           onBusy={setBusy}
           onSaved={onSaved}
+          canConfigure={canConfigure}
         />
       )}
     </MealDialog>
@@ -127,6 +135,7 @@ function Choice({
   onConfigure,
   onBusy,
   onSaved,
+  canConfigure,
 }: {
   date: string;
   meal: Occurrence;
@@ -135,6 +144,7 @@ function Choice({
   onConfigure: () => void;
   onBusy: (v: boolean) => void;
   onSaved: (id: string, text: string) => void;
+  canConfigure: boolean;
 }) {
   const [selected, setSelected] = useState("");
   const [scope, setScope] = useState("ONCE");
@@ -183,7 +193,11 @@ function Choice({
         <div className="swap-empty">
           <ArrowLeftRight size={26} />
           <h3>Este alimento está sem trocas liberadas</h3>
-          <p>Vincule as alternativas e suas porções para escolher por aqui.</p>
+          <p>
+            {canConfigure
+              ? "Vincule as alternativas e suas porções para escolher por aqui."
+              : "O nutricionista ainda não liberou alternativas para este alimento."}
+          </p>
         </div>
       ) : (
         <fieldset disabled={busy}>
@@ -211,51 +225,63 @@ function Choice({
                     {option.item.quantity} {units[option.item.unit]} ·{" "}
                     {bases[option.item.basis]}
                   </span>
-                  <small>
-                    <PackageCheck size={14} />
-                    {balance(option)}
-                  </small>
-                  <small>
-                    Saldo registrado: {option.available}{" "}
-                    {units[option.item.unit]}
-                  </small>
+                  {!option.selectable && option.knowledge === "DISABLED" && (
+                    <small>{option.blockedReason}</small>
+                  )}
+                  {option.knowledge !== "DISABLED" && (
+                    <small>
+                      <PackageCheck size={14} />
+                      {balance(option)}
+                    </small>
+                  )}
+                  {option.knowledge !== "DISABLED" && (
+                    <small>
+                      Saldo registrado: {option.available}{" "}
+                      {units[option.item.unit]}
+                    </small>
+                  )}
                 </span>
               </label>
             ))}
           </div>
-          <p className="access-note">
-            O saldo não reserva alimentos para outras refeições. Confira as
-            condições e a validade antes de consumir.
-          </p>
-          <label>
-            Aplicar troca
-            <select value={scope} onChange={(e) => setScope(e.target.value)}>
-              <option value="ONCE">Só nesta refeição</option>
-              <option value="NEXT">Nesta e nas próximas</option>
-            </select>
-          </label>
+          {options.alternatives.some((a) => a.knowledge !== "DISABLED") && (
+            <p className="access-note">
+              O saldo não reserva alimentos para outras refeições. Confira as
+              condições e a validade antes de consumir.
+            </p>
+          )}
+          {canConfigure && (
+            <label>
+              Aplicar troca
+              <select value={scope} onChange={(e) => setScope(e.target.value)}>
+                <option value="ONCE">Só nesta refeição</option>
+                <option value="NEXT">Nesta e nas próximas</option>
+              </select>
+            </label>
+          )}
           <p className="access-note">
             {scope === "NEXT"
               ? "Atualiza esta refeição na dieta a partir deste dia, até a próxima revisão já agendada. Registros consumidos e trocas individuais são preservados."
               : "Muda apenas esta refeição neste dia. Sua dieta habitual continua igual."}{" "}
-            O estoque só diminui ao confirmar o consumo.
           </p>
           <button className="button swap-apply" disabled={!selected || busy}>
             {busy ? "Aplicando…" : "Confirmar troca"}
           </button>
         </fieldset>
       )}
-      <button
-        type="button"
-        className="meal-text-button"
-        disabled={busy}
-        onClick={onConfigure}
-      >
-        Configurar alternativas e porções
-      </button>
+      {canConfigure && (
+        <button
+          type="button"
+          className="meal-text-button"
+          disabled={busy}
+          onClick={onConfigure}
+        >
+          Configurar alternativas e porções
+        </button>
+      )}
       <p className="access-note">
-        As porções são definidas por você no plano; não calculamos equivalência
-        nutricional.
+        As porções são definidas no plano pelo nutricionista; não calculamos
+        equivalência nutricional.
       </p>
       {error && (
         <p role="alert" className="form-error">
@@ -284,7 +310,8 @@ function RulesEditor({
   onSaved: () => void;
   onCancel: () => void;
 }) {
-  const foods = useFoods(userId);
+  const prefix = useDietApi();
+  const foods = useFoods(userId, prefix);
   const client = useQueryClient();
   const [items, setItems] = useState<Item[]>(
     options.alternatives.map((a) => a.item),
@@ -318,7 +345,7 @@ function RulesEditor({
         onBusy(true);
         setError("");
         try {
-          await api("/api/plan/substitutions", "PUT", {
+          await api(prefix + "/plan/substitutions", "PUT", {
             date,
             mealId,
             itemIndex: index,

@@ -15,57 +15,72 @@ beforeEach(() => {
     "fetch",
     vi.fn(async (path: string, options?: RequestInit) => {
       const data =
-        path === "/api/me"
+        path === "/api/features"
           ? {
-              id: "owner",
-              name: "Teste",
-              email: "test@example.invalid",
-              timezone: "UTC",
+              role: "NUTRITIONIST",
+              tier: "PREMIUM",
+              inventoryAllowed: true,
+              inventoryEnabled: true,
+              reviewRequired: false,
             }
-          : path === "/api/auth/csrf"
-            ? { token: "csrf", headerName: "X-CSRF-TOKEN" }
-            : path.startsWith("/api/foods")
-              ? {
-                  items: [
-                    { id: "egg", name: "Ovos", unit: "UNIT", baseUnit: "UNIT" },
-                  ],
-                  totalPages: 1,
-                }
-              : path.startsWith("/api/plan") && options?.method === "PUT"
-                ? ((saved = JSON.parse(options.body as string)),
-                  { version: 1, meals: [], revisionDates: [] })
-                : path.startsWith("/api/plan")
-                  ? {
-                      version: 0,
-                      effectiveFrom: null,
-                      meals: [],
-                      revisionDates: [],
-                    }
-                  : path === "/api/schedule/skip"
-                    ? ((skipped = true), {})
-                    : path.startsWith("/api/schedule")
-                      ? {
-                          timezone: "UTC",
-                          meals: [
-                            {
-                              id: "occ",
-                              mealId: "meal",
-                              name: "Café",
-                              time: "08:00",
-                              status: skipped ? "SKIPPED" : "PENDING",
-                              items: [
-                                {
-                                  foodId: "egg",
-                                  name: "Ovos",
-                                  quantity: "2",
-                                  unit: "UNIT",
-                                  basis: "AS_SOLD",
-                                },
-                              ],
-                            },
-                          ],
-                        }
-                      : {};
+          : path === "/api/me"
+            ? {
+                id: "owner",
+                name: "Teste",
+                email: "test@example.invalid",
+                timezone: "UTC",
+                role: "NUTRITIONIST",
+              }
+            : path === "/api/auth/csrf"
+              ? { token: "csrf", headerName: "X-CSRF-TOKEN" }
+              : path.startsWith("/api/foods")
+                ? {
+                    items: [
+                      {
+                        id: "egg",
+                        name: "Ovos",
+                        unit: "UNIT",
+                        baseUnit: "UNIT",
+                      },
+                    ],
+                    totalPages: 1,
+                  }
+                : path.startsWith("/api/plan") && options?.method === "PUT"
+                  ? ((saved = JSON.parse(options.body as string)),
+                    { version: 1, meals: [], revisionDates: [] })
+                  : path.startsWith("/api/plan")
+                    ? {
+                        version: 0,
+                        effectiveFrom: null,
+                        meals: [],
+                        revisionDates: [],
+                      }
+                    : path === "/api/schedule/skip"
+                      ? ((skipped = true), {})
+                      : path.startsWith("/api/schedule")
+                        ? {
+                            timezone: "UTC",
+                            role: "NUTRITIONIST",
+                            meals: [
+                              {
+                                id: "occ",
+                                mealId: "meal",
+                                name: "Café",
+                                time: "08:00",
+                                status: skipped ? "SKIPPED" : "PENDING",
+                                items: [
+                                  {
+                                    foodId: "egg",
+                                    name: "Ovos",
+                                    quantity: "2",
+                                    unit: "UNIT",
+                                    basis: "AS_SOLD",
+                                  },
+                                ],
+                              },
+                            ],
+                          }
+                        : {};
       return new Response(JSON.stringify(data), { status: 200 });
     }),
   );

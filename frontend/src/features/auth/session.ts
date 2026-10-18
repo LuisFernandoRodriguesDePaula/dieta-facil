@@ -6,6 +6,7 @@ export type Profile = {
   name: string;
   email: string;
   timezone: string;
+  role: "CLIENT" | "NUTRITIONIST";
 };
 export const sessionKey = ["session"];
 export function useSession() {

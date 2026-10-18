@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run src",
     "test:e2e": "playwright test",
-    "demo:hypertrophy": "node scripts/seed-hypertrophy.mjs"
+    "demo:hypertrophy": "node scripts/seed-care.mjs",
+    "demo:care": "node scripts/seed-care.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",

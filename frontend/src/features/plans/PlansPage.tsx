@@ -11,6 +11,7 @@ import { localDate } from "../../lib/dates";
 import { PersonalNav } from "../personal";
 
 import DayPanel from "./DayPanel";
+import { useDietApi } from "./DietApi";
 
 export type Item = {
   foodId: string;
@@ -62,6 +63,7 @@ export default function PlansPage({ agenda = false }: { agenda?: boolean }) {
       userId={session.data.id}
       timezone={session.data.timezone}
       agenda={agenda}
+      professional={session.data.role === "NUTRITIONIST"}
     />
   );
 }
@@ -69,15 +71,17 @@ function Workspace({
   userId,
   timezone,
   agenda,
+  professional,
 }: {
   userId: string;
   timezone: string;
   agenda: boolean;
+  professional: boolean;
 }) {
   const today = localDate(timezone);
   const [date, setDate] = useState(today);
   const [params, setParams] = useSearchParams();
-  const editing = !agenda && params.get("editar") === "1";
+  const editing = professional && !agenda && params.get("editar") === "1";
   return (
     <main className="plan-page">
       <PersonalNav />
@@ -90,7 +94,7 @@ function Workspace({
               ? "Agenda de refeições"
               : "Minha dieta"}
         </h1>
-        {!agenda && (
+        {!agenda && professional && (
           <button onClick={() => setParams(editing ? {} : { editar: "1" })}>
             {editing ? "Voltar às refeições" : "Editar dieta"}
           </button>
@@ -121,6 +125,7 @@ function Workspace({
           date={date}
           today={today}
           timezone={timezone}
+          clientView={!professional}
         />
       )}
     </main>
@@ -131,7 +136,7 @@ function failure(error: unknown) {
     ? error.message
     : "Não foi possível conectar ao serviço. Tente novamente.";
 }
-function EditorLoader({
+export function EditorLoader({
   userId,
   date,
   today,
@@ -140,12 +145,14 @@ function EditorLoader({
   date: string;
   today: string;
 }) {
+  const prefix = useDietApi();
+  const [notice, setNotice] = useState("");
   const plan = useQuery({
     queryKey: ["plan", userId, date],
-    queryFn: () => api<Plan>("/api/plan?date=" + date),
+    queryFn: () => api<Plan>(prefix + "/plan?date=" + date),
     retry: false,
   });
-  const foods = useFoods(userId);
+  const foods = useFoods(userId, prefix);
   if (plan.isPending || foods.isPending)
     return <p role="status">Carregando dieta e alimentos…</p>;
   if (plan.isError || foods.isError)
@@ -163,14 +170,22 @@ function EditorLoader({
       </div>
     );
   return (
-    <Editor
-      key={plan.data.version}
-      initial={plan.data}
-      foods={foods.data}
-      date={date}
-      today={today}
-      refresh={() => plan.refetch()}
-    />
+    <>
+      <Editor
+        key={plan.data.version}
+        initial={plan.data}
+        foods={foods.data}
+        date={date}
+        today={today}
+        refresh={() => plan.refetch()}
+        onNotice={setNotice}
+      />
+      {notice && (
+        <p role="status" className="form-success">
+          {notice}
+        </p>
+      )}
+    </>
   );
 }
 function Editor({
@@ -179,17 +194,19 @@ function Editor({
   date,
   today,
   refresh,
+  onNotice,
 }: {
   initial: Plan;
   foods: Food[];
   date: string;
   today: string;
   refresh: () => unknown;
+  onNotice: (value: string) => void;
 }) {
+  const prefix = useDietApi();
   const client = useQueryClient();
   const [meals, setMeals] = useState<Meal[]>(initial.meals);
   const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
   const [saving, setSaving] = useState(false);
   const patch = (id: string, change: Partial<Meal>) =>
     setMeals((old) => old.map((m) => (m.id === id ? { ...m, ...change } : m)));
@@ -207,14 +224,14 @@ function Editor({
   const save = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-    setNotice("");
+    onNotice("");
     if (meals.some((m) => !m.days.length || !m.items.length)) {
       setError("Escolha pelo menos um dia e um alimento em cada refeição.");
       return;
     }
     setSaving(true);
     try {
-      await api<Plan>("/api/plan", "PUT", {
+      await api<Plan>(prefix + "/plan", "PUT", {
         version: initial.version,
         effectiveFrom: date,
         meals: meals.map((m) => ({
@@ -227,7 +244,7 @@ function Editor({
           })),
         })),
       });
-      setNotice("Revisão salva.");
+      onNotice("Revisão salva.");
       await client.invalidateQueries({ queryKey: ["schedule"] });
       refresh();
     } catch (err) {
@@ -472,11 +489,6 @@ function Editor({
           <button type="button" onClick={() => refresh()}>
             Recarregar dieta
           </button>
-        </p>
-      )}
-      {notice && (
-        <p role="status" className="form-success">
-          {notice}
         </p>
       )}
       <p className="access-note">

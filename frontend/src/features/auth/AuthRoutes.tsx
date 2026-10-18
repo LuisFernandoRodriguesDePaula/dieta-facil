@@ -25,6 +25,24 @@ const PlansPage = lazy(() => import("../plans/PlansPage"));
 const InventoryPage = lazy(() => import("../inventory/InventoryPage"));
 const ShoppingPage = lazy(() => import("../shopping/ShoppingPage"));
 const DashboardPage = lazy(() => import("../dashboard/DashboardPage"));
+const ResultsPage = lazy(() =>
+  import("../care/CarePages").then((m) => ({ default: m.ResultsPage })),
+);
+const CarePage = lazy(() =>
+  import("../care/CarePages").then((m) => ({ default: m.CarePage })),
+);
+const ProfessionalPage = lazy(() =>
+  import("../care/CarePages").then((m) => ({ default: m.ProfessionalPage })),
+);
+const ProfessionalClientPage = lazy(() =>
+  import("../care/CarePages").then((m) => ({
+    default: m.ProfessionalClientPage,
+  })),
+);
+const PremiumPage = lazy(() =>
+  import("../care/CarePages").then((m) => ({ default: m.PremiumPage })),
+);
+import { FeatureGate } from "../care/CareAccess";
 const timezone = () =>
   Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Sao_Paulo";
 const emailField = z
@@ -54,6 +72,7 @@ const registerSchema = z
     password: passwordField,
     confirmation: z.string(),
     timezone: z.string().min(1, "Informe seu fuso horário.").max(100),
+    role: z.enum(["CLIENT", "NUTRITIONIST"]),
   })
   .refine((input) => input.password === input.confirmation, {
     message: "As senhas devem ser iguais.",
@@ -103,12 +122,48 @@ export default function AuthRoutes() {
           element={<RecoveryPage mode="verify" />}
         />
         <Route path="/conta/inicio" element={<DashboardPage />} />
-        <Route path="/conta/alimentos" element={<FoodsPage />} />
+        <Route
+          path="/conta/alimentos"
+          element={
+            <FeatureGate professional>
+              <FoodsPage />
+            </FeatureGate>
+          }
+        />
+        <Route path="/conta/resultados" element={<ResultsPage />} />
+        <Route path="/conta/nutricionista" element={<CarePage />} />
+        <Route path="/conta/premium" element={<PremiumPage />} />
+        <Route path="/profissional" element={<ProfessionalPage />} />
+        <Route
+          path="/profissional/clientes/:clientId"
+          element={<ProfessionalClientPage />}
+        />
         <Route path="/conta/dieta" element={<PlansPage />} />
         <Route path="/conta/agenda" element={<PlansPage agenda />} />
-        <Route path="/conta/estoque" element={<InventoryPage />} />
-        <Route path="/conta/compras" element={<ShoppingPage />} />
-        <Route path="/conta/preparo" element={<InventoryPage preparation />} />
+        <Route
+          path="/conta/estoque"
+          element={
+            <FeatureGate>
+              <InventoryPage />
+            </FeatureGate>
+          }
+        />
+        <Route
+          path="/conta/compras"
+          element={
+            <FeatureGate>
+              <ShoppingPage />
+            </FeatureGate>
+          }
+        />
+        <Route
+          path="/conta/preparo"
+          element={
+            <FeatureGate>
+              <InventoryPage preparation />
+            </FeatureGate>
+          }
+        />
         <Route path="*" element={<App />} />
       </Routes>
     </Suspense>
@@ -285,6 +340,7 @@ function RegisterForm() {
       password: "",
       confirmation: "",
       timezone: timezone(),
+      role: "CLIENT",
     },
   });
   const submit = form.handleSubmit(
@@ -314,6 +370,13 @@ function RegisterForm() {
       <h2>Crie seu espaço.</h2>
       <p>Uma conta para organizar sua rotina.</p>
       <form onSubmit={submit} noValidate>
+        <label htmlFor="register-role">Como você vai usar?</label>
+        <select id="register-role" {...form.register("role")}>
+          <option value="CLIENT">Sou cliente · consultar minha dieta</option>
+          <option value="NUTRITIONIST">
+            Sou nutricionista · acompanhar clientes
+          </option>
+        </select>
         <label htmlFor="register-name">Nome</label>
         <input
           id="register-name"

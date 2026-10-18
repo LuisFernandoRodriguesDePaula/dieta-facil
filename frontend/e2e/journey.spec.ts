@@ -18,13 +18,14 @@ async function post(
     },
   });
 }
-async function account(page: Page) {
+async function account(page: Page, role = "NUTRITIONIST", premium = true) {
   const email = "browser-" + crypto.randomUUID() + "@example.invalid";
   const created = await post(page.request, "/api/auth/register", {
     name: "Pessoa Demo",
     email,
     password: "Senha-ficticia-2026!",
     timezone: "America/Sao_Paulo",
+    role,
   });
   expect(created.status()).toBe(201);
   const logged = await post(page.request, "/api/auth/login", {
@@ -32,7 +33,23 @@ async function account(page: Page) {
     password: "Senha-ficticia-2026!",
   });
   expect(logged.status()).toBe(200);
-  return { email };
+  const profile = await logged.json();
+  if (premium) {
+    expect(
+      (
+        await post(page.request, "/api/demo/features", { tier: "PREMIUM" })
+      ).ok(),
+    ).toBeTruthy();
+    expect(
+      (
+        await post(page.request, "/api/features/inventory", {
+          enabled: true,
+          reviewed: true,
+        })
+      ).ok(),
+    ).toBeTruthy();
+  }
+  return { email, id: profile.id };
 }
 async function screenshot(page: Page, name: string, fullPage = true) {
   await mkdir("../.local/screenshots", { recursive: true });
@@ -486,5 +503,189 @@ test("acessibilidade das telas públicas de acesso", async ({ page }) => {
       })),
       path,
     ).toEqual([]);
+  }
+});
+
+test("versão 1.0: nutricionista prepara, cliente consulta e acompanha resultados", async ({
+  page,
+  browser,
+}, info) => {
+  await account(page, "NUTRITIONIST", false);
+  const context = await browser.newContext({
+    baseURL: "http://127.0.0.1:5173",
+    viewport: page.viewportSize()!,
+    isMobile: info.project.name === "mobile",
+    locale: "pt-BR",
+  });
+  try {
+    const clientPage = await context.newPage();
+    const client = await account(clientPage, "CLIENT", false);
+    await page.goto("/profissional");
+    await page.getByLabel("Nome do cliente").fill("Cliente fictício");
+    await page.getByLabel("E-mail do cliente").fill(client.email);
+    await page.getByRole("button", { name: "Criar convite" }).click();
+    await expect(page.getByRole("status")).toContainText("Convite disponível");
+    await clientPage.goto("/conta/nutricionista");
+    await clientPage
+      .getByRole("button", { name: "Aceitar acompanhamento" })
+      .click();
+    await expect(clientPage.getByText("ACOMPANHAMENTO ATIVO")).toBeVisible();
+    await page.reload();
+    await page.getByRole("link", { name: "Abrir acompanhamento →" }).click();
+    await page.getByRole("button", { name: "Alimentos", exact: true }).click();
+    for (const [name, unit] of [
+      ["Ovos", "UNIT"],
+      ["Frango", "G"],
+    ]) {
+      await page.getByLabel("Nome do alimento", { exact: true }).fill(name);
+      await page
+        .getByRole("combobox", { name: "Unidade", exact: true })
+        .selectOption(unit);
+      await page
+        .getByRole("button", { name: "Adicionar alimento", exact: true })
+        .click();
+      await expect(
+        page.getByRole("listitem").filter({ hasText: name }),
+      ).toBeVisible();
+    }
+    await page.getByRole("button", { name: "Dieta", exact: true }).click();
+    await page
+      .getByRole("button", { name: "Adicionar refeição", exact: true })
+      .click();
+    await page.getByLabel("Nome da refeição 1").fill("Café");
+    await page
+      .getByRole("button", { name: "Adicionar alimento", exact: true })
+      .click();
+    await page
+      .getByRole("combobox", { name: "Alimento", exact: true })
+      .selectOption({ label: "Ovos" });
+    await page
+      .getByRole("spinbutton", { name: "Quantidade", exact: true })
+      .fill("2");
+    await page.getByRole("button", { name: "Salvar revisão" }).click();
+    await expect(page.getByRole("status")).toContainText("Revisão salva");
+    await page
+      .getByRole("button", { name: "Configurar trocas de Café", exact: true })
+      .click();
+    const dialog = page.getByRole("dialog");
+    await dialog
+      .getByRole("button", { name: "Adicionar alternativa", exact: true })
+      .click();
+    await dialog
+      .getByRole("combobox", { name: "Alimento alternativo 1", exact: true })
+      .selectOption({ label: "Frango" });
+    await dialog.getByLabel("Porção 1", { exact: true }).fill("90");
+    await dialog
+      .getByRole("combobox", { name: "Estado 1", exact: true })
+      .selectOption("COOKED");
+    await dialog.getByRole("button", { name: "Salvar alternativas" }).click();
+    await expect(dialog).toHaveCount(0);
+    await page
+      .getByRole("button", { name: "Avaliações mensais", exact: true })
+      .click();
+    await page
+      .getByRole("button", { name: "Registrar avaliação mensal" })
+      .click();
+    await page.getByLabel("Peso (kg)", { exact: true }).fill("82");
+    await page
+      .getByLabel("Altura (cm) · opcional", { exact: true })
+      .fill("180");
+    await page
+      .getByLabel("Observações da avaliação")
+      .fill("Registro fictício para testar a versão 1.0.");
+    await page.getByRole("button", { name: "Salvar avaliação" }).click();
+    await expect(page.getByText("82 kg", { exact: true })).toBeVisible();
+    expect(
+      (
+        await new AxeBuilder({ page })
+          .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+          .analyze()
+      ).violations,
+    ).toEqual([]);
+    await screenshot(page, "profissional-" + info.project.name);
+    await clientPage.goto("/conta/dieta?editar=1");
+    await expect(
+      clientPage.getByRole("button", { name: "Editar dieta", exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      clientPage.getByRole("link", { name: "Estoque", exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      clientPage.getByRole("button", { name: /Configurar trocas/ }),
+    ).toHaveCount(0);
+    await clientPage
+      .getByRole("button", { name: "Trocar alimento", exact: true })
+      .click();
+    const clientDialog = clientPage.getByRole("dialog");
+    await expect(
+      clientDialog.getByRole("button", {
+        name: "Configurar alternativas e porções",
+      }),
+    ).toHaveCount(0);
+    await expect(clientDialog.getByText(/Saldo registrado/)).toHaveCount(0);
+    await clientDialog.getByRole("radio", { name: /Frango/ }).check();
+    await clientDialog.getByRole("button", { name: "Confirmar troca" }).click();
+    await clientPage
+      .getByRole("button", { name: "Já comi", exact: true })
+      .click();
+    await expect(clientPage.getByRole("status")).toContainText(
+      "Nenhum item de estoque",
+    );
+    expect((await clientPage.request.get("/api/inventory")).status()).toBe(403);
+    await screenshot(clientPage, "cliente-basico-" + info.project.name);
+    await clientPage.goto("/conta/resultados");
+    await expect(clientPage.getByText("82 kg", { exact: true })).toBeVisible();
+    expect(
+      (
+        await new AxeBuilder({ page: clientPage })
+          .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+          .analyze()
+      ).violations,
+    ).toEqual([]);
+    await clientPage.goto("/conta/premium");
+    await clientPage
+      .getByRole("button", { name: "Experimentar Premium na demonstração" })
+      .click();
+    await clientPage
+      .getByRole("checkbox", {
+        name: "Conferi os saldos e quero ativar o controle",
+      })
+      .check();
+    await clientPage
+      .getByRole("button", { name: "Ativar controle de estoque" })
+      .click();
+    await expect(
+      clientPage.getByRole("heading", { name: "Controle de estoque ativado" }),
+    ).toBeVisible();
+    expect(
+      (await (await clientPage.request.get("/api/inventory")).json()).history,
+    ).toEqual([]);
+    await clientPage
+      .getByRole("button", { name: "Desativar controle de estoque" })
+      .click();
+    await expect(
+      clientPage.getByRole("heading", {
+        name: "Dieta sem controle de estoque",
+        exact: true,
+      }),
+    ).toBeVisible();
+    expect((await clientPage.request.get("/api/inventory")).status()).toBe(403);
+    await clientPage.goto("/conta/nutricionista");
+    await clientPage
+      .getByRole("button", { name: "Revogar acesso", exact: true })
+      .click();
+    await clientPage
+      .getByRole("button", { name: "Confirmar revogação", exact: true })
+      .click();
+    await expect(
+      clientPage.getByText("Seu acompanhamento começa com um convite"),
+    ).toBeVisible();
+    expect(
+      (
+        await page.request.get(`/api/professional/clients/${client.id}/results`)
+      ).status(),
+    ).toBe(404);
+  } finally {
+    await context.close();
   }
 });

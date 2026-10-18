@@ -14,25 +14,29 @@ import { bases, units } from "../foods/food-types";
 import type { Occurrence, Schedule } from "./PlansPage";
 import MealDialog from "./MealDialog";
 import SwapPanel from "./SwapPanel";
+import { useFeatures } from "../care/features";
 
 function message(error: unknown) {
   return error instanceof ApiError
     ? error.message
     : "Não foi possível conectar. Tente novamente.";
 }
-type LastAction = { kind: "swap" | "consumption"; id: string };
+type LastAction = { kind: "swap" | "consumption" | "checkin"; id: string };
 export default function DayPanel({
   userId,
   date,
   today,
   timezone,
+  clientView = false,
 }: {
   userId: string;
   date: string;
   today: string;
   timezone: string;
+  clientView?: boolean;
 }) {
   const client = useQueryClient();
+  const features = useFeatures();
   const schedule = useQuery({
     queryKey: ["schedule", userId, date],
     queryFn: () => api<Schedule>("/api/schedule?date=" + date),
@@ -60,7 +64,7 @@ export default function DayPanel({
     path: string,
     body: unknown,
     success: string,
-    kind?: "consumption",
+    kind?: "consumption" | "checkin",
   ) => {
     if (lock.current) return false;
     lock.current = true;
@@ -70,16 +74,24 @@ export default function DayPanel({
     if (requestKey.current.signature !== signature)
       requestKey.current = { signature, key: crypto.randomUUID() };
     try {
-      const result = await api<{ operationId?: string }>(
+      const result = await api<{
+        operationId?: string;
+        id?: string;
+        message?: string;
+      }>(
         path,
         "POST",
-        body,
+        kind === "checkin"
+          ? { ...(body as object), requestId: requestKey.current.key }
+          : body,
         requestKey.current.key,
       );
       requestKey.current = { signature: "", key: "" };
-      setNotice(success);
+      setNotice(result?.message || success);
       setLast(
-        kind && result?.operationId ? { kind, id: result.operationId } : null,
+        kind && (result?.operationId || result?.id)
+          ? { kind, id: (result.operationId || result.id)! }
+          : null,
       );
       await refresh();
       return true;
@@ -91,13 +103,20 @@ export default function DayPanel({
       setBusy(false);
     }
   };
-  if (schedule.isPending)
+  if (schedule.isPending || features.isPending)
     return <p role="status">Carregando suas refeições…</p>;
-  if (schedule.isError)
+  if (schedule.isError || features.isError)
     return (
       <div role="alert">
-        <p>{message(schedule.error)}</p>
-        <button onClick={() => schedule.refetch()}>Tentar novamente</button>
+        <p>{message(schedule.error || features.error)}</p>
+        <button
+          onClick={() => {
+            void schedule.refetch();
+            void features.refetch();
+          }}
+        >
+          Tentar novamente
+        </button>
       </div>
     );
   const meals = [...schedule.data.meals].sort(
@@ -136,8 +155,8 @@ export default function DayPanel({
         />
       </div>
       <p className="diet-timezone">
-        Horários em {schedule.data.timezone}. O estoque só muda ao confirmar o
-        consumo.
+        Horários em {schedule.data.timezone}. Registrar “Já comi” é opcional;
+        uma refeição sem registro não significa que você deixou de comer.
       </p>
       {error && (
         <p role="alert" className="form-error">
@@ -154,10 +173,14 @@ export default function DayPanel({
                 run(
                   last.kind === "swap"
                     ? "/api/schedule/substitute/undo"
-                    : "/api/inventory/reversals",
+                    : last.kind === "checkin"
+                      ? "/api/meals/checkins/undo"
+                      : "/api/inventory/reversals",
                   last.kind === "swap"
                     ? { actionId: last.id }
-                    : { operationId: last.id },
+                    : last.kind === "checkin"
+                      ? { id: last.id }
+                      : { operationId: last.id },
                   last.kind === "swap"
                     ? "Troca desfeita."
                     : "Consumo desfeito e estoque devolvido.",
@@ -174,7 +197,11 @@ export default function DayPanel({
           <Utensils size={32} />
           <h2>Seu dia começa por aqui</h2>
           <p>Nenhuma refeição prevista neste dia.</p>
-          <Link to="/conta/dieta?editar=1">Organizar minha dieta</Link>
+          <Link
+            to={clientView ? "/conta/nutricionista" : "/conta/dieta?editar=1"}
+          >
+            {clientView ? "Ver meu acompanhamento" : "Organizar minha dieta"}
+          </Link>
         </div>
       )}
       <div className="meal-timeline">
@@ -237,14 +264,35 @@ export default function DayPanel({
                   disabled={busy}
                   onClick={() => {
                     setError("");
+                    if (!features.data.inventoryEnabled) {
+                      void run(
+                        "/api/meals/checkins",
+                        {
+                          date,
+                          mealId: meal.mealId,
+                          items: meal.items.map(
+                            ({ foodId, quantity, unit, basis }) => ({
+                              foodId,
+                              quantity,
+                              unit,
+                              basis,
+                            }),
+                          ),
+                        },
+                        "Refeição registrada.",
+                        "checkin",
+                      );
+                      return;
+                    }
                     setConsuming(meal);
                     setActual(meal.items.map((i) => i.quantity));
                   }}
                 >
-                  <Check size={17} /> Confirmar consumo
+                  <Check size={17} />{" "}
+                  {clientView ? "Já comi" : "Confirmar consumo"}
                 </button>
               )}
-              {meal.status !== "CONSUMED" && date <= today && (
+              {!clientView && meal.status !== "CONSUMED" && date <= today && (
                 <button
                   className="meal-text-button"
                   disabled={busy}
@@ -267,7 +315,7 @@ export default function DayPanel({
                     : "Marcar como pulada"}
                 </button>
               )}
-              {meal.status === "PENDING" && date >= today && (
+              {!clientView && meal.status === "PENDING" && date >= today && (
                 <button
                   className="meal-text-button"
                   aria-label={"Configurar trocas de " + meal.name}
@@ -292,19 +340,21 @@ export default function DayPanel({
               e.preventDefault();
               if (
                 await run(
-                  "/api/inventory/consumptions",
+                  clientView
+                    ? "/api/meals/checkins"
+                    : "/api/inventory/consumptions",
                   {
                     date,
                     mealId: consuming.mealId,
                     items: consuming.items.map((item, i) => ({
                       foodId: item.foodId,
                       basis: item.basis,
-                      quantity: actual[i],
+                      quantity: clientView ? item.quantity : actual[i],
                       unit: item.unit,
                     })),
                   },
                   "Refeição consumida. Estoque atualizado.",
-                  "consumption",
+                  clientView ? "checkin" : "consumption",
                 )
               )
                 setConsuming(null);
@@ -314,24 +364,40 @@ export default function DayPanel({
               Confira as porções que você comeu. Ao confirmar, elas serão
               baixadas do estoque. Alimentos preparados usam o saldo preparado.
             </p>
+            {clientView && (
+              <ul className="meal-foods">
+                {consuming.items.map((item, i) => (
+                  <li key={i}>
+                    <span>
+                      {item.name}
+                      <small>{bases[item.basis]}</small>
+                    </span>
+                    <strong>
+                      {item.quantity} {units[item.unit]}
+                    </strong>
+                  </li>
+                ))}
+              </ul>
+            )}
             <fieldset disabled={busy}>
-              {consuming.items.map((item, i) => (
-                <label key={i}>
-                  {item.name} · {bases[item.basis]} ({units[item.unit]})
-                  <input
-                    required
-                    type="number"
-                    min={item.unit === "UNIT" ? 1 : 0.000001}
-                    step={item.unit === "UNIT" ? 1 : 0.000001}
-                    value={actual[i]}
-                    onChange={(e) =>
-                      setActual((old) =>
-                        old.map((v, k) => (k === i ? e.target.value : v)),
-                      )
-                    }
-                  />
-                </label>
-              ))}
+              {!clientView &&
+                consuming.items.map((item, i) => (
+                  <label key={i}>
+                    {item.name} · {bases[item.basis]} ({units[item.unit]})
+                    <input
+                      required
+                      type="number"
+                      min={item.unit === "UNIT" ? 1 : 0.000001}
+                      step={item.unit === "UNIT" ? 1 : 0.000001}
+                      value={actual[i]}
+                      onChange={(e) =>
+                        setActual((old) =>
+                          old.map((v, k) => (k === i ? e.target.value : v)),
+                        )
+                      }
+                    />
+                  </label>
+                ))}
               <div className="plan-actions">
                 <button className="button">
                   {busy ? "Confirmando…" : "Confirmar e baixar estoque"}

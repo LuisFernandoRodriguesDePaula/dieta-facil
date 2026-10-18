@@ -25,6 +25,7 @@ const profile = {
   name: "Pessoa Teste",
   email: "food@example.invalid",
   timezone: "UTC",
+  role: "NUTRITIONIST",
 };
 const fixture: Food = {
   id: "rice-id",
