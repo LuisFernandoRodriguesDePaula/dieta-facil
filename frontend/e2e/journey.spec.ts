@@ -34,11 +34,11 @@ async function account(page: Page) {
   expect(logged.status()).toBe(200);
   return { email };
 }
-async function screenshot(page: Page, name: string) {
+async function screenshot(page: Page, name: string, fullPage = true) {
   await mkdir("../.local/screenshots", { recursive: true });
   await page.screenshot({
     path: "../.local/screenshots/" + name + ".png",
-    fullPage: true,
+    fullPage,
   });
   expect(
     await page.evaluate(
@@ -183,7 +183,7 @@ test("jornada demonstrável: cenário, consumo, preparo, compras e alertas", asy
   expect(lotAfterStorage.expiry).toBe(lotBeforeStorage.expiry);
   expect(lotAfterStorage.location).toBe("FREEZER");
   await screenshot(page, "estoque-" + info.project.name);
-  await page.goto("/conta/dieta");
+  await page.goto("/conta/dieta?editar=1");
   await expect(page.getByLabel("Nome da refeição 1")).toHaveValue(
     "Café da manhã",
   );
@@ -255,7 +255,7 @@ test("cenário de hipertrofia e acessibilidade das telas pessoais", async ({
       ),
     ).toBeTruthy();
   }
-  await page.goto("/conta/dieta");
+  await page.goto("/conta/dieta?editar=1");
   await expect(page.getByLabel("Nome da refeição 1")).toHaveValue(
     "Café da manhã",
   );
@@ -327,6 +327,150 @@ test("recuperação de senha por e-mail local e exclusão da conta fictícia", a
   ).toBeVisible();
   await unlink(found!.path);
 });
+test("dieta simplificada: configurar, trocar, desfazer e consumir", async ({
+  page,
+}, info) => {
+  await account(page);
+  expect(
+    (
+      await post(page.request, "/api/onboarding/scenario?type=hypertrophy", {})
+    ).ok(),
+  ).toBeTruthy();
+  const schedule = await (await page.request.get("/api/schedule")).json();
+  const breakfast = schedule.meals.find(
+    (m: { name: string }) => m.name === "Café da manhã",
+  );
+  const eggsIndex = breakfast.items.findIndex(
+    (i: { name: string }) => i.name === "Ovos",
+  );
+  const lunch = schedule.meals.find(
+    (m: { name: string }) => m.name === "Almoço",
+  );
+  const chicken = lunch.items.find(
+    (i: { name: string }) => i.name === "Peito de frango",
+  );
+  const stockBefore = await (await page.request.get("/api/inventory")).json();
+  await page.goto("/conta/dieta");
+  const card = page.getByRole("article", {
+    name: "Café da manhã",
+    exact: true,
+  });
+  await expect(card).toBeVisible();
+  await expect(page.getByRole("article").first()).toHaveAccessibleName(
+    "Café da manhã",
+  );
+  await expect(page.getByLabel("Nome da refeição 1")).toHaveCount(0);
+  await card
+    .getByRole("button", { name: "Trocar alimento", exact: true })
+    .click();
+  let dialog = page.getByRole("dialog");
+  await dialog.getByLabel("Qual alimento?").selectOption(String(eggsIndex));
+  await expect(
+    dialog.getByText("Este alimento está sem trocas liberadas"),
+  ).toBeVisible();
+  await dialog
+    .getByRole("button", { name: "Configurar alternativas e porções" })
+    .click();
+  await dialog
+    .getByRole("button", { name: "Adicionar alternativa", exact: true })
+    .click();
+  await dialog
+    .getByRole("combobox", { name: "Alimento alternativo 1", exact: true })
+    .selectOption(chicken.foodId);
+  await dialog.getByLabel("Porção 1", { exact: true }).fill("90");
+  await dialog
+    .getByRole("combobox", { name: "Estado 1", exact: true })
+    .selectOption("COOKED");
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
+  await dialog.getByRole("button", { name: "Salvar alternativas" }).click();
+  await expect(
+    dialog.getByRole("radio", { name: /Peito de frango/ }),
+  ).toBeVisible();
+  await dialog.getByRole("radio", { name: /Peito de frango/ }).check();
+  await expect(
+    dialog.getByRole("heading", { name: "Trocar alimento", exact: true }),
+  ).toBeInViewport();
+  await screenshot(page, "troca-" + info.project.name, false);
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
+  await dialog.getByRole("button", { name: "Confirmar troca" }).click();
+  await expect(
+    card.getByRole("listitem").filter({ hasText: "Peito de frango" }),
+  ).toBeVisible();
+  const stockAfter = await (await page.request.get("/api/inventory")).json();
+  expect(stockAfter.lots).toEqual(stockBefore.lots);
+  await page.getByRole("button", { name: "Desfazer", exact: true }).click();
+  await expect(
+    card.getByRole("listitem").filter({ hasText: "Ovos" }),
+  ).toBeVisible();
+  await card
+    .getByRole("button", { name: "Trocar alimento", exact: true })
+    .click();
+  dialog = page.getByRole("dialog");
+  await dialog.getByLabel("Qual alimento?").selectOption(String(eggsIndex));
+  await dialog.getByRole("radio", { name: /Peito de frango/ }).check();
+  await dialog
+    .getByRole("combobox", { name: "Aplicar troca", exact: true })
+    .selectOption("NEXT");
+  await dialog.getByRole("button", { name: "Confirmar troca" }).click();
+  await expect(
+    card.getByRole("listitem").filter({ hasText: "Peito de frango" }),
+  ).toBeVisible();
+  const nextDate = new Date(schedule.date + "T12:00:00Z");
+  nextDate.setUTCDate(nextDate.getUTCDate() + 1);
+  const tomorrow = await (
+    await page.request.get(
+      "/api/schedule?date=" + nextDate.toISOString().slice(0, 10),
+    )
+  ).json();
+  expect(
+    tomorrow.meals
+      .find((m: { mealId: string }) => m.mealId === breakfast.mealId)
+      .items.some((i: { foodId: string }) => i.foodId === chicken.foodId),
+  ).toBeTruthy();
+  await page.getByRole("button", { name: "Desfazer", exact: true }).click();
+  await expect(
+    card.getByRole("listitem").filter({ hasText: "Ovos" }),
+  ).toBeVisible();
+  await card
+    .getByRole("button", { name: "Confirmar consumo", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Confirmar e baixar estoque" })
+    .click();
+  await expect(card.getByText("Consumida", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Desfazer", exact: true }).click();
+  await expect(
+    card.getByRole("button", { name: "Confirmar consumo", exact: true }),
+  ).toBeVisible();
+  await screenshot(page, "dieta-simplificada-" + info.project.name);
+  const swapButton = card.getByRole("button", {
+    name: "Trocar alimento",
+    exact: true,
+  });
+  await swapButton.click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(swapButton).toBeFocused();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBeTruthy();
+});
+
 test("acessibilidade das telas públicas de acesso", async ({ page }) => {
   for (const path of ["/", "/entrar", "/cadastro", "/recuperar-senha"]) {
     await page.goto(path);

@@ -93,7 +93,7 @@ function open(path: string) {
   );
 }
 it("cria uma refeição com dias e quantidades e envia a revisão", async () => {
-  open("/conta/dieta");
+  open("/conta/dieta?editar=1");
   const user = userEvent.setup();
   await user.click(
     await screen.findByRole("button", { name: "Adicionar refeição" }),

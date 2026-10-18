@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { api, ApiError } from "../../lib/api";
 import { useSession } from "../auth/session";
 import { bases, units, compatibleUnits } from "../foods/food-types";
@@ -9,16 +9,17 @@ import "./plans.css";
 import { useFoods } from "../foods/useFoods";
 import { localDate } from "../../lib/dates";
 import { PersonalNav } from "../personal";
-import { useCommand } from "../../lib/useCommand";
 
-type Item = {
+import DayPanel from "./DayPanel";
+
+export type Item = {
   foodId: string;
   name?: string;
   quantity: string;
   unit: Unit;
   basis: Basis;
 };
-type Meal = {
+export type Meal = {
   id: string;
   name: string;
   time: string;
@@ -31,8 +32,12 @@ type Plan = {
   meals: Meal[];
   revisionDates: string[];
 };
-type Occurrence = Meal & { mealId: string; date: string; status: string };
-type Schedule = { date: string; timezone: string; meals: Occurrence[] };
+export type Occurrence = Meal & {
+  mealId: string;
+  date: string;
+  status: string;
+};
+export type Schedule = { date: string; timezone: string; meals: Occurrence[] };
 const weekdays = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 export default function PlansPage({ agenda = false }: { agenda?: boolean }) {
   const session = useSession();
@@ -71,18 +76,33 @@ function Workspace({
 }) {
   const today = localDate(timezone);
   const [date, setDate] = useState(today);
+  const [params, setParams] = useSearchParams();
+  const editing = !agenda && params.get("editar") === "1";
   return (
     <main className="plan-page">
       <PersonalNav />
       <p className="eyebrow">SUA ROTINA</p>
-      <h1>{agenda ? "Agenda de refeições" : "Minha dieta"}</h1>
+      <div className="diet-title-row">
+        <h1>
+          {editing
+            ? "Editar dieta"
+            : agenda
+              ? "Agenda de refeições"
+              : "Minha dieta"}
+        </h1>
+        {!agenda && (
+          <button onClick={() => setParams(editing ? {} : { editar: "1" })}>
+            {editing ? "Voltar às refeições" : "Editar dieta"}
+          </button>
+        )}
+      </div>
       <p>
-        {agenda
-          ? "Veja as refeições previstas para cada dia. Agendar ou pular uma refeição não movimenta o estoque."
-          : "Organize alimentos, quantidades e dias da semana. Cada revisão começa na data escolhida."}
+        {editing
+          ? "Organize refeições e porções. As mudanças começam na data escolhida."
+          : "O que comer, na hora certa. Troque um alimento ou confirme sua refeição por aqui."}
       </p>
       <label className="plan-date">
-        {agenda ? "Consultar dia" : "Revisão a partir de"}
+        {editing ? "Revisão a partir de" : "Consultar dia"}
         <input
           type="date"
           required
@@ -92,10 +112,16 @@ function Workspace({
           }}
         />
       </label>
-      {agenda ? (
-        <Agenda key={date} userId={userId} date={date} today={today} />
-      ) : (
+      {editing ? (
         <EditorLoader key={date} userId={userId} date={date} today={today} />
+      ) : (
+        <DayPanel
+          key={date}
+          userId={userId}
+          date={date}
+          today={today}
+          timezone={timezone}
+        />
       )}
     </main>
   );
@@ -458,177 +484,5 @@ function Editor({
         separadamente; não há conversão automática de rendimento.
       </p>
     </form>
-  );
-}
-function Agenda({
-  userId,
-  date,
-  today,
-}: {
-  userId: string;
-  date: string;
-  today: string;
-}) {
-  const schedule = useQuery({
-    queryKey: ["schedule", userId, date],
-    queryFn: () => api<Schedule>("/api/schedule?date=" + date),
-    retry: false,
-  });
-  const command = useCommand();
-  const [consuming, setConsuming] = useState<Occurrence | null>(null);
-  const [actual, setActual] = useState<string[]>([]);
-  const [pending, setPending] = useState(false);
-  const [error, setError] = useState("");
-  const skip = async (meal: Occurrence) => {
-    setPending(true);
-    setError("");
-    try {
-      await api("/api/schedule/skip", "POST", {
-        date,
-        mealId: meal.mealId,
-        skipped: meal.status !== "SKIPPED",
-      });
-      await schedule.refetch();
-    } catch (e) {
-      setError(failure(e));
-    } finally {
-      setPending(false);
-    }
-  };
-  if (schedule.isPending) return <p role="status">Carregando agenda…</p>;
-  if (schedule.isError)
-    return (
-      <div role="alert">
-        <p>{failure(schedule.error)}</p>
-        <button onClick={() => schedule.refetch()}>Tentar novamente</button>
-      </div>
-    );
-  return (
-    <section>
-      {error && (
-        <p role="alert" className="form-error">
-          {error}
-        </p>
-      )}
-      <p>Horários em {schedule.data.timezone}.</p>
-      {command.error && (
-        <p role="alert" className="form-error">
-          {command.error}
-        </p>
-      )}
-      {command.notice && (
-        <p role="status" className="form-success">
-          {command.notice}
-        </p>
-      )}
-      {!schedule.data.meals.length && (
-        <p>
-          Nenhuma refeição prevista neste dia.{" "}
-          <Link to="/conta/dieta">Organizar minha dieta</Link>
-        </p>
-      )}
-      {consuming && (
-        <form
-          className="plan-meal"
-          aria-label="Confirmar consumo"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            if (
-              await command.run("/api/inventory/consumptions", {
-                date,
-                mealId: consuming.mealId,
-                items: consuming.items.map((item, i) => ({
-                  foodId: item.foodId,
-                  basis: item.basis,
-                  quantity: actual[i],
-                  unit: item.unit,
-                })),
-              })
-            ) {
-              setConsuming(null);
-              await schedule.refetch();
-            }
-          }}
-        >
-          <h2>Confirmar consumo de {consuming.name}</h2>
-          <p>
-            Confira o que foi consumido. Ao confirmar, o estoque será reduzido
-            usando os lotes pela validade mais próxima. Alimento preparado usa
-            somente o saldo preparado.
-          </p>
-          {consuming.items.map((item, i) => (
-            <label key={i}>
-              {item.name} · {bases[item.basis]} ({units[item.unit]})
-              <input
-                required
-                type="number"
-                min={item.unit === "UNIT" ? 1 : 0.000001}
-                step={item.unit === "UNIT" ? 1 : "0.000001"}
-                value={actual[i]}
-                onChange={(e) =>
-                  setActual((old) =>
-                    old.map((v, k) => (k === i ? e.target.value : v)),
-                  )
-                }
-              />
-            </label>
-          ))}
-          <div className="plan-actions">
-            <button className="button" disabled={command.busy}>
-              Confirmar e baixar estoque
-            </button>
-            <button
-              type="button"
-              disabled={command.busy}
-              onClick={() => setConsuming(null)}
-            >
-              Cancelar
-            </button>
-          </div>
-        </form>
-      )}
-      {schedule.data.meals.map((meal) => (
-        <article className="plan-meal" key={meal.id}>
-          <div className="plan-row">
-            <h2>
-              {meal.time.slice(0, 5)} · {meal.name}
-            </h2>
-            <span>
-              {meal.status === "PENDING"
-                ? "Prevista"
-                : meal.status === "SKIPPED"
-                  ? "Pulada"
-                  : "Consumida"}
-            </span>
-          </div>
-          <ul>
-            {meal.items.map((item, i) => (
-              <li key={i}>
-                {item.quantity} {units[item.unit]} de {item.name} ·{" "}
-                {bases[item.basis]}
-              </li>
-            ))}
-          </ul>
-          {date <= today && meal.status === "PENDING" && (
-            <button
-              disabled={pending || command.busy}
-              onClick={() => {
-                setConsuming(meal);
-                setActual(meal.items.map((i) => i.quantity));
-              }}
-            >
-              Confirmar consumo
-            </button>
-          )}
-          {date <= today && meal.status !== "CONSUMED" && (
-            <button disabled={pending} onClick={() => skip(meal)}>
-              {meal.status === "SKIPPED"
-                ? "Voltar a prevista"
-                : "Marcar como pulada"}
-            </button>
-          )}
-        </article>
-      ))}
-    </section>
   );
 }

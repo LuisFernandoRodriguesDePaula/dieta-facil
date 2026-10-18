@@ -136,3 +136,13 @@ Uma sessão deve ter um objetivo, uma verificação proporcional e um registro d
 ## Decisões assumidas, revisáveis sem bloquear o início
 
 Interface pt-BR; estoque individual; entrada manual da dieta; ciclo sugerido de sete dias; validade opcional; aviso de proximidade padrão três dias; sem rendimento automático; sem funções pagas de terceiros. Ciclo e dia de compras já são salvos por conta; o período também pode ser manual. E04–E09 implementadas na versão demonstrável local. Produção, publicação e funcionalidades opcionais permanecem separadas. Detalhes em DEMO_GUIDE.md e RETOMADA.md.
+
+## Painel diário e alternativas — entregue
+
+- [x] Cartões por horário, progresso e próxima refeição em Minha dieta/Agenda.
+- [x] Editor completo separado do uso diário.
+- [x] Alternativas por alimento/refeição com porção explícita e permissão de troca.
+- [x] Troca única ou revisão para as próximas, respeitando revisões agendadas.
+- [x] Desfazer com validação de estado e versão; confirmação/estorno de consumo.
+- [x] Exceções refletidas na demanda e na sinalização de compras desatualizadas.
+- [x] Painel lateral/inferior, teclado, verificações axe e jornadas em dois tamanhos de tela.

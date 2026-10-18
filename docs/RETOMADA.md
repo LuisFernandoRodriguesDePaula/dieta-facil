@@ -33,3 +33,13 @@ O usuário autorizou preparar uma opção sem mensalidade e informou que ainda n
 Concluir/consultar CI do push mais recente e ativar os serviços externos conforme DEPLOYMENT.md quando o usuário conectar suas contas. Validar cadastro, confirmação de e-mail, recuperação, cookies e backup na URL real. O projeto Portfólio é separado e não deve ser alterado nesta etapa; PROJECT_CASE.md prepara apenas o texto dentro deste repositório.
 
 Português do Brasil; computador e celular; commits coerentes; processo documentado. Prosseguir autonomamente no escopo autorizado. Não modificar configurações globais de aprovação, não criar agentes sem autorização e não usar serviços pagos. O aplicativo não chama API de IA.
+
+## Atualização — painel diário e trocas (V10)
+
+A tela /conta/dieta abre nos cartões do dia; o editor está em /conta/dieta?editar=1. /conta/agenda usa o mesmo painel. Há resumo/progresso, destaque de próxima refeição, troca de alimento com porções cadastradas, configuração de permissão e alternativas por item, confirmação de consumo e Desfazer. Painel lateral no computador e inferior no celular.
+
+Regras podem ficar bloqueadas. A porção original faz parte da configuração: editar essa porção exige revisão das alternativas. Trocas ONCE persistem em meal_overrides; NEXT usa a revisão da dieta a partir do dia escolhido e respeita revisões futuras. Snapshots consumidos/pulados são preservados. Compras consideram as exceções e ficam desatualizadas quando a origem muda. Trocar não baixa estoque. Regras/exceções/ações são removidas na exclusão da conta.
+
+42 testes Java passaram no PostgreSQL de testes separado dieta_facil_test; não executar testes de API contra o banco pessoal nem em paralelo usando a mesma base da demonstração. 18 testes da interface, build e lint passaram. A jornada de navegador foi ampliada para 12 casos em computador/viewport móvel, incluindo troca e desfazer; consultar a CI do último push para a validação final H2/PostgreSQL/navegador/Docker.
+
+O script demo:hypertrophy adicionou três regras ilustrativas ausentes à conta fictícia já existente. Nenhuma dieta, refeição ou quantidade de estoque foi alterada nessa conta. As credenciais permanecem no arquivo privado anterior. A publicação externa segue pendente das contas gratuitas do proprietário; o Portfólio continua separado.

@@ -12,6 +12,7 @@ Aplicativo de planejamento alimentar que conecta uma dieta já definida ao estoq
 - Recuperação de senha, confirmação de e-mail e exclusão da conta; envio local por arquivo ou produção pela API HTTPS do Brevo.
 - Catálogo pessoal, busca, arquivamento e conversões exatas de unidades.
 - Dieta com revisões por data, refeições recorrentes e agenda no fuso do perfil.
+- Painel diário por horário, alternativas com porções cadastradas, troca única ou recorrente e opção de desfazer. Editor completo em “Editar dieta”.
 - Estoque por lotes, com quantidade, validade, origem da data e armazenamento; conferência conhecida, parcial ou desconhecida.
 - Compras calculadas por dia, considerando os lotes pela validade mais próxima, com listas salvas, ajustes e recebimentos parciais.
 - Ciclo semanal ou mensal salvo na conta, com dia configurável e período manual para o cálculo.

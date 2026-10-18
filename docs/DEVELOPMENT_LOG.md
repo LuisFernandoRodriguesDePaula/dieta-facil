@@ -97,3 +97,13 @@ Implementadas recuperação de senha, confirmação de e-mail, invalidação de 
 Teste PostgreSQL: 36 casos aprovados. Interface: 18 testes, build e lint aprovados. Axe passou nas sete telas pessoais em desktop e mobile; recuperação/exclusão também passaram após corrigir uma corrida de navegação/cache, com recarga completa ao excluir. O teste de API garante que 401 atrasado de uma sessão anterior não encerra a seguinte. Carregamento inicial foi dividido por rotas, reduzindo o pacote principal para aproximadamente 460 kB.
 
 Backup PostgreSQL gerado e restaurado com sucesso em banco temporário; original preservado. Dockerfile e render.yaml preparados para uma única origem React/API, execução sem privilégios e 512 MB. Não há Docker instalado no Windows: a construção e o smoke test do container são verificados pela CI. A ativação real depende de contas Free Render/Neon/Brevo, credenciais e remetente confirmado. Não houve publicação nem contratação. Conteúdo para futura integração ao Portfólio fica em docs/PROJECT_CASE.md; o projeto separado não foi alterado.
+
+## 2026-10-18 — Painel diário e substituições de refeições
+
+Minha dieta agora abre em cartões por horário, com porções legíveis, destaque da próxima refeição e progresso do dia. O editor completo permanece em Editar dieta. Agenda usa o mesmo painel diário. Trocas abrem em painel lateral no computador e janela inferior no celular.
+
+V10 adiciona regras por refeição/alimento/estado/porção, exceções por dia e ações de troca. Alternativas exigem porção própria, podem ser bloqueadas e não afirmam equivalência nutricional. Modos: só uma ocorrência ou revisão a partir do dia escolhido, respeitando a próxima revisão agendada. Validação de versão/fingerprint evita sobrescrever alterações concorrentes; requestId impede reaplicação em tentativas repetidas. Desfazer confere estado atual antes de reverter.
+
+Exceções atualizam a demanda de compras e a sinalização de lista desatualizada. O estoque muda somente na confirmação de consumo; estorno devolve os lotes e preserva a exceção. Exclusão de conta remove também as novas tabelas. Regras ilustrativas foram adicionadas somente à conta fictícia existente, sem trocar alimentos ou movimentar estoque; dados pessoais preservados.
+
+Validação: 42 testes Java aprovados no PostgreSQL isolado; 18 testes de interface, build e lint aprovados. Jornada nova validada em computador e viewport móvel, incluindo configuração, troca única/recorrente, desfazer e consumo. Verificação axe nos painéis de configuração/escolha sem violações nos critérios automatizados; sem auditoria completa ou aparelho físico. A CI do commit final executa as suítes completas e o pacote Docker.

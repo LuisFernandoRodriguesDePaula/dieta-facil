@@ -59,3 +59,20 @@ stale indica mudanças relevantes desde o cálculo ou início do período já pa
 POST /api/onboarding/scenario?type=basic ou type=hypertrophy: conta vazia, carga explícita e única. Repetição não duplica dados. Disponível fora do perfil prod, sempre autenticado e com CSRF.
 
 Erros: 400 validação/parâmetros; 401 sessão ausente; 403 CSRF; 404 recurso ausente ou de outra conta; 409 conflito de versão/chave/saldo/estado. Respostas não incluem senha, hash ou stack trace.
+
+## Uso diário e substituições — V10
+
+`/conta/dieta` e `/conta/agenda` mostram cartões ordenados por horário, resumo do dia e confirmação de consumo. `/conta/dieta?editar=1` mantém o editor completo de revisões. O painel de troca abre ao lado no computador e pela parte inferior no celular, com foco contido e fechamento por Escape.
+
+- GET /api/plan/substitutions?date=AAAA-MM-DD&mealId=UUID&itemIndex=N retorna fingerprint da refeição, versão da regra, permissão e alternativas com porção/unidade/estado e saldo registrado.
+- PUT /api/plan/substitutions: date, mealId, itemIndex, fingerprint, version, enabled, alternatives (foodId, quantity, unit, basis). Até dez alternativas. A regra pertence ao alimento/estado de uma refeição lógica e à porção original. Alterar essa porção exige revisar a configuração. Não há equivalência nutricional automática.
+- POST /api/schedule/substitute: requestId (UUID), date, mealId, itemIndex, fingerprint, ruleVersion, alternativeIndex e scope (ONCE ou NEXT). Repetir requestId com o mesmo corpo não reaplica; outro corpo gera conflito.
+- POST /api/schedule/substitute/undo: actionId. Valida estado/versão antes de desfazer. Nunca desfaz silenciosamente edições posteriores.
+
+ONCE cria uma exceção somente para aquela refeição/data. NEXT salva uma revisão da dieta a partir da data escolhida e respeita revisões futuras já agendadas; exceções individuais dos outros dias continuam preservadas. Se a refeição escolhida tem uma exceção diferente da dieta, é necessário desfazê-la antes de alterar as próximas. Registros consumidos/pulados permanecem snapshots.
+
+Trocas só são permitidas hoje ou no futuro em refeições pendentes. Alimentos de outra conta, arquivados, repetições e unidades incompatíveis são rejeitados. Uma alternativa já presente na refeição fica indisponível. Configuração com permissão desativada mantém alternativas para futura revisão.
+
+Exceções entram na projeção de compras e no hash que sinaliza listas desatualizadas. Trocar/configurar/desfazer troca não movimenta estoque. O consumo confirma os alimentos efetivamente previstos após a troca. Estornar consumo devolve os lotes e mantém a exceção do dia. A exclusão da conta remove também regras, exceções e ações.
+
+O saldo mostrado considera alimento, estado, data de recebimento e vencimento conhecido. Não é reserva nem garantia de conservação; saldo desconhecido/parcial é identificado e validade desconhecida precisa ser conferida.

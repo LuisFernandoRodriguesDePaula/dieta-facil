@@ -34,3 +34,11 @@ Testes Java cobrem HTTP real e domínio em H2/PostgreSQL; testes de interface us
 ## Pacote de publicação
 
 Docker compila React e o empacota como recursos estáticos do Spring Boot, com fallback para as rotas conhecidas da SPA. Interface e API compartilham a origem e a sessão. Container usa usuário sem privilégios e limite de memória testado na CI. O Blueprint Free do Render recebe PostgreSQL externo e credenciais de e-mail por segredo; ativação aguarda as contas do proprietário. Java e frontend não contêm chaves de provedor.
+
+## Substituições e painel diário (V10)
+
+O editor de revisões fica separado dos cartões de uso diário. SubstitutionService bloqueia a conta nas escritas, valida fingerprint da ocorrência e versão da regra e registra requestId para repetição segura. Regras vinculam refeição lógica, alimento/estado e porção original a alternativas explícitas. Alterar a porção desativa a permissão efetiva até revisão.
+
+Exceções por dia ficam em meal_overrides e são mescladas à dieta vigente antes dos snapshots consumidos/pulados. A projeção usa essas ocorrências e inclui as exceções no hash de origem. Troca recorrente salva revisão; revisões futuras previamente agendadas mantêm prioridade. Desfazer verifica estado atual/versão e não movimenta estoque; estorno de consumo mantém a exceção de refeição.
+
+Não há comparação automática de calorias/proteína nem equivalência entre alimentos. Saldos exibidos são registros por alimento/estado, sem reserva e sem garantir conservação.

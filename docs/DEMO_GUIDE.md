@@ -46,3 +46,13 @@ Sessões expiram após inatividade e são perdidas quando a API reinicia. O hist
 ## Evolução de acesso e publicação
 
 Use /recuperar-senha para pedir redefinição ou confirmação. No ambiente local, o e-mail é um arquivo privado em .local/mail. A exclusão fica em /conta/seguranca, exige a senha atual e a palavra EXCLUIR. O cenário de hipertrofia está em HYPERTROPHY_DEMO.md e a publicação em DEPLOYMENT.md.
+
+## Painel de refeições e trocas
+
+Abra Minha dieta para consultar o dia em cartões por horário. Use Editar dieta para alterar horários, dias e porções do plano completo.
+
+Em Trocar alimento, escolha o ingrediente e uma alternativa previamente cadastrada. Se não houver opção, Configurar alternativas e porções permite vincular até dez opções, cada uma com quantidade, unidade e estado próprios. Desmarcar Permitir trocas bloqueia o uso dessas opções. Alterar a porção original exige revisar as alternativas.
+
+Escolha Só nesta refeição ou Nesta e nas próximas (até a próxima revisão agendada). A mensagem de sucesso oferece Desfazer. Confirmar consumo abre a conferência de porções e só então baixa o estoque; o Desfazer desse registro devolve o estoque.
+
+No exemplo de hipertrofia, executar `npm run demo:hypertrophy` também cadastra alternativas ilustrativas que ainda não existem nessa conta separada: ovos → frango no café, frango → carne no almoço e carne → frango no jantar. São porções de demonstração, sem afirmar equivalência nutricional. Não substitui regras já configuradas nem altera estoque/dieta pessoal.

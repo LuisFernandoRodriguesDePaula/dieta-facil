@@ -25,3 +25,7 @@ Use a opção **Treino de hipertrofia · exemplo 82 kg / 1,80 m** no painel de u
 O script npm run demo:hypertrophy, executado em frontend com os servidores locais ativos, cria uma conta fictícia independente. As credenciais aleatórias ficam somente em .local/demo-hypertrophy.json, ignorado pelo Git. Reexecutar o script reutiliza essa conta e não apaga seus testes.
 
 Para entrar, abra esse arquivo local e copie o e-mail e a senha para a tela /entrar. A conta pessoal anterior permanece no banco, com a dieta e o estoque preservados. Não publique esse arquivo de acesso.
+
+## Alternativas para demonstrar a interface
+
+O script de carga acrescenta somente regras ainda ausentes na conta fictícia: no café, ovos podem ser trocados por 90 g de frango preparado; no almoço, frango por 90 g de carne preparada; no jantar, carne por 90 g de frango preparado. Esses pares e porções servem para experimentar a funcionalidade; não são equivalências nutricionais calculadas ou recomendações individuais. Regras existentes são preservadas.
