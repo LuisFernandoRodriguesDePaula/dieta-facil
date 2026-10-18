@@ -9,3 +9,5 @@ target/
 .idea/
 .vscode/
 Thumbs.db
+test-results/
+playwright-report/

@@ -16,8 +16,21 @@ jobs:
         working-directory: frontend
       - run: npm test
         working-directory: frontend
+      - run: npm run lint
+        working-directory: frontend
   backend:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: dieta_facil_test
+          POSTGRES_USER: dieta_facil
+          POSTGRES_PASSWORD: ci-only-password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U dieta_facil -d dieta_facil_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -25,5 +38,49 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-      - run: bash mvnw -B -ntp test
+      - name: Testar com H2
+        run: bash mvnw -B -ntp test
         working-directory: backend
+      - name: Testar com PostgreSQL
+        run: bash mvnw -B -ntp test
+        working-directory: backend
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/dieta_facil_test
+          SPRING_DATASOURCE_USERNAME: dieta_facil
+          SPRING_DATASOURCE_PASSWORD: ci-only-password
+  browser:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: dieta_facil_demo
+          POSTGRES_USER: dieta_facil
+          POSTGRES_PASSWORD: ci-only-password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U dieta_facil -d dieta_facil_demo"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DB_URL: jdbc:postgresql://localhost:5432/dieta_facil_demo
+      DB_USER: dieta_facil
+      DB_PASSWORD: ci-only-password
+      PLAYWRIGHT_CHANNEL: chromium
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+        working-directory: frontend
+      - run: npx playwright install --with-deps chromium
+        working-directory: frontend
+      - run: npm run test:e2e
+        working-directory: frontend
