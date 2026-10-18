@@ -1,3 +1,5 @@
+import AxeBuilder from "@axe-core/playwright";
+import { readFile, readdir, unlink } from "node:fs/promises";
 import { test, expect } from "@playwright/test";
 import type { APIRequestContext, Page } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
@@ -30,6 +32,7 @@ async function account(page: Page) {
     password: "Senha-ficticia-2026!",
   });
   expect(logged.status()).toBe(200);
+  return { email };
 }
 async function screenshot(page: Page, name: string) {
   await mkdir("../.local/screenshots", { recursive: true });
@@ -199,4 +202,145 @@ test("sessão encerrada impede continuar na área pessoal", async ({ page }) => 
   await expect(
     page.getByRole("button", { name: "Entrar", exact: true }),
   ).toBeVisible();
+});
+
+test("cenário de hipertrofia e acessibilidade das telas pessoais", async ({
+  page,
+}, info) => {
+  await account(page);
+  await page.goto("/conta/inicio");
+  await page
+    .getByRole("combobox", { name: "Cenário de demonstração", exact: true })
+    .selectOption("hypertrophy");
+  await page.getByRole("button", { name: "Carregar cenário fictício" }).click();
+  await page.getByRole("button", { name: "Confirmar carga fictícia" }).click();
+  await expect(
+    page
+      .getByRole("status")
+      .filter({ hasText: "Cenário fictício de hipertrofia carregado" }),
+  ).toBeVisible();
+  const plan = await (await page.request.get("/api/plan")).json();
+  expect(plan.meals).toHaveLength(5);
+  const stock = await (await page.request.get("/api/inventory")).json();
+  expect(stock.lots).toHaveLength(18);
+  expect(
+    stock.lots.every((l: { expiry: unknown }) => l.expiry === null),
+  ).toBeTruthy();
+  for (const path of [
+    "/conta/inicio",
+    "/conta/dieta",
+    "/conta/agenda",
+    "/conta/estoque",
+    "/conta/compras",
+    "/conta/preparo",
+    "/conta/seguranca",
+  ]) {
+    await page.goto(path);
+    await expect(page.locator("main h1")).toBeVisible();
+    await expect(page.getByText(/Carregando|Verificando/)).toHaveCount(0);
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+      .analyze();
+    expect(
+      results.violations.map((v) => ({
+        id: v.id,
+        impact: v.impact,
+        nodes: v.nodes.map((n) => n.target),
+      })),
+      path,
+    ).toEqual([]);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBeTruthy();
+  }
+  await page.goto("/conta/dieta");
+  await expect(page.getByLabel("Nome da refeição 1")).toHaveValue(
+    "Café da manhã",
+  );
+  await screenshot(page, "hipertrofia-" + info.project.name);
+  await page.getByRole("link", { name: "Início", exact: true }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/\/conta\/inicio$/);
+});
+test("recuperação de senha por e-mail local e exclusão da conta fictícia", async ({
+  page,
+}) => {
+  const profile = await account(page);
+  await post(page.request, "/api/auth/logout", {});
+  await page.goto("/recuperar-senha");
+  await page.getByLabel("E-mail da conta").fill(profile.email);
+  await page.getByRole("button", { name: "Enviar link", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText(
+    "Se houver uma conta elegível",
+  );
+  let found: { path: string; body: string } | undefined;
+  await expect
+    .poll(
+      async () => {
+        const paths = await readdir("../.local/mail").catch(() => []);
+        for (const name of paths.filter((n) => n.endsWith(".json"))) {
+          const path = "../.local/mail/" + name;
+          let message;
+          try {
+            message = JSON.parse(await readFile(path, "utf8"));
+          } catch {
+            continue;
+          }
+          if (
+            message.to === profile.email &&
+            message.subject.includes("Redefina")
+          ) {
+            found = { path, body: message.body };
+            return true;
+          }
+        }
+        return false;
+      },
+      { timeout: 25000 },
+    )
+    .toBe(true);
+  const link = found!.body.match(/http[^\s]+/)![0];
+  await page.goto(link);
+  await page
+    .getByLabel("Nova senha", { exact: true })
+    .fill("Senha-alterada-2026!");
+  await page.getByLabel("Repita a nova senha").fill("Senha-alterada-2026!");
+  await page.getByRole("button", { name: "Salvar nova senha" }).click();
+  await expect(page).toHaveURL(/\/entrar$/);
+  await page.getByLabel("E-mail", { exact: true }).fill(profile.email);
+  await page.getByLabel("Senha", { exact: true }).fill("Senha-alterada-2026!");
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page).toHaveURL(/\/conta$/);
+  await page.getByRole("link", { name: "Segurança e privacidade" }).click();
+  await page.getByRole("button", { name: "Quero excluir minha conta" }).click();
+  await page.getByLabel("Senha atual").fill("Senha-alterada-2026!");
+  await page.getByLabel("Digite EXCLUIR para confirmar").fill("EXCLUIR");
+  await page
+    .getByRole("button", { name: "Excluir definitivamente minha conta" })
+    .click();
+  await expect(page).toHaveURL("http://127.0.0.1:5173/entrar?conta=excluida");
+  expect((await page.request.get("/api/me")).status()).toBe(401);
+  await expect(
+    page.getByRole("status").filter({ hasText: "Conta excluída" }),
+  ).toBeVisible();
+  await unlink(found!.path);
+});
+test("acessibilidade das telas públicas de acesso", async ({ page }) => {
+  for (const path of ["/", "/entrar", "/cadastro", "/recuperar-senha"]) {
+    await page.goto(path);
+    await expect(page.locator("main")).toBeVisible();
+    await expect(page.getByText(/Verificando sua sessão/)).toHaveCount(0);
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+      .analyze();
+    expect(
+      results.violations.map((v) => ({
+        id: v.id,
+        nodes: v.nodes.map((n) => n.target),
+      })),
+      path,
+    ).toEqual([]);
+  }
 });

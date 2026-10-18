@@ -159,3 +159,23 @@
     margin: 8px 0;
   }
 }
+.danger-button {
+  color: #8b2020 !important;
+  border-color: #b74848 !important;
+}
+.plan-page .eyebrow {
+  color: #6a5a2f;
+}
+.plan-page nav a,
+.personal-links a {
+  color: #405a49;
+}
+.access-card select {
+  font: inherit;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #aab7ad;
+  border-radius: 8px;
+  background: #fff;
+  color: #263d31;
+}
