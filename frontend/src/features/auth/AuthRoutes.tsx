@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -19,6 +19,9 @@ import { useSession, sessionKey } from "./session";
 import type { Profile } from "./session";
 import FoodsPage from "../foods/FoodsPage";
 import PlansPage from "../plans/PlansPage";
+import InventoryPage from "../inventory/InventoryPage";
+import ShoppingPage from "../shopping/ShoppingPage";
+import DashboardPage from "../dashboard/DashboardPage";
 
 const timezone = () =>
   Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Sao_Paulo";
@@ -60,14 +63,30 @@ const profileSchema = z.object({
 });
 
 export default function AuthRoutes() {
+  const client = useQueryClient();
+  const navigate = useNavigate();
+  useEffect(() => {
+    const expired = () => {
+      client.clear();
+      client.setQueryData(sessionKey, null);
+      navigate("/entrar", { replace: true, state: { expired: true } });
+    };
+    window.addEventListener("dieta-facil-session-expired", expired);
+    return () =>
+      window.removeEventListener("dieta-facil-session-expired", expired);
+  }, [client, navigate]);
   return (
     <Routes>
       <Route path="/entrar" element={<AccessPage registerMode={false} />} />
       <Route path="/cadastro" element={<AccessPage registerMode />} />
       <Route path="/conta" element={<AccountPage />} />
+      <Route path="/conta/inicio" element={<DashboardPage />} />
       <Route path="/conta/alimentos" element={<FoodsPage />} />
       <Route path="/conta/dieta" element={<PlansPage />} />
       <Route path="/conta/agenda" element={<PlansPage agenda />} />
+      <Route path="/conta/estoque" element={<InventoryPage />} />
+      <Route path="/conta/compras" element={<ShoppingPage />} />
+      <Route path="/conta/preparo" element={<InventoryPage preparation />} />
       <Route path="*" element={<App />} />
     </Routes>
   );
@@ -88,8 +107,8 @@ function AuthFrame({ children }: { children: React.ReactNode }) {
             cuidar do seu dia.
           </h1>
           <p>
-            Comece pela sua conta. Aos poucos, vamos conectar sua dieta, seu
-            estoque e suas compras.
+            Organize sua dieta, confira o que tem em casa e planeje as próximas
+            compras.
           </p>
         </div>
         <small>
@@ -472,6 +491,12 @@ function AccountForm({ user }: { user: Profile }) {
       </button>
       <div className="account-next">
         <strong>Organize sua rotina.</strong>
+        <p>
+          <Link to="/conta/inicio">Abrir meu painel</Link> ·{" "}
+          <Link to="/conta/estoque">Estoque</Link> ·{" "}
+          <Link to="/conta/compras">Compras</Link> ·{" "}
+          <Link to="/conta/preparo">Preparo</Link>
+        </p>
         <p>
           <Link to="/conta/dieta">Minha dieta</Link> ·{" "}
           <Link to="/conta/agenda">Agenda de refeições</Link>

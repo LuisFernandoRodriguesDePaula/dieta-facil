@@ -52,7 +52,8 @@ export default function App() {
     queryFn: loadSchedule,
     retry: 1,
   });
-  const date = new Date();
+  const [baseDate] = useState(() => Date.now());
+  const date = new Date(baseDate);
   date.setDate(date.getDate() + dayOffset);
   const dateKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   const meals = schedule.data?.meals ?? [];
@@ -76,7 +77,12 @@ export default function App() {
     <div className="meal-list">
       {meals.map((meal, index) => {
         const checked = completed.includes(`${dateKey}:${meal.id}`);
-        const icons = [<Sprout />, <Salad />, <Leaf />, <Utensils />];
+        const icons = [
+          <Sprout key="sprout" />,
+          <Salad key="salad" />,
+          <Leaf key="leaf" />,
+          <Utensils key="utensils" />,
+        ];
         return (
           <article
             className={`meal-card ${checked ? "is-done" : ""}`}

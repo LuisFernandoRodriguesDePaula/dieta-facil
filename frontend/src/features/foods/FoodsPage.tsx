@@ -141,6 +141,14 @@ function Catalog({ userId, name }: { userId: string; name: string }) {
           </div>
         </header>
         <main className="catalog-main">
+          <nav className="personal-links" aria-label="Área pessoal">
+            <Link to="/conta/inicio">Início</Link>
+            <Link to="/conta/dieta">Dieta</Link>
+            <Link to="/conta/agenda">Agenda</Link>
+            <Link to="/conta/estoque">Estoque</Link>
+            <Link to="/conta/compras">Compras</Link>
+            <Link to="/conta/preparo">Preparo</Link>
+          </nav>
           <Link className="back-link" to="/conta">
             <ArrowLeft size={16} />
             Voltar à minha conta
