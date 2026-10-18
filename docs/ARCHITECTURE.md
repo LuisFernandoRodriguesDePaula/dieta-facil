@@ -1,40 +1,31 @@
-# Arquitetura inicial
+# Arquitetura — Dieta Fácil
 
-O navegador executa React e consulta `/api/demo/schedule`. Durante o desenvolvimento, o proxy do Vite encaminha `/api` e `/actuator` ao Spring Boot na porta 8080. O Spring consulta o PostgreSQL por Spring Data JPA. Flyway aplica migrações e Hibernate valida o esquema, sem criá-lo automaticamente.
+Monorepositório com React/TypeScript/Vite na interface, Spring Boot 4/Java 21 na API e PostgreSQL 17. O domínio é um monólito dividido por funcionalidade; não há microserviços nem IA nos cálculos.
 
-## Decisões
+## Interface
 
-- Monorepositório: interface, API e documentação evoluem no mesmo histórico Git.
-- Java 21 e Maven Wrapper: ambiente explícito, sem Maven global.
-- React Router para navegação e TanStack Query para carregamento, cache e erro da API.
-- PostgreSQL local em 5433 para não depender de Docker e separar o cluster deste projeto do serviço instalado em 5432.
-- SQL versionado desde a primeira entrega. H2 apenas para testes rápidos.
-- Demonstração de leitura antes de autenticação: nenhum endpoint recebe dados pessoais. Servidores limitados a loopback.
-- Datas do navegador na demonstração; quando houver perfil, o fuso configurado pelo usuário será a referência. O plano fictício repete as mesmas refeições todos os dias.
-- Marcação em memória por data: não representa histórico persistente nem funcionalidade concluída do MVP.
+React Router separa a demonstração pública das rotas pessoais em /conta. TanStack Query gerencia consultas/cache por conta; login/logout limpam o cache e respostas 401 de recursos protegidos encerram a área pessoal. Formulários e ações mostram carregamento, erro e confirmação.
 
-## Limites deliberados
+A demonstração pública antiga usa dados fixos de leitura e marcação em memória. O painel pessoal, agenda, estoque e compras consultam dados persistidos e não usam essa marcação.
 
-`demo_meals` é uma tabela de exemplo, não o modelo definitivo do domínio. Seus itens são textos para apresentação; não são usados para cálculo. O modelo normalizado de usuários, alimentos, planos, dias e itens será implementado em migrações posteriores. Não calcular compras a partir desses textos.
+## Persistência e transações
 
-Antes de CRUD pessoal: Spring Security, sessão com cookie HttpOnly, CSRF, validação e autorização de propriedade. A decisão para implementação está em ADR-001, abaixo. A API atual não está pronta para exposição pública.
+Flyway versiona o esquema desde a V1. Usuários e alimentos usam JPA. Planos, estoque e compras usam JdbcTemplate para deixar explícitas as consultas e movimentações do domínio, compartilhando DataSource e transações Spring. A decisão está em [ADR-002](decisions/ADR-002-plan-and-stock.md).
 
-## Evolução planejada em 2026-10-16
+Escritas do domínio bloqueiam a linha da conta antes de conferir versões/chaves e alterar lotes. Esse bloqueio serializa operações domésticas da mesma conta e preserva paralelismo entre contas. Quantidades usam NUMERIC(19,6), BigDecimal e unidades canônicas; movimentos registram deltas imutáveis. Estornos criam operações compensatórias.
 
-A decisão de acesso está em [ADR-001](decisions/ADR-001-auth-and-modules.md). O back-end evoluirá como monólito modular, sem IA nos cálculos, conforme [modelo de domínio](DOMAIN_MODEL.md). O banco atual ainda não contém essas entidades.
+A chave lógica de ocorrência usa usuário, refeição lógica e data, sem revisão. Ocorrências puladas/consumidas guardam snapshot, preservando o histórico ao editar a dieta.
 
-O fluxo planejado é dieta -> projeção de demanda com estoque -> lista -> recebimento real -> lote/movimento -> preparo/consumo. Projeções nunca alteram saldos. Idempotência, transações e histórico de movimentos evitam duplicidade. Detalhes e cenários de teste estão em [INVENTORY_RULES.md](INVENTORY_RULES.md); a ordem de implementação está em [ROADMAP.md](ROADMAP.md).
+Compras projetam ocorrências pendentes por data e alocam saldo compatível por validade. Gerar lista não reserva nem movimenta saldo. Listas guardam snapshot, ajustes, recebimentos e impressão digital das fontes para indicar desatualização.
 
-## E02 implementada
+## Acesso
 
-Migração V2 cria users. AuthService valida fuso e limite em bytes da senha, normaliza e-mail e retorna somente DTOs de perfil. Spring Security usa BCrypt, sessão em memória e proteção CSRF. O login JSON autentica pelo AuthenticationManager, executa a estratégia de renovação de sessão/CSRF e salva explicitamente o SecurityContext. O logout usa o filtro do Spring Security.
+Sessão no servidor, cookie HttpOnly/SameSite e CSRF. O perfil prod exige cookie Secure. IDs são consultados com o proprietário da sessão. Veja [ADR-001](decisions/ADR-001-auth-and-modules.md).
 
-A interface usa React Hook Form/Zod e cliente HTTP compartilhado com obtenção de CSRF antes de mutações. Erros de conexão não são tratados como ausência de sessão. Dados da conta são removidos do cache ao sair ou receber 401 em alteração de perfil. Cadastro não inicia sessão automaticamente. /api/me sempre deriva a identidade da sessão; não oferece consulta por ID fornecido pelo cliente. Revalidar autorização ao criar novos módulos.
+Sessões em memória são perdidas ao reiniciar; recuperação de senha, exclusão de conta, mitigação de abuso e revisão completa de produção não fazem parte da demonstração local.
 
-## E03 implementada
+## Execução e qualidade
 
-Módulo foods usa consultas por id + user_id, sem aceitar proprietário do navegador. Migração V3 cria a chave estrangeira de usuário e uma chave única (user_id, id) para futuros vínculos de domínio. Unidade preferida pode mudar apenas dentro da mesma dimensão. Arquivamento mantém o registro; não há exclusão definitiva.
+Servidores locais em loopback; PostgreSQL exclusivo em 5433. Credenciais/dados/capturas temporárias em .local/, fora do Git. A carga de cenário fictício é explícita, restrita a conta vazia e indisponível no perfil prod.
 
-Versão explícita no DTO + @Version no JPA evitam sobrescrita de alterações concorrentes. A conversão de unidades é domínio Java puro com BigDecimal, sem assumir rendimento cru/cozido. A API devolve quantidades como strings. Referência de quantidade é separada do alimento; futuros meal_items/lotes guardarão seu próprio basis.
-
-Frontend separa tipos, página de catálogo, formulário e conversor. A consulta é vinculada ao ID da conta no cache. O módulo usa o mesmo hook de sessão da área pessoal, limpa cache em 401 e distingue erro de conexão de catálogo vazio. Detalhes de contrato em FOODS_API.md.
+Testes Java cobrem HTTP real e domínio em H2/PostgreSQL; testes de interface usam respostas simuladas; Playwright percorre a aplicação real em desktop e viewport móvel. A CI repete as camadas com PostgreSQL e Chromium. Não houve validação em aparelho físico nem implantação pública nesta entrega.

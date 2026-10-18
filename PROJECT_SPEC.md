@@ -96,7 +96,7 @@ Pessoas que já possuem um plano alimentar e querem organizá-lo. O sistema **n�
 
 **Observação:** validar cardinalidade, exclusão e integridade referencial antes de gerar as entidades. Evitar duplicação de informações deriváveis, exceto quando necessário para manter o histórico da lista.
 
-**Extensão aprovada:** o modelo acima era a proposta inicial. Lotes, movimentos, revisões de plano, compras e preparo estão especificados em [DOMAIN_MODEL.md](docs/DOMAIN_MODEL.md), que passa a ser a referência para as próximas migrações. A tabela atual `demo_meals` continua exclusivamente demonstrativa.
+**Extensão aprovada:** o modelo acima era a proposta inicial. Lotes, movimentos, revisões de plano, compras e preparo estão especificados em [DOMAIN_MODEL.md](docs/DOMAIN_MODEL.md), que registra a visão do domínio; as migrações SQL e docs/DOMAIN_API.md descrevem o contrato implementado. A tabela atual `demo_meals` continua exclusivamente demonstrativa.
 
 ## 6. API REST proposta
 
@@ -181,7 +181,7 @@ O checklist abaixo registra as fases originais. A sequência executável revisad
 ### Fase 2 — Back-end e persistência
 - [ ] Criar esquema do banco com Flyway.
 - [x] Implementar autenticação e isolamento de dados (perfil pessoal; validar propriedade novamente em cada novo módulo).
-- [ ] Implementar CRUD de alimentos e planos/refeições (alimentos concluídos na E03; planos/refeições pendentes).
+- [x] Implementar catálogo e plano/refeições pessoais, com revisões e agenda.
 - [ ] Documentar API e criar testes.
 
 ### Fase 3 — Integração e regras de negócio
@@ -244,4 +244,4 @@ O MVP está concluído quando um usuário consegue criar uma conta, cadastrar su
 
 ---
 
-**Status:** base demonstrativa, E02 (acesso pessoal) e E03 (catálogo pessoal/unidades) implementadas localmente. Estoque ainda planejado. Próxima entrega: E04 — dieta manual e agenda recorrente.
+**Status — 2026-10-18:** versão demonstrável local com conta, catálogo, dieta, agenda, estoque, compras, preparo, consumo e alertas. Ciclo de compra pessoal e cenário fictício opcional implementados. Contratos efetivos em docs/DOMAIN_API.md; roteiro em docs/DEMO_GUIDE.md. Publicação, produção e integração com Portfólio estão adiadas por orientação do usuário.

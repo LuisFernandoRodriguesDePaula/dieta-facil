@@ -2,7 +2,7 @@
 
 Planejado em 2026-10-16; não representa tabelas já implementadas. Criar migrações apenas na entrega correspondente. `demo_meals` permanece isolada e nunca vira dados pessoais automaticamente.
 
-Estado atual: users implementada na V2; foods implementada na V3 com unidade preferida, categoria, frequência, versão e arquivamento. Dimensão/base são derivadas da unidade. As demais tabelas desta proposta continuam futuras.
+Estado atual — 2026-10-18: V2 users; V3 foods; V4 diet_plans, plan_revisions, plan_meals, meal_days, plan_items e meal_occurrences; V5 inventory_accounts, inventory_lots, inventory_operations e inventory_movements; V6 shopping_lists e shopping_receipts; V7 demo_scenarios; V8 shopping_preferences. O modelo abaixo preserva a visão conceitual; nomes/colunas efetivos estão nas migrações. Snapshots de ocorrência/lista e pedidos de operação são JSON em TEXT.
 
 ## Estrutura
 
@@ -14,7 +14,7 @@ Estado atual: users implementada na V2; foods implementada na V3 com unidade pre
 | food_packages | Alimento, conteúdo na unidade base; opcional para arredondar compra |
 | meal_plans / plan_revisions | Dono, nome, revisão e vigência sem sobreposição de planos ativos |
 | meals / meal_days / meal_items | Revisão, nome, horário local, dias 1–7, alimento, quantidade e referência |
-| meal_occurrences / occurrence_items | Revisão e snapshot de itens por data; estado pendente/consumida/pulada; unicidade refeição+data+revisão |
+| meal_occurrences / occurrence_items | Revisão e snapshot de itens por data; estado pendente/consumida/pulada; unicidade usuário+refeição lógica+data, independente da revisão |
 | inventory_accounts | Dono, alimento, referência, conhecimento KNOWN/UNKNOWN/PARTIAL e data de conferência |
 | inventory_lots | Dono, alimento, referência, saldo NUMERIC(19,6), local, estado, validade/origem, abertura/preparo, versão |
 | stock_operations | Dono, tipo, chave de idempotência, hash de payload, resultado persistido, origem, instante/data local, reversão |

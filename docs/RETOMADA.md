@@ -1,43 +1,46 @@
-# Ponto de retorno — 2026-10-16
+# Ponto de retorno — 2026-10-18
 
-Trabalho encerrado após E03. Retomada prevista pelo usuário para 2026-10-17; sem agendamento automático.
+## Estado
 
-## Estado salvo
+Dieta Fácil está na versão demonstrável local, com conta, catálogo, dieta versionada, agenda, estoque por lotes, compras por cobertura/validade, recebimento parcial, preparo medido, consumo, estornos e alertas.
 
-- E01: demonstração integrada React, Spring Boot e PostgreSQL.
-- E02: cadastro, login, logout e perfil pessoal com sessão HttpOnly e CSRF.
-- E03: catálogo pessoal, busca, edição, arquivamento/restauração e conversões exatas.
-- Último commit de implementação: `9c5a76a`.
-- Repositório: https://github.com/LuisFernandoRodriguesDePaula/dieta-facil
-- Árvore de trabalho limpa antes de criar este ponto de retorno.
+A pasta física é C:\Users\Usuario\Documents\ChatGPT\Dieta Fácil. O caminho antigo que eventualmente aparece no contexto do chat não existe mais. Sempre use o caminho físico atual ao executar comandos.
 
-Validação da E03: 13 testes Java, 11 testes de interface, build e GitHub Actions passaram. Os sete testes de alimentos/conversão também passaram no PostgreSQL. Interface revisada em computador e frame de 390 px, sem aparelho físico.
+Repositório: https://github.com/LuisFernandoRodriguesDePaula/dieta-facil
 
-## Próxima entrega: E04 — dieta manual e agenda
+## Para experimentar
 
-1. Ler este arquivo, PROJECT_SPEC.md, ROADMAP.md, DOMAIN_MODEL.md e INVENTORY_RULES.md.
-2. Conferir `git status` e o código atual antes de modificar arquivos.
-3. Começar pelo contrato e modelo de planos, revisões com vigência, refeições, dias e itens vinculados ao catálogo pessoal. Detalhar a regra de revisão/identidade de ocorrência antes da migração.
-4. Implementar em partes: persistência, API com autorização, interface e testes relevantes. Registrar commits menores e coerentes ao concluir cada parte verificável.
-5. Permitir criar/duplicar refeições, copiar dias e consultar agenda por data no fuso do perfil.
-6. Testar mudança de semana/mês, vigência de revisões, quantidades/unidades/referências e isolamento entre duas contas.
+Inicie os scripts Start-Database.ps1, Start-Backend.ps1 e Start-Frontend.ps1 conforme README. Abra http://127.0.0.1:5173/conta/inicio, crie uma conta de teste e entre. Em conta vazia, carregue explicitamente o cenário fictício. Veja docs/DEMO_GUIDE.md.
 
-Não iniciar E05/estoque antes de concluir esta entrega. Agendar ou marcar refeição não deve reduzir estoque. Preservar snapshots/histórico confirmado; não alterar dados passados ao editar a dieta.
+API: 8080; banco exclusivo: 5433. Não presuma que processos de uma sessão anterior continuaram ativos. Sessões são perdidas ao reiniciar a API. Credenciais e banco ficam em .local/, fora do Git; nunca publicar esse diretório.
 
-## Ambiente e cuidados ao retomar
+## Implementação
 
-- A pasta física ainda é `C:\Users\Usuario\Documents\ChatGPT\Nutri Fácil`; o produto chama-se Dieta Fácil. A renomeação foi bloqueada pelo Windows enquanto a pasta estava em uso.
-- PostgreSQL exclusivo do projeto: 127.0.0.1:5433. Credenciais e dados ficam em `.local/`, ignorados pelo Git. Nunca publicar esse diretório.
-- API: http://127.0.0.1:8080 ; interface: http://127.0.0.1:5173 . Verificar se os processos continuam ativos; não presumir que sobreviveram ao encerramento do aplicativo/computador.
-- Para iniciar, usar os scripts Start-Database.ps1, Start-Backend.ps1 e Start-Frontend.ps1 conforme README.
-- Sessões são perdidas ao reiniciar a API e expiram após inatividade. Usar conta fictícia para QA; a prévia foi verificada com dados de teste e não representa a conta pessoal do usuário.
-- Dieta pessoal ainda não existe. `/minha-dieta` é demonstração; `/conta/alimentos` é o catálogo pessoal real.
-- Recuperação de senha, verificação de e-mail e preparação para abertura pública permanecem pendentes.
+- V1 demonstração pública fixa, separada da conta.
+- V2 usuários, acesso e perfil; V3 alimentos pessoais.
+- V4 plano/revisões, refeições/dias/itens e snapshots de ocorrência.
+- V5 contas de estoque, lotes, operações e movimentos.
+- V6 listas e recebimentos; V7 marcador da carga fictícia; V8 ritmo semanal/mensal da conta.
+- Escritas de domínio bloqueiam a conta. Saldo não negativo; tentativas repetidas usam chave idempotente.
+- Projeção usa FEFO em cada dia; cru, preparado e como vendido são referências distintas.
+- Preparo exige entrada e rendimento medidos. Agenda só baixa estoque ao confirmar consumo.
+- Alterar armazenamento não estende a validade; alteração de lote usa versão.
+- Contratos efetivos: docs/DOMAIN_API.md. Decisões: docs/decisions/ADR-002-plan-and-stock.md.
 
-## Preferências do usuário
+## Validação
 
-Português do Brasil; computador e celular; aprender por entregas funcionais com explicação breve; registrar processo no GitHub para portfólio. Nas próximas etapas, preferir commits menores, com mensagens claras e validação documentada. Prosseguir sem confirmações conversacionais rotineiras dentro do escopo autorizado; permissões obrigatórias do sistema continuam aplicáveis. Não modificar configurações globais de aprovação.
+30 testes Java passaram em H2. A suíte PostgreSQL completa passou antes dos últimos testes adicionais, que também passaram em execuções específicas: concorrência de retirada, virada do mês e persistência do ciclo. Interface: 17 testes, build e lint. Jornada Playwright: quatro casos aprovados, cobrindo fluxo completo e sessão encerrada em desktop e viewport móvel.
 
-## Mensagem para continuar
+Revisadas capturas reais da aplicação com dados fictícios; sem teste em aparelho físico e sem auditoria completa de acessibilidade. A CI executa build/lint/interface, Java em H2 e PostgreSQL e navegador Chromium; consulte a execução do último push no GitHub. Capturas temporárias/traces ficam em .local/ e test-results/, ignorados.
 
-> Retome o Dieta Fácil pelo arquivo docs/RETOMADA.md. Continue com a E04, dieta manual e agenda recorrente, em entregas verificáveis e commits menores. Confira o estado atual antes de implementar.
+## Escopo e próximos passos
+
+A orientação mais recente do usuário é cuidar exclusivamente do Dieta Fácil. O projeto Portfólio é separado e não deve ser alterado. Publicação/contratação de hospedagem não fazem parte desta entrega.
+
+A próxima etapa é a avaliação do usuário sobre a demonstração: usabilidade, refinamentos e prioridades. Não reiniciar E04 nem refazer funcionalidades já entregues. Antes de editar, conferir git status, commits recentes e este arquivo.
+
+Evoluções registradas: embalagem/arredondamento comercial, agrupamento adicional de compras, receitas compostas, importação de dieta, revisão ampliada de acessibilidade e recursos de produção. Sem recuperação de senha, verificação de e-mail, exclusão de conta ou mitigação completa de abuso. Não apresentar a versão como pronta para abertura pública.
+
+## Preferências
+
+Português do Brasil; computador e celular; entregas funcionais, commits coerentes e processo documentado no GitHub. Prosseguir autonomamente no escopo autorizado. Não modificar configurações globais de aprovação. Não criar múltiplos agentes sem autorização aplicável. A aplicação não chama API de IA e não usa serviços pagos.

@@ -18,13 +18,13 @@ Revisão de 2026-10-16. Este backlog substitui a ordem genérica da especificaç
 | P01 | Regras, modelo e plano revisados com estoque | E01 | Documentado nesta revisão |
 | E02 | Conta, login, logout e isolamento | P01 | Concluída, ambiente local |
 | E03 | Catálogo pessoal e unidades | E02 | Concluída, ambiente local |
-| E04 | Dieta manual e agenda recorrente | E03 | Próxima |
-| E05 | Estoque inicial, lotes e ajustes | E03 | Pendente |
-| E06 | Demanda, cobertura e lista de compras | E04 + E05 | Pendente |
-| E07 | Confirmação de compras parciais | E06 | Pendente |
-| E08 | Consumo e preparo sem baixa duplicada | E04 + E05 + E07 | Pendente |
-| E09 | Validade, alertas e revisão da projeção | E06 + E08 | Pendente |
-| E10 | Qualidade final, deploy e apresentação | E02–E09 | Pendente |
+| E04 | Dieta manual e agenda recorrente | E03 | Implementada localmente |
+| E05 | Estoque inicial, lotes e ajustes | E03 | Implementada localmente |
+| E06 | Demanda, cobertura e lista de compras | E04 + E05 | Implementada; embalagem comercial futura |
+| E07 | Confirmação de compras parciais | E06 | Implementada localmente |
+| E08 | Consumo e preparo sem baixa duplicada | E04 + E05 + E07 | Implementada localmente |
+| E09 | Validade, alertas e revisão da projeção | E06 + E08 | Implementada localmente |
+| E10 | Qualidade final, deploy e apresentação | E02–E09 | Demonstração local; produção/publicação adiadas |
 
 E05 já armazena validade e local de forma opcional, para evitar retrabalho. E06 já respeita datas informadas. E09 acrescenta a experiência completa de alertas e correções, sem adiar as regras básicas de validade.
 
@@ -56,67 +56,70 @@ Aceite: alimento criado reaparece após login; não há soma de dimensões incom
 
 ## E04 — Dieta e agenda
 
-- [ ] Plano, revisões com vigência, refeições, dias e itens normalizados.
-- [ ] Criar/duplicar refeição, copiar dias e visualizar agenda por data.
-- [ ] Regras de ocorrência e fuso; snapshots para não mudar histórico confirmado.
-- [ ] Identificar refeições pendentes/puladas sem gerar consumo de estoque automaticamente.
+- [x] Plano, revisões com vigência, refeições, dias e itens normalizados.
+- [x] Criar/duplicar refeição incluindo seus dias e visualizar agenda por data.
+- [x] Regras de ocorrência e fuso; snapshots para não mudar histórico confirmado.
+- [x] Identificar refeições pendentes/puladas sem gerar consumo de estoque automaticamente.
 
 Aceite: agenda muda corretamente por dia; revisões respeitam vigência; virada de semana/mês funciona; referências RAW/COOKED são visíveis.
 
 ## E05 — Meu estoque
 
-- [ ] Quantidade conhecida, zero ou desconhecida, inclusive conferência parcial.
-- [ ] Lotes com unidade/referência, validade opcional, origem da data, estado e local.
-- [ ] Entradas iniciais, descarte e correção por movimentos, com motivo e idempotência.
-- [ ] Saldo transacional não negativo, autorização e histórico.
+- [x] Quantidade conhecida, zero ou desconhecida, inclusive conferência parcial.
+- [x] Lotes com unidade/referência, validade opcional, origem da data, estado e local.
+- [x] Entradas iniciais, descarte e correção por movimentos, com motivo e idempotência.
+- [x] Saldo transacional não negativo, autorização e histórico.
 
 Aceite: saldo reconcilia com movimentos; repetir operação não duplica; dois usuários não compartilham lotes; quantidades desconhecidas ficam explícitas. Não exigir preenchimento de todos os alimentos para usar o app.
 
 ## E06 — Planejar compras
 
-- [ ] Ciclo semanal/mensal/manual e período explícito, sem dia padrão obrigatório.
-- [ ] Expandir refeições e projetar alocação por data com FEFO e compatibilidade.
-- [ ] Mostrar demanda, saldo considerado, falta, incertezas e primeira data de falta.
-- [ ] Persistir snapshot da lista, ajustes e data de cálculo; detectar desatualização.
-- [ ] Embalagem opcional e arredondamento explicado; recalcular sem apagar ajustes.
+- [x] Ciclo semanal/mensal/manual e período explícito, sem dia padrão obrigatório.
+- [x] Expandir refeições e projetar alocação por data com FEFO e compatibilidade.
+- [x] Mostrar demanda, saldo considerado, falta, incertezas e primeira data de falta.
+- [x] Persistir snapshot da lista, ajustes e data de cálculo; detectar desatualização.
+- [x] Recalcular sem apagar ajustes dos itens remanescentes.
+- [ ] Evolução opcional: embalagem comercial e arredondamento explicado.
 
 Aceite: exemplo dos 14 ovos/5 em estoque resulta em falta 9; lote vencendo antes do uso não cobre essa data; desconhecido não vira zero; gerar listas não altera estoque. Testar a matriz de regras aplicável em PostgreSQL.
 
 ## E07 — Confirmar compras
 
-- [ ] Recebimento parcial e avulso, com quantidades reais e separação de lotes.
-- [ ] Transação idempotente com confirmação revisável antes de envio.
-- [ ] Estados da lista, progresso de recebimento e estorno validado.
+- [x] Recebimento parcial e avulso, com quantidades reais e separação de lotes.
+- [x] Transação idempotente com confirmação revisável antes de envio.
+- [x] Estados da lista, progresso de recebimento e estorno validado.
 
 Aceite: recebimento de 6 itens numa falta de 9 cria entrada de 6; repetir requisição não soma novamente; cancelamento da lista não apaga o que já foi recebido.
 
 ## E08 — Consumo e preparo
 
-- [ ] Confirmar consumo por ocorrência com quantidades reais e lotes sugeridos.
-- [ ] Preparo simples com entradas RAW e saída COOKED explícita, sem rendimento inventado.
-- [ ] Consumir lotes preparados sem voltar a baixar ingredientes de origem.
-- [ ] Tratar falta real de saldo, confirmação concorrente e estorno de preparo.
-- [ ] Integrar ocorrências consumidas/puladas à demanda restante.
+- [x] Confirmar consumo por ocorrência com quantidades reais e alocação FEFO.
+- [x] Preparo simples com entradas RAW e saída COOKED explícita, sem rendimento inventado.
+- [x] Consumir lotes preparados sem voltar a baixar ingredientes de origem.
+- [x] Tratar falta real de saldo, confirmação concorrente e estorno de preparo.
+- [x] Integrar ocorrências consumidas/puladas à demanda restante.
 
 Aceite: preparar hoje e comer amanhã não duplica baixa; falha intermediária reverte tudo; duas saídas concorrentes não deixam saldo negativo. Receitas compostas ficam fora desta entrega.
 
 ## E09 — Validade e alertas
 
-- [ ] Dashboard com faltas até próxima compra, lotes próximos do prazo e datas desconhecidas.
-- [ ] Abrir, mover, preparar e descartar com revisão explícita de data, sem extensão automática.
-- [ ] Fluxo curto para conferir saldo e corrigir divergências.
-- [ ] Revisão integrada de projeção com preparados, vencimentos e listas antigas.
+- [x] Dashboard com faltas até a próxima compra, lotes próximos do prazo e datas desconhecidas.
+- [x] Abrir, mover, preparar e descartar com revisão explícita de data, sem extensão automática.
+- [x] Fluxo curto para conferir saldo e corrigir divergências.
+- [x] Revisão integrada de projeção com preparados, vencimentos e listas antigas.
 
 Aceite: avisos explicam o motivo e levam à ação; não garantem segurança alimentar; não existem prazos gerados por IA. Sem push, e-mail ou monitor externo.
 
-## E10 — Pronto para demonstrar publicamente
+## E10 — Demonstração local e preparação futura de produção
 
-- [ ] Testes de jornada completa, autorização e concorrência em PostgreSQL.
-- [ ] Validação visual em computador e celular (incluindo teclado, contraste e zoom).
+- [x] Testes de jornada completa, autorização e concorrência em PostgreSQL.
+- [x] Jornada e layout em computador e viewport móvel, sem aparelho físico.
+- [ ] Revisão ampliada de acessibilidade: teclado, contraste, zoom e tecnologias assistivas.
 - [ ] Política de dados e exclusão de conta; recuperação de acesso e limites de tentativas antes de uso real.
 - [ ] HTTPS, secrets de deploy, sessão/CSRF e origem de produção revisados.
 - [ ] Backup e restauração do banco verificados; logs sem senhas/dados alimentares desnecessários.
-- [ ] Dados de demonstração isolados, screenshots, README e vídeo/roteiro do portfólio.
+- [x] Carga fictícia explícita em conta vazia, screenshots, README e roteiro do Dieta Fácil.
+- Integração com o projeto Portfólio: fora desta entrega, por orientação do usuário.
 - [ ] Escolher hospedagem só após medir a base; obter aceite antes de contratar serviço pago.
 
 ## Uso econômico da IA
@@ -129,4 +132,4 @@ Uma sessão deve ter um objetivo, uma verificação proporcional e um registro d
 
 ## Decisões assumidas, revisáveis sem bloquear o início
 
-Interface pt-BR; estoque individual; entrada manual da dieta; ciclo sugerido de sete dias; validade opcional; aviso de proximidade padrão três dias; sem rendimento automático; sem funções pagas de terceiros. Preferências serão ajustáveis pelo usuário. E03 concluída. Próxima entrega: E04, dieta manual e agenda recorrente.
+Interface pt-BR; estoque individual; entrada manual da dieta; ciclo sugerido de sete dias; validade opcional; aviso de proximidade padrão três dias; sem rendimento automático; sem funções pagas de terceiros. Ciclo e dia de compras já são salvos por conta; o período também pode ser manual. E04–E09 implementadas na versão demonstrável local. Produção, publicação e funcionalidades opcionais permanecem separadas. Detalhes em DEMO_GUIDE.md e RETOMADA.md.
