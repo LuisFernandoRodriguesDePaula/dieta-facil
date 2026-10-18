@@ -117,6 +117,11 @@ public class ShoppingService {
             "select id,status from meal_occurrences where user_id=? order by id",
             (r, n) -> r.getString(1) + ":" + r.getString(2),
             owner));
+    pieces.add(
+        access.db.query(
+            "select id,snapshot from meal_overrides where user_id=? order by id",
+            (r, n) -> r.getString(1) + ":" + r.getString(2),
+            owner));
     return hash(json.writeValueAsString(pieces));
   }
 

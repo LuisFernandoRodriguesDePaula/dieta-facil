@@ -169,6 +169,9 @@ public class AccountService {
     access.db.update("update inventory_operations set reversal_of=null where user_id=?", owner);
     for (var table :
         List.of(
+            "meal_substitution_actions",
+            "meal_overrides",
+            "meal_substitution_rules",
             "email_outbox",
             "account_tokens",
             "shopping_receipts",

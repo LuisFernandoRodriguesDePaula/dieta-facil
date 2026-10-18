@@ -163,6 +163,16 @@ public class PlanService {
             id,
             new Occurrence(id, meal.id(), date, meal.name(), meal.time(), "PENDING", meal.items()));
       }
+    var overrides =
+        access.db.queryForList(
+            "select snapshot from meal_overrides where user_id=? and local_date=?",
+            String.class,
+            owner,
+            date);
+    for (var snapshot : overrides) {
+      var entry = json.readValue(snapshot, Occurrence.class);
+      if (result.containsKey(entry.id())) result.put(entry.id(), entry);
+    }
     var stored =
         access.db.queryForList(
             "select snapshot from meal_occurrences where user_id=? and local_date=?",
