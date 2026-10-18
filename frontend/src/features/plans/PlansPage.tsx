@@ -4,8 +4,12 @@ import { Link, Navigate } from "react-router-dom";
 import { api, ApiError } from "../../lib/api";
 import { useSession } from "../auth/session";
 import { bases, units, compatibleUnits } from "../foods/food-types";
-import type { Basis, Unit, FoodListing, Food } from "../foods/food-types";
+import type { Basis, Unit, Food } from "../foods/food-types";
 import "./plans.css";
+import { useFoods } from "../foods/useFoods";
+import { localDate } from "../../lib/dates";
+import { PersonalNav } from "../personal";
+import { useCommand } from "../../lib/useCommand";
 
 type Item = {
   foodId: string;
@@ -30,17 +34,6 @@ type Plan = {
 type Occurrence = Meal & { mealId: string; date: string; status: string };
 type Schedule = { date: string; timezone: string; meals: Occurrence[] };
 const weekdays = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
-export function localDate(timezone: string) {
-  const parts = new Intl.DateTimeFormat("en", {
-    timeZone: timezone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(new Date());
-  return ["year", "month", "day"]
-    .map((type) => parts.find((p) => p.type === type)!.value)
-    .join("-");
-}
 export default function PlansPage({ agenda = false }: { agenda?: boolean }) {
   const session = useSession();
   if (session.isPending)
@@ -80,15 +73,7 @@ function Workspace({
   const [date, setDate] = useState(today);
   return (
     <main className="plan-page">
-      <Link className="access-brand" to="/">
-        Dieta Fácil
-      </Link>
-      <nav aria-label="Área pessoal">
-        <Link to="/conta">Minha conta</Link>
-        <Link to="/conta/alimentos">Alimentos</Link>
-        <Link to="/conta/dieta">Minha dieta</Link>
-        <Link to="/conta/agenda">Agenda</Link>
-      </nav>
+      <PersonalNav />
       <p className="eyebrow">SUA ROTINA</p>
       <h1>{agenda ? "Agenda de refeições" : "Minha dieta"}</h1>
       <p>
@@ -134,11 +119,7 @@ function EditorLoader({
     queryFn: () => api<Plan>("/api/plan?date=" + date),
     retry: false,
   });
-  const foods = useQuery({
-    queryKey: ["plan-foods", userId],
-    queryFn: () => api<FoodListing>("/api/foods?size=100&archived=false"),
-    retry: false,
-  });
+  const foods = useFoods(userId);
   if (plan.isPending || foods.isPending)
     return <p role="status">Carregando dieta e alimentos…</p>;
   if (plan.isError || foods.isError)
@@ -159,7 +140,7 @@ function EditorLoader({
     <Editor
       key={plan.data.version}
       initial={plan.data}
-      foods={foods.data.items}
+      foods={foods.data}
       date={date}
       today={today}
       refresh={() => plan.refetch()}
@@ -493,6 +474,9 @@ function Agenda({
     queryFn: () => api<Schedule>("/api/schedule?date=" + date),
     retry: false,
   });
+  const command = useCommand();
+  const [consuming, setConsuming] = useState<Occurrence | null>(null);
+  const [actual, setActual] = useState<string[]>([]);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const skip = async (meal: Occurrence) => {
@@ -527,11 +511,81 @@ function Agenda({
         </p>
       )}
       <p>Horários em {schedule.data.timezone}.</p>
+      {command.error && (
+        <p role="alert" className="form-error">
+          {command.error}
+        </p>
+      )}
+      {command.notice && (
+        <p role="status" className="form-success">
+          {command.notice}
+        </p>
+      )}
       {!schedule.data.meals.length && (
         <p>
           Nenhuma refeição prevista neste dia.{" "}
           <Link to="/conta/dieta">Organizar minha dieta</Link>
         </p>
+      )}
+      {consuming && (
+        <form
+          className="plan-meal"
+          aria-label="Confirmar consumo"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            if (
+              await command.run("/api/inventory/consumptions", {
+                date,
+                mealId: consuming.mealId,
+                items: consuming.items.map((item, i) => ({
+                  foodId: item.foodId,
+                  basis: item.basis,
+                  quantity: actual[i],
+                  unit: item.unit,
+                })),
+              })
+            ) {
+              setConsuming(null);
+              await schedule.refetch();
+            }
+          }}
+        >
+          <h2>Confirmar consumo de {consuming.name}</h2>
+          <p>
+            Confira o que foi consumido. Ao confirmar, o estoque será reduzido
+            usando os lotes pela validade mais próxima. Alimento preparado usa
+            somente o saldo preparado.
+          </p>
+          {consuming.items.map((item, i) => (
+            <label key={i}>
+              {item.name} · {bases[item.basis]} ({units[item.unit]})
+              <input
+                required
+                type="number"
+                min={item.unit === "UNIT" ? 1 : 0.000001}
+                step={item.unit === "UNIT" ? 1 : "0.000001"}
+                value={actual[i]}
+                onChange={(e) =>
+                  setActual((old) =>
+                    old.map((v, k) => (k === i ? e.target.value : v)),
+                  )
+                }
+              />
+            </label>
+          ))}
+          <div className="plan-actions">
+            <button className="button" disabled={command.busy}>
+              Confirmar e baixar estoque
+            </button>
+            <button
+              type="button"
+              disabled={command.busy}
+              onClick={() => setConsuming(null)}
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
       )}
       {schedule.data.meals.map((meal) => (
         <article className="plan-meal" key={meal.id}>
@@ -555,6 +609,17 @@ function Agenda({
               </li>
             ))}
           </ul>
+          {date <= today && meal.status === "PENDING" && (
+            <button
+              disabled={pending || command.busy}
+              onClick={() => {
+                setConsuming(meal);
+                setActual(meal.items.map((i) => i.quantity));
+              }}
+            >
+              Confirmar consumo
+            </button>
+          )}
           {date <= today && meal.status !== "CONSUMED" && (
             <button disabled={pending} onClick={() => skip(meal)}>
               {meal.status === "SKIPPED"
