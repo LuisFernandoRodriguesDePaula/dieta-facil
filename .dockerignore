@@ -1,0 +1,13 @@
+.git
+.local
+.agents
+.codex
+**/node_modules
+**/target
+**/dist
+**/test-results
+**/playwright-report
+.env
+.env.*
+docs
+

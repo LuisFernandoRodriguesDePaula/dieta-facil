@@ -28,7 +28,7 @@ A sugestão mantém cru e preparado separados. Se a dieta está em gramas prepar
 ## O que esta versão não promete
 
 - Hospedagem pública, integração com o Portfólio ou acesso pela internet.
-- Recuperação de senha, verificação de e-mail, exclusão de conta ou proteção completa contra abuso.
+- Entrega real de e-mail sem ativar o provedor, nem proteção completa contra abuso distribuído. Recuperação, confirmação e exclusão funcionam localmente; os links ficam em .local/mail.
 - Receitas compostas, importação de dieta, leitura de rótulos, nutrientes ou recomendações nutricionais.
 - Validade automática, garantia de segurança alimentar ou notificações externas.
 - Reserva de produtos ao gerar uma lista; duas listas podem mostrar necessidades semelhantes.
@@ -38,7 +38,11 @@ Sessões expiram após inatividade e são perdidas quando a API reinicia. O hist
 
 ## Verificar
 
-- Interface: build, 17 testes de componente/cliente e lint.
+- Interface: build, 18 testes de componente/cliente e lint.
 - API: suíte Java com H2 e PostgreSQL, incluindo HTTP real, autorização, CSRF e concorrência.
 - Navegador: Playwright, jornada completa e sessão encerrada, nos projetos desktop e mobile.
 - As capturas usam contas fictícias. Logs, credenciais, banco e traces ficam fora do Git.
+
+## Evolução de acesso e publicação
+
+Use /recuperar-senha para pedir redefinição ou confirmação. No ambiente local, o e-mail é um arquivo privado em .local/mail. A exclusão fica em /conta/seguranca, exige a senha atual e a palavra EXCLUIR. O cenário de hipertrofia está em HYPERTROPHY_DEMO.md e a publicação em DEPLOYMENT.md.

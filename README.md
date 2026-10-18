@@ -2,13 +2,14 @@
 
 Aplicativo de planejamento alimentar que conecta uma dieta já definida ao estoque doméstico, às compras e ao preparo. Interface em português para computador e celular, com React, Java/Spring Boot e PostgreSQL.
 
-**Versão demonstrável local.** O fluxo pessoal já funciona: cadastro → catálogo → dieta → agenda → estoque → compras → preparo e consumo. A demonstração usa dados fictícios e não prescreve alimentação. Publicação e integração com o projeto Portfólio ficam para uma etapa posterior.
+**Versão demonstrável local.** O fluxo pessoal já funciona: cadastro → catálogo → dieta → agenda → estoque → compras → preparo e consumo. A demonstração usa dados fictícios e não prescreve alimentação. Publicação preparada em Docker/Render, aguardando ativação das contas externas. Veja docs/DEPLOYMENT.md; a integração com o Portfólio fica após validar a URL real.
 
 ![Painel pessoal com cenário fictício](docs/images/demo-personal-desktop.png)
 
 ## O que funciona
 
 - Conta com sessão HttpOnly, CSRF, senha BCrypt e dados separados por usuário.
+- Recuperação de senha, confirmação de e-mail e exclusão da conta; envio local por arquivo ou produção pela API HTTPS do Brevo.
 - Catálogo pessoal, busca, arquivamento e conversões exatas de unidades.
 - Dieta com revisões por data, refeições recorrentes e agenda no fuso do perfil.
 - Estoque por lotes, com quantidade, validade, origem da data e armazenamento; conferência conhecida, parcial ou desconhecida.
@@ -18,7 +19,7 @@ Aplicativo de planejamento alimentar que conecta uma dieta já definida ao estoq
 - Painel de cobertura até a próxima compra e de validades próximas/desconhecidas.
 - Carga opcional de cenário fictício em conta vazia, sem sobrescrever dados existentes.
 
-O [roteiro da demonstração](docs/DEMO_GUIDE.md) explica como experimentar cada etapa.
+O [roteiro da demonstração](docs/DEMO_GUIDE.md) explica como experimentar cada etapa. Há também um [cenário fictício de hipertrofia, 82 kg e 1,80 m](docs/HYPERTROPHY_DEMO.md), com conta separada criada pelo script npm run demo:hypertrophy.
 
 ## Executar no Windows
 
@@ -79,7 +80,7 @@ Consulte [arquitetura](docs/ARCHITECTURE.md), [API](docs/API.md), [regras de est
 
 ## Limites desta versão
 
-Sem recuperação de senha, verificação de e-mail, exclusão de conta ou preparação completa para abertura pública. Sessões expiram após 30 minutos sem atividade e são perdidas ao reiniciar a API.
+Recuperação, confirmação de e-mail e exclusão estão implementadas. Na execução local, os links ficam em .local/mail; envio real requer configuração do provedor. Publicação, TLS na plataforma, entrega real de e-mail e revisão operacional aguardam ativação externa. Sessões expiram após 30 minutos sem atividade e são perdidas ao reiniciar a API.
 
 Cru, preparado e como vendido permanecem separados. Rendimento e validade são informados explicitamente; não há estimativa por IA. Receitas compostas, importação de dieta, nutrientes e embalagens/arredondamento comercial ficam para evolução posterior. O cálculo não reserva estoque. O histórico da tela mostra as 100 operações mais recentes, preservadas integralmente no banco.
 

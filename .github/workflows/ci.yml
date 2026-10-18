@@ -7,7 +7,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: "24"
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
@@ -27,7 +27,7 @@ jobs:
           POSTGRES_DB: dieta_facil_test
           POSTGRES_USER: dieta_facil
           POSTGRES_PASSWORD: ci-only-password
-        ports: ['5432:5432']
+        ports: ["5432:5432"]
         options: >-
           --health-cmd "pg_isready -U dieta_facil -d dieta_facil_test"
           --health-interval 5s --health-timeout 5s --health-retries 10
@@ -36,7 +36,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: "21"
           cache: maven
       - name: Testar com H2
         run: bash mvnw -B -ntp test
@@ -57,7 +57,7 @@ jobs:
           POSTGRES_DB: dieta_facil_demo
           POSTGRES_USER: dieta_facil
           POSTGRES_PASSWORD: ci-only-password
-        ports: ['5432:5432']
+        ports: ["5432:5432"]
         options: >-
           --health-cmd "pg_isready -U dieta_facil -d dieta_facil_demo"
           --health-interval 5s --health-timeout 5s --health-retries 10
@@ -71,11 +71,11 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: "21"
           cache: maven
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: "24"
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
@@ -84,3 +84,42 @@ jobs:
         working-directory: frontend
       - run: npm run test:e2e
         working-directory: frontend
+  container:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: dieta_facil_container
+          POSTGRES_USER: dieta_facil
+          POSTGRES_PASSWORD: ci-only-password
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U dieta_facil -d dieta_facil_container"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construir imagem completa
+        run: docker build -t dieta-facil:ci .
+      - name: Iniciar pacote de produção
+        run: >-
+          docker run -d --name dieta-facil --network host --memory 512m
+          -e DB_URL=jdbc:postgresql://127.0.0.1:5432/dieta_facil_container
+          -e DB_USER=dieta_facil -e DB_PASSWORD=ci-only-password
+          -e PUBLIC_BASE_URL=https://demo.example.invalid dieta-facil:ci
+      - name: Verificar saúde, SPA e proteção da API
+        shell: bash
+        run: |
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:8080/actuator/health > /tmp/health.json; then break; fi
+            sleep 2
+          done
+          curl --fail --silent http://127.0.0.1:8080/actuator/health
+          curl --fail --silent http://127.0.0.1:8080/conta/preparo | grep 'id="root"'
+          test "$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8080/api/me)" = "401"
+          curl --silent --dump-header /tmp/headers.txt --output /dev/null http://127.0.0.1:8080/api/auth/csrf
+          grep -i 'content-security-policy' /tmp/headers.txt
+          grep -i 'set-cookie:.*Secure' /tmp/headers.txt
+      - name: Diagnóstico do pacote em falha
+        if: failure()
+        run: docker logs dieta-facil

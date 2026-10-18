@@ -115,12 +115,15 @@ Aceite: avisos explicam o motivo e levam à ação; não garantem segurança ali
 - [x] Testes de jornada completa, autorização e concorrência em PostgreSQL.
 - [x] Jornada e layout em computador e viewport móvel, sem aparelho físico.
 - [ ] Revisão ampliada de acessibilidade: teclado, contraste, zoom e tecnologias assistivas.
-- [ ] Política de dados e exclusão de conta; recuperação de acesso e limites de tentativas antes de uso real.
+- [x] Exclusão de conta, recuperação, confirmação de e-mail e limite básico de tentativas.
+- [ ] Revisar retenção, política operacional e proteção de borda antes de uso real.
 - [ ] HTTPS, secrets de deploy, sessão/CSRF e origem de produção revisados.
-- [ ] Backup e restauração do banco verificados; logs sem senhas/dados alimentares desnecessários.
+- [x] Backup e restauração local verificados em banco temporário; erro SQL de autenticação sem detalhes de e-mail no log.
+- [ ] Ativar e testar backup externo e sua retenção.
 - [x] Carga fictícia explícita em conta vazia, screenshots, README e roteiro do Dieta Fácil.
 - Integração com o projeto Portfólio: fora desta entrega, por orientação do usuário.
-- [ ] Escolher hospedagem só após medir a base; obter aceite antes de contratar serviço pago.
+- [x] Preparar opção Free: Render + Neon + Brevo HTTPS, sem contratação paga.
+- [ ] Ativar contas externas, validar HTTPS/e-mails reais e integrar ao Portfólio após a URL real.
 
 ## Uso econômico da IA
 

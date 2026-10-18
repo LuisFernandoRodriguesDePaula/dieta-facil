@@ -2,45 +2,34 @@
 
 ## Estado
 
-Dieta Fácil está na versão demonstrável local, com conta, catálogo, dieta versionada, agenda, estoque por lotes, compras por cobertura/validade, recebimento parcial, preparo medido, consumo, estornos e alertas.
-
-A pasta física é C:\Users\Usuario\Documents\ChatGPT\Dieta Fácil. O caminho antigo que eventualmente aparece no contexto do chat não existe mais. Sempre use o caminho físico atual ao executar comandos.
+Dieta Fácil tem versão demonstrável local: dieta versionada, agenda, estoque por lotes, compras por cobertura e validade, recebimentos parciais, preparo medido, consumo e estornos. A pasta física é C:\Users\Usuario\Documents\ChatGPT\Dieta Fácil; o caminho antigo Nutri Fácil não existe mais.
 
 Repositório: https://github.com/LuisFernandoRodriguesDePaula/dieta-facil
 
-## Para experimentar
+## Demonstração de hipertrofia
 
-Inicie os scripts Start-Database.ps1, Start-Backend.ps1 e Start-Frontend.ps1 conforme README. Abra http://127.0.0.1:5173/conta/inicio, crie uma conta de teste e entre. Em conta vazia, carregue explicitamente o cenário fictício. Veja docs/DEMO_GUIDE.md.
+O usuário autorizou uma conta de demonstração separada, preservando seus dados. Ela foi criada e carregada com cinco refeições diárias e 18 lotes para um adulto fictício de 82 kg e 1,80 m. É um exemplo de uso, sem prescrição individual ou cálculo de calorias/macronutrientes. Validades permanecem desconhecidas.
 
-API: 8080; banco exclusivo: 5433. Não presuma que processos de uma sessão anterior continuaram ativos. Sessões são perdidas ao reiniciar a API. Credenciais e banco ficam em .local/, fora do Git; nunca publicar esse diretório.
+Execute `npm run demo:hypertrophy` em frontend para consultar/reutilizar essa conta. Credenciais estão em `.local/demo-hypertrophy.json`, fora do Git. Detalhes: [HYPERTROPHY_DEMO.md](HYPERTROPHY_DEMO.md).
 
-## Implementação
+## Execução e segurança
 
-- V1 demonstração pública fixa, separada da conta.
-- V2 usuários, acesso e perfil; V3 alimentos pessoais.
-- V4 plano/revisões, refeições/dias/itens e snapshots de ocorrência.
-- V5 contas de estoque, lotes, operações e movimentos.
-- V6 listas e recebimentos; V7 marcador da carga fictícia; V8 ritmo semanal/mensal da conta.
-- Escritas de domínio bloqueiam a conta. Saldo não negativo; tentativas repetidas usam chave idempotente.
-- Projeção usa FEFO em cada dia; cru, preparado e como vendido são referências distintas.
-- Preparo exige entrada e rendimento medidos. Agenda só baixa estoque ao confirmar consumo.
-- Alterar armazenamento não estende a validade; alteração de lote usa versão.
-- Contratos efetivos: docs/DOMAIN_API.md. Decisões: docs/decisions/ADR-002-plan-and-stock.md.
+Use scripts Start-Database.ps1, Start-Backend.ps1 e Start-Frontend.ps1. Interface: http://127.0.0.1:5173/entrar; API: 8080; PostgreSQL exclusivo: 5433. Reiniciar a API encerra sessões. Nunca publicar `.local/`, credenciais, e-mails locais, dumps ou traces.
 
-## Validação
+V1–V8 mantêm o domínio já entregue. V9 adiciona tokens de acesso, verificação de e-mail e fila criptografada de envio. Recuperação troca a senha e invalida sessões anteriores. Exclusão exige senha e EXCLUIR, remove dados da própria conta e preserva outras contas. Produção exige e-mail verificado, cookie Secure e limita tentativas por IP/rota em cada instância.
 
-30 testes Java passaram em H2. A suíte PostgreSQL completa passou antes dos últimos testes adicionais, que também passaram em execuções específicas: concorrência de retirada, virada do mês e persistência do ciclo. Interface: 17 testes, build e lint. Jornada Playwright: quatro casos aprovados, cobrindo fluxo completo e sessão encerrada em desktop e viewport móvel.
+No ambiente local, mensagens são arquivos privados em `.local/mail/`; nenhum e-mail real é enviado. Produção usa Brevo por HTTPS. Não colocar chaves no código ou no chat.
 
-Revisadas capturas reais da aplicação com dados fictícios; sem teste em aparelho físico e sem auditoria completa de acessibilidade. A CI executa build/lint/interface, Java em H2 e PostgreSQL e navegador Chromium; consulte a execução do último push no GitHub. Capturas temporárias/traces ficam em .local/ e test-results/, ignorados.
+## Validação e publicação
 
-## Escopo e próximos passos
+Foram executados 36 testes Java no PostgreSQL, 18 testes de interface, build e lint. A suíte de navegador cobre computador e viewport móvel, jornadas de domínio, recuperação/exclusão e acessibilidade automatizada nas sete telas pessoais e nas telas públicas. Consulte a CI do último commit para os resultados finais de H2, PostgreSQL, navegador e imagem Docker. Verificações automatizadas não equivalem a auditoria completa de acessibilidade ou teste em aparelho físico.
 
-A orientação mais recente do usuário é cuidar exclusivamente do Dieta Fácil. O projeto Portfólio é separado e não deve ser alterado. Publicação/contratação de hospedagem não fazem parte desta entrega.
+Backup local foi criado e restaurado em banco temporário de verificação, sem alterar o original. Script: Backup-Database.ps1. Backups externos e ensaio de restauração na hospedagem ainda dependem da ativação.
 
-A próxima etapa é a avaliação do usuário sobre a demonstração: usabilidade, refinamentos e prioridades. Não reiniciar E04 nem refazer funcionalidades já entregues. Antes de editar, conferir git status, commits recentes e este arquivo.
+O usuário autorizou preparar uma opção sem mensalidade e informou que ainda não possui serviços. Dockerfile, render.yaml e [DEPLOYMENT.md](DEPLOYMENT.md) preparam Render Free + Neon + Brevo. Ainda não existe publicação pública: é necessário criar/conectar as contas, verificar remetente, configurar segredos e validar a URL HTTPS. Não contratar planos ou prometer gratuidade ilimitada. A imagem completa é validada na CI, pois Docker não está instalado nesta máquina.
 
-Evoluções registradas: embalagem/arredondamento comercial, agrupamento adicional de compras, receitas compostas, importação de dieta, revisão ampliada de acessibilidade e recursos de produção. Sem recuperação de senha, verificação de e-mail, exclusão de conta ou mitigação completa de abuso. Não apresentar a versão como pronta para abertura pública.
+## Próxima etapa
 
-## Preferências
+Concluir/consultar CI do push mais recente e ativar os serviços externos conforme DEPLOYMENT.md quando o usuário conectar suas contas. Validar cadastro, confirmação de e-mail, recuperação, cookies e backup na URL real. O projeto Portfólio é separado e não deve ser alterado nesta etapa; PROJECT_CASE.md prepara apenas o texto dentro deste repositório.
 
-Português do Brasil; computador e celular; entregas funcionais, commits coerentes e processo documentado no GitHub. Prosseguir autonomamente no escopo autorizado. Não modificar configurações globais de aprovação. Não criar múltiplos agentes sem autorização aplicável. A aplicação não chama API de IA e não usa serviços pagos.
+Português do Brasil; computador e celular; commits coerentes; processo documentado. Prosseguir autonomamente no escopo autorizado. Não modificar configurações globais de aprovação, não criar agentes sem autorização e não usar serviços pagos. O aplicativo não chama API de IA.
