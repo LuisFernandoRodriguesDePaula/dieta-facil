@@ -74,11 +74,15 @@ public class SecurityConfig {
       SecurityContextRepository contexts,
       HttpSessionCsrfTokenRepository csrf,
       UserRepository users,
+      br.com.dietafacil.care.FeatureService features,
       org.springframework.core.env.Environment env)
       throws Exception {
     return http.addFilterAfter(
             new br.com.dietafacil.account.CredentialSessionFilter(users),
             org.springframework.security.web.context.SecurityContextHolderFilter.class)
+        .addFilterAfter(
+            new br.com.dietafacil.care.FeatureAccessFilter(features),
+            br.com.dietafacil.account.CredentialSessionFilter.class)
         .addFilterBefore(
             new br.com.dietafacil.account.AccessRateLimitFilter(
                 env.getProperty("app.security.rate-limit-enabled", Boolean.class, false)),
@@ -116,12 +120,16 @@ public class SecurityConfig {
                         "/confirmar-email",
                         "/conta",
                         "/conta/**",
+                        "/profissional",
+                        "/profissional/**",
                         "/minha-dieta",
                         "/alimentos",
                         "/compras",
                         "/preparo",
                         "/sobre")
                     .permitAll()
+                    .requestMatchers("/api/demo/features")
+                    .authenticated()
                     .requestMatchers(
                         "/api/auth/forgot-password",
                         "/api/auth/reset-password",

@@ -21,13 +21,19 @@ public class SubstitutionService {
   private final PlanService plans;
   private final InventoryService stock;
   private final ObjectMapper json;
+  private final br.com.dietafacil.care.FeatureService features;
 
   public SubstitutionService(
-      DomainAccess access, PlanService plans, InventoryService stock, ObjectMapper json) {
+      DomainAccess access,
+      PlanService plans,
+      InventoryService stock,
+      ObjectMapper json,
+      br.com.dietafacil.care.FeatureService features) {
     this.access = access;
     this.plans = plans;
     this.stock = stock;
     this.json = json;
+    this.features = features;
   }
 
   private record Rule(long version, boolean enabled, String quantity, List<PlanDtos.Item> items) {}
@@ -88,7 +94,11 @@ public class SubstitutionService {
     var occurrence = meal(owner, date, mealId);
     var source = item(occurrence, index);
     var rule = rule(owner, mealId, source);
-    var lots = stock.lots(owner);
+    var inventoryActive = features.get(owner).inventoryEnabled();
+    var lots =
+        inventoryActive
+            ? stock.lots(owner)
+            : List.<br.com.dietafacil.inventory.InventoryDtos.Lot>of();
     var alternatives =
         rule.items().stream()
             .map(
@@ -104,21 +114,25 @@ public class SubstitutionService {
                           .map(l -> new BigDecimal(l.quantity()))
                           .reduce(BigDecimal.ZERO, BigDecimal::add);
                   var knowledge =
-                      access.db.queryForList(
-                          "select knowledge from inventory_accounts where user_id=? and food_id=?"
-                              + " and basis=?",
-                          String.class,
-                          owner,
-                          i.foodId(),
-                          i.basis().name());
+                      inventoryActive
+                          ? access.db.queryForList(
+                              "select knowledge from inventory_accounts where user_id=? and"
+                                  + " food_id=? and basis=?",
+                              String.class,
+                              owner,
+                              i.foodId(),
+                              i.basis().name())
+                          : List.<String>of();
                   var archived = access.food(owner, i.foodId(), false).archived();
                   var present =
                       occurrence.items().stream()
                           .anyMatch(v -> v.foodId().equals(i.foodId()) && v.basis() == i.basis());
                   return new Alternative(
                       i,
-                      available.stripTrailingZeros().toPlainString(),
-                      knowledge.isEmpty() ? "UNKNOWN" : knowledge.getFirst(),
+                      inventoryActive ? available.stripTrailingZeros().toPlainString() : null,
+                      !inventoryActive
+                          ? "DISABLED"
+                          : knowledge.isEmpty() ? "UNKNOWN" : knowledge.getFirst(),
                       !archived && !present,
                       archived ? "Alimento arquivado" : present ? "Já está nesta refeição" : null);
                 })
@@ -360,5 +374,16 @@ public class SubstitutionService {
     access.db.update(
         "update meal_substitution_actions set undone=true where user_id=? and id=?", owner, id);
     return new Result(id, "Troca desfeita. O estoque não foi movimentado.");
+  }
+
+  public boolean singleOccurrenceAction(String email, UUID id) {
+    var values =
+        access.db.queryForList(
+            "select scope from meal_substitution_actions where user_id=? and id=?",
+            String.class,
+            access.owner(email),
+            id);
+    if (values.isEmpty()) throw error(404, "Troca não encontrada.");
+    return values.getFirst().equals("ONCE");
   }
 }

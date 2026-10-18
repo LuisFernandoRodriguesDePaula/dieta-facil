@@ -17,6 +17,15 @@ public class AppUser {
   private Instant createdAt;
   private Instant emailVerifiedAt;
   private long credentialVersion;
+  private String accountRole = "CLIENT";
+
+  public String getAccountRole() {
+    return accountRole;
+  }
+
+  public void setAccountRole(String role) {
+    accountRole = role;
+  }
 
   protected AppUser() {}
 

@@ -14,6 +14,8 @@ public class SpaController {
     "/confirmar-email",
     "/conta",
     "/conta/**",
+    "/profissional",
+    "/profissional/**",
     "/minha-dieta",
     "/alimentos",
     "/compras",

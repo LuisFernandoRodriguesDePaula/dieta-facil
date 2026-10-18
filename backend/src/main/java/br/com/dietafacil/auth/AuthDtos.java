@@ -13,7 +13,12 @@ public final class AuthDtos {
       @NotBlank @Size(max = 100) String name,
       @NotBlank @Email @Size(max = 254) String email,
       @NotBlank @Size(min = 10, max = 72) String password,
-      @NotBlank @Size(max = 100) String timezone) {}
+      @NotBlank @Size(max = 100) String timezone,
+      @jakarta.validation.constraints.Pattern(regexp = "CLIENT|NUTRITIONIST") String role) {
+    public Registration(String name, String email, String password, String timezone) {
+      this(name, email, password, timezone, "CLIENT");
+    }
+  }
 
   public record Login(
       @NotBlank @Email @Size(max = 254) String email, @NotBlank @Size(max = 72) String password) {}
@@ -24,9 +29,10 @@ public final class AuthDtos {
   public record Registered(
       UUID id, String name, String email, String timezone, boolean emailVerificationRequired) {}
 
-  public record Profile(UUID id, String name, String email, String timezone) {
+  public record Profile(UUID id, String name, String email, String timezone, String role) {
     public static Profile from(AppUser user) {
-      return new Profile(user.getId(), user.getName(), user.getEmail(), user.getTimezone());
+      return new Profile(
+          user.getId(), user.getName(), user.getEmail(), user.getTimezone(), user.getAccountRole());
     }
   }
 }

@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/shopping")
 public class ShoppingController {
   private final ShoppingService shopping;
+  private final br.com.dietafacil.care.FeatureService features;
 
-  public ShoppingController(ShoppingService shopping) {
+  public ShoppingController(
+      ShoppingService shopping, br.com.dietafacil.care.FeatureService features) {
+    this.features = features;
     this.shopping = shopping;
   }
 
@@ -23,8 +26,10 @@ public class ShoppingController {
     return shopping.preferences(auth.getName());
   }
 
+  @org.springframework.transaction.annotation.Transactional
   @PutMapping("/preferences")
   public Preferences preferences(Authentication auth, @Valid @RequestBody PreferencesInput input) {
+    features.requireInventoryLocked(auth.getName());
     return shopping.preferences(auth.getName(), input);
   }
 
@@ -39,8 +44,10 @@ public class ShoppingController {
     return shopping.lists(auth.getName());
   }
 
+  @org.springframework.transaction.annotation.Transactional
   @PostMapping("/lists")
   public ShoppingList generate(Authentication auth, @Valid @RequestBody Generate input) {
+    features.requireInventoryLocked(auth.getName());
     return shopping.generate(auth.getName(), input);
   }
 
@@ -49,23 +56,29 @@ public class ShoppingController {
     return shopping.get(auth.getName(), id);
   }
 
+  @org.springframework.transaction.annotation.Transactional
   @PutMapping("/lists/{id}")
   public ShoppingList update(
       Authentication auth, @PathVariable UUID id, @Valid @RequestBody Update input) {
+    features.requireInventoryLocked(auth.getName());
     return shopping.update(auth.getName(), id, input);
   }
 
+  @org.springframework.transaction.annotation.Transactional
   @PostMapping("/lists/{id}/recalculate")
   public ShoppingList recalculate(
       Authentication auth, @PathVariable UUID id, @Valid @RequestBody Recalculate input) {
+    features.requireInventoryLocked(auth.getName());
     return shopping.recalculate(auth.getName(), id, input);
   }
 
+  @org.springframework.transaction.annotation.Transactional
   @PostMapping("/receipts")
   public InventoryDtos.Result receipt(
       Authentication auth,
       @RequestHeader("Idempotency-Key") String key,
       @Valid @RequestBody Receipt input) {
+    features.requireInventoryLocked(auth.getName());
     return shopping.receipt(auth.getName(), key, input);
   }
 }

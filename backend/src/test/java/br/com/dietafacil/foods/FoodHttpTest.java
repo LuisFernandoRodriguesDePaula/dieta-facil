@@ -115,7 +115,7 @@ class FoodHttpTest {
     private JsonNode parse(HttpResponse<String> response) { return json.readTree(response.body()); }
     private HttpClient account(String email) throws Exception {
         var user = client();
-        assertThat(request(user, "POST", "/api/auth/register", Map.of("name", "Catálogo teste", "email", email, "password", PASSWORD, "timezone", "America/Sao_Paulo")).statusCode()).isEqualTo(201);
+        assertThat(request(user, "POST", "/api/auth/register", Map.of("name", "Catálogo teste", "email", email, "password", PASSWORD, "timezone", "America/Sao_Paulo", "role", "NUTRITIONIST")).statusCode()).isEqualTo(201);
         return login(user, email);
     }
     private HttpClient login(HttpClient user, String email) throws Exception {

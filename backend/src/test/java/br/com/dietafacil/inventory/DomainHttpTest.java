@@ -17,6 +17,9 @@ class DomainHttpTest {
   @Value("${local.server.port}")
   int port;
 
+  @org.springframework.beans.factory.annotation.Autowired
+  br.com.dietafacil.care.FeatureService features;
+
   ObjectMapper json = new ObjectMapper();
 
   HttpClient client() {
@@ -67,7 +70,9 @@ class DomainHttpTest {
                         "password",
                         "Senha-de-teste-2026!",
                         "timezone",
-                        "UTC"),
+                        "UTC",
+                        "role",
+                        "NUTRITIONIST"),
                     null,
                     true)
                 .statusCode())
@@ -82,6 +87,8 @@ class DomainHttpTest {
                     true)
                 .statusCode())
         .isEqualTo(200);
+    features.demoTier(email, "PREMIUM");
+    features.inventory(email, true, true);
     return client;
   }
 
