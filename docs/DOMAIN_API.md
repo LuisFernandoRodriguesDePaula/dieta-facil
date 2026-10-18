@@ -56,6 +56,6 @@ stale indica mudanças relevantes desde o cálculo ou início do período já pa
 
 ## Cenário fictício local
 
-POST /api/onboarding/scenario: conta vazia, carga explícita e única. Repetição não duplica dados. Disponível fora do perfil prod, sempre autenticado e com CSRF.
+POST /api/onboarding/scenario?type=basic ou type=hypertrophy: conta vazia, carga explícita e única. Repetição não duplica dados. Disponível fora do perfil prod, sempre autenticado e com CSRF.
 
 Erros: 400 validação/parâmetros; 401 sessão ausente; 403 CSRF; 404 recurso ausente ou de outra conta; 409 conflito de versão/chave/saldo/estado. Respostas não incluem senha, hash ou stack trace.

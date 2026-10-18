@@ -75,6 +75,7 @@ function Dashboard({
       }>("/api/shopping/projection?from=" + today + "&until=" + until),
     retry: false,
   });
+  const [scenario, setScenario] = useState("basic");
   const [confirm, setConfirm] = useState(false);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
@@ -85,7 +86,7 @@ function Dashboard({
     setError("");
     try {
       const result = await api<{ message: string }>(
-        "/api/onboarding/scenario",
+        "/api/onboarding/scenario?type=" + scenario,
         "POST",
       );
       setNotice(result.message);
@@ -210,6 +211,27 @@ function Dashboard({
           explorar o fluxo. Isso adiciona dados nesta conta e só pode ser feito
           uma vez. As validades e quantidades são fictícias.
         </p>
+        <label>
+          Cenário de demonstração
+          <select
+            value={scenario}
+            disabled={busy || confirm}
+            onChange={(e) => setScenario(e.target.value)}
+          >
+            <option value="basic">Rotina simples</option>
+            <option value="hypertrophy">
+              Treino de hipertrofia · exemplo 82 kg / 1,80 m
+            </option>
+          </select>
+        </label>
+        {scenario === "hypertrophy" && (
+          <p>
+            Cinco refeições com fontes variadas de proteína, carboidratos,
+            frutas e legumes. Exemplo para adulto fictício; porções não
+            individualizadas. Cru e preparado ficam separados e as validades
+            começam desconhecidas.
+          </p>
+        )}
         {confirm ? (
           <>
             <p>Carregar o cenário nesta conta?</p>

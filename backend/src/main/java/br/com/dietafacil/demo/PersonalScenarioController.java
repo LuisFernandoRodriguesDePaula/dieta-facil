@@ -35,7 +35,9 @@ public class PersonalScenarioController {
 
   @PostMapping("/api/onboarding/scenario")
   @Transactional
-  public Map<String, String> create(Authentication auth) {
+  public Map<String, String> create(
+      Authentication auth, @RequestParam(defaultValue = "basic") String type) {
+    if (!Set.of("basic", "hypertrophy").contains(type)) throw error(400, "Cenário desconhecido.");
     var email = auth.getName();
     var owner = access.lock(email);
     if (access.db.queryForObject(
@@ -46,6 +48,15 @@ public class PersonalScenarioController {
         || !plans.plan(email, access.today(email)).revisionDates().isEmpty())
       throw error(409, "Use uma conta vazia para carregar o cenário fictício.");
     var today = access.today(email);
+    if (type.equals("hypertrophy")) {
+      createHypertrophy(email, today);
+      access.db.update(
+          "insert into demo_scenarios values (?,?)", owner, Timestamp.from(Instant.now()));
+      return Map.of(
+          "message",
+          "Cenário fictício de hipertrofia carregado: adulto ilustrativo de 82 kg e 1,80 m, cinco"
+              + " refeições. Não é prescrição individual. Validades não foram estimadas.");
+    }
     var eggs = food(email, "Ovos", Unit.UNIT, Category.PROTEIN);
     var rice = food(email, "Arroz", Unit.G, Category.GRAINS);
     var chicken = food(email, "Frango", Unit.G, Category.PROTEIN);
@@ -137,6 +148,244 @@ public class PersonalScenarioController {
         "message",
         "Cenário fictício carregado. Quantidades e validades são exemplos para demonstração, não"
             + " orientações alimentares.");
+  }
+
+  private void createHypertrophy(String email, LocalDate today) {
+    var eggs = food(email, "Ovos", Unit.UNIT, Category.PROTEIN);
+    var oats = food(email, "Aveia", Unit.G, Category.GRAINS);
+    var milk = food(email, "Leite integral", Unit.ML, Category.DAIRY);
+    var banana = food(email, "Banana sem casca", Unit.G, Category.PRODUCE);
+    var rice = food(email, "Arroz", Unit.G, Category.GRAINS);
+    var beans = food(email, "Feijão", Unit.G, Category.GRAINS);
+    var chicken = food(email, "Peito de frango", Unit.G, Category.PROTEIN);
+    var broccoli = food(email, "Brócolis", Unit.G, Category.PRODUCE);
+    var oil = food(email, "Azeite", Unit.ML, Category.PANTRY);
+    var yogurt = food(email, "Iogurte natural", Unit.G, Category.DAIRY);
+    var bread = food(email, "Pão integral", Unit.G, Category.GRAINS);
+    var peanuts = food(email, "Pasta de amendoim sem açúcar", Unit.G, Category.PANTRY);
+    var beef = food(email, "Carne bovina magra", Unit.G, Category.PROTEIN);
+    plans.save(
+        email,
+        new PlanDtos.Save(
+            0L,
+            today,
+            List.of(
+                meal(
+                    "Café da manhã",
+                    7,
+                    30,
+                    List.of(
+                        item(eggs, "3", Unit.UNIT, Basis.AS_SOLD),
+                        item(oats, "60", Unit.G, Basis.AS_SOLD),
+                        item(milk, "250", Unit.ML, Basis.AS_SOLD),
+                        item(banana, "120", Unit.G, Basis.AS_SOLD))),
+                meal(
+                    "Lanche da manhã",
+                    10,
+                    30,
+                    List.of(
+                        item(yogurt, "170", Unit.G, Basis.AS_SOLD),
+                        item(bread, "70", Unit.G, Basis.AS_SOLD),
+                        item(peanuts, "20", Unit.G, Basis.AS_SOLD))),
+                meal(
+                    "Almoço",
+                    12,
+                    30,
+                    List.of(
+                        item(rice, "200", Unit.G, Basis.COOKED),
+                        item(beans, "120", Unit.G, Basis.COOKED),
+                        item(chicken, "90", Unit.G, Basis.COOKED),
+                        item(broccoli, "100", Unit.G, Basis.COOKED),
+                        item(oil, "10", Unit.ML, Basis.AS_SOLD))),
+                meal(
+                    "Lanche da tarde",
+                    16,
+                    30,
+                    List.of(
+                        item(banana, "120", Unit.G, Basis.AS_SOLD),
+                        item(oats, "30", Unit.G, Basis.AS_SOLD),
+                        item(milk, "200", Unit.ML, Basis.AS_SOLD))),
+                meal(
+                    "Jantar",
+                    20,
+                    0,
+                    List.of(
+                        item(rice, "200", Unit.G, Basis.COOKED),
+                        item(beans, "120", Unit.G, Basis.COOKED),
+                        item(beef, "90", Unit.G, Basis.COOKED),
+                        item(broccoli, "100", Unit.G, Basis.COOKED),
+                        item(oil, "10", Unit.ML, Basis.AS_SOLD))))));
+    add(
+        email,
+        "hypertrophy-eggs",
+        eggs,
+        Basis.AS_SOLD,
+        "12",
+        Unit.UNIT,
+        today,
+        null,
+        Location.FRIDGE);
+    add(
+        email,
+        "hypertrophy-oats",
+        oats,
+        Basis.AS_SOLD,
+        "1000",
+        Unit.G,
+        today,
+        null,
+        Location.PANTRY);
+    add(
+        email,
+        "hypertrophy-milk",
+        milk,
+        Basis.AS_SOLD,
+        "2000",
+        Unit.ML,
+        today,
+        null,
+        Location.FRIDGE);
+    add(
+        email,
+        "hypertrophy-banana",
+        banana,
+        Basis.AS_SOLD,
+        "480",
+        Unit.G,
+        today,
+        null,
+        Location.PANTRY);
+    add(
+        email,
+        "hypertrophy-rice-raw",
+        rice,
+        Basis.RAW,
+        "1000",
+        Unit.G,
+        today,
+        null,
+        Location.PANTRY);
+    add(
+        email,
+        "hypertrophy-rice-cooked",
+        rice,
+        Basis.COOKED,
+        "600",
+        Unit.G,
+        today,
+        null,
+        Location.FRIDGE);
+    add(
+        email,
+        "hypertrophy-beans-raw",
+        beans,
+        Basis.RAW,
+        "500",
+        Unit.G,
+        today,
+        null,
+        Location.PANTRY);
+    add(
+        email,
+        "hypertrophy-beans-cooked",
+        beans,
+        Basis.COOKED,
+        "480",
+        Unit.G,
+        today,
+        null,
+        Location.FRIDGE);
+    add(
+        email,
+        "hypertrophy-chicken-raw",
+        chicken,
+        Basis.RAW,
+        "600",
+        Unit.G,
+        today,
+        null,
+        Location.FREEZER);
+    add(
+        email,
+        "hypertrophy-chicken-cooked",
+        chicken,
+        Basis.COOKED,
+        "180",
+        Unit.G,
+        today,
+        null,
+        Location.FRIDGE);
+    add(
+        email,
+        "hypertrophy-broccoli-raw",
+        broccoli,
+        Basis.RAW,
+        "700",
+        Unit.G,
+        today,
+        null,
+        Location.FRIDGE);
+    add(
+        email,
+        "hypertrophy-broccoli-cooked",
+        broccoli,
+        Basis.COOKED,
+        "400",
+        Unit.G,
+        today,
+        null,
+        Location.FRIDGE);
+    add(email, "hypertrophy-oil", oil, Basis.AS_SOLD, "250", Unit.ML, today, null, Location.PANTRY);
+    add(
+        email,
+        "hypertrophy-yogurt",
+        yogurt,
+        Basis.AS_SOLD,
+        "680",
+        Unit.G,
+        today,
+        null,
+        Location.FRIDGE);
+    add(
+        email,
+        "hypertrophy-bread",
+        bread,
+        Basis.AS_SOLD,
+        "350",
+        Unit.G,
+        today,
+        null,
+        Location.PANTRY);
+    add(
+        email,
+        "hypertrophy-peanuts",
+        peanuts,
+        Basis.AS_SOLD,
+        "200",
+        Unit.G,
+        today,
+        null,
+        Location.PANTRY);
+    add(
+        email,
+        "hypertrophy-beef-raw",
+        beef,
+        Basis.RAW,
+        "500",
+        Unit.G,
+        today,
+        null,
+        Location.FREEZER);
+    add(
+        email,
+        "hypertrophy-beef-cooked",
+        beef,
+        Basis.COOKED,
+        "180",
+        Unit.G,
+        today,
+        null,
+        Location.FRIDGE);
   }
 
   private UUID food(String email, String name, Unit unit, Category category) {
