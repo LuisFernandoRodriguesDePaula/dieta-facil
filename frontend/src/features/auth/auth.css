@@ -38,7 +38,7 @@
 .access-intro small {
   font-size: 11px;
   line-height: 1.7;
-  color: #5c7452;
+  color: #465b3e;
 }
 .access-main {
   max-width: none;
@@ -268,4 +268,13 @@
     border-radius: 8px;
     font-size: 13px;
   }
+}
+.access-card select {
+  font: inherit;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #aab7ad;
+  border-radius: 8px;
+  background: #fff;
+  color: #263d31;
 }

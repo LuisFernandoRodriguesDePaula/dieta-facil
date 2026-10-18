@@ -26,3 +26,40 @@ it("envia CSRF em mutação e não repete a escrita automaticamente após erro",
     headers: { "X-CSRF-TOKEN": "masked-token" },
   });
 });
+it("uma resposta 401 antiga não encerra a sessão após uma transição de acesso", async () => {
+  let resolveOld: (response: Response) => void = () => {};
+  let waiting = true;
+  const dispatch = vi.fn();
+  vi.stubGlobal("window", { dispatchEvent: dispatch });
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (path: string) => {
+      if (path === "/api/auth/csrf")
+        return new Response(
+          JSON.stringify({ token: "csrf", headerName: "X-CSRF-TOKEN" }),
+        );
+      if (path === "/api/auth/logout")
+        return new Response(null, { status: 204 });
+      if (waiting) {
+        waiting = false;
+        return new Promise<Response>((resolve) => {
+          resolveOld = resolve;
+        });
+      }
+      return new Response(JSON.stringify({ message: "Sessão encerrada." }), {
+        status: 401,
+      });
+    }),
+  );
+  const old = api("/api/foods");
+  await api("/api/auth/logout", "POST");
+  resolveOld(
+    new Response(JSON.stringify({ message: "Sessão anterior encerrada." }), {
+      status: 401,
+    }),
+  );
+  await expect(old).rejects.toMatchObject({ status: 401 });
+  expect(dispatch).not.toHaveBeenCalled();
+  await expect(api("/api/foods")).rejects.toMatchObject({ status: 401 });
+  expect(dispatch).toHaveBeenCalledTimes(1);
+});

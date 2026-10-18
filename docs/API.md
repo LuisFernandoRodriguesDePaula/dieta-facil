@@ -30,3 +30,13 @@ GET /actuator/health verifica a aplicação e o banco, retornando status=UP quan
 ## Convenções
 
 Erros usam code/message e, quando aplicável, fields. Quantidades são transmitidas como strings decimais; datas de calendário usam YYYY-MM-DD e instantes usam UTC. Detalhes de idempotência e versões estão em DOMAIN_API.md. Identificador de correlação e observabilidade completa permanecem evoluções para produção.
+
+## Recuperação e privacidade
+
+POST /api/auth/forgot-password e /api/auth/resend-verification recebem email, exigem CSRF e retornam 202 com resposta genérica para conta conhecida/desconhecida. Links têm token aleatório no fragmento do navegador, armazenado como hash no banco, com validade de 30 minutos (RESET) ou 24 horas (VERIFY).
+
+POST /api/auth/reset-password recebe token e password; POST /api/auth/verify-email recebe token. Cada link só pode ser usado uma vez. Trocar senha encerra as sessões anteriores no próximo acesso. Em prod, e-mail confirmado é exigido antes de criar uma sessão.
+
+GET /api/account/status retorna a situação da própria conta. DELETE /api/account exige senha atual e confirmation=EXCLUIR, remove os dados ativos e encerra a sessão. A proteção CSRF permanece obrigatória. Em prod, os endpoints de acesso têm limite básico de 20 tentativas por IP/rota a cada 15 minutos.
+
+A fila de e-mail é cifrada e persistida no PostgreSQL, com tentativas e expiração. Payload é apagado após envio. No ambiente local, a saída é arquivo privado; em produção, usa API HTTPS do Brevo. Ativação real está em DEPLOYMENT.md.

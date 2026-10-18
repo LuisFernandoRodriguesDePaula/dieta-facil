@@ -1,5 +1,20 @@
 server:
+  address: 0.0.0.0
+  port: ${PORT:8080}
+  forward-headers-strategy: native
   servlet:
     session:
       cookie:
         secure: true
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 4
+      minimum-idle: 0
+app:
+  public-base-url: ${PUBLIC_BASE_URL:https://configure-o-endereco.example.invalid}
+  require-verified-email: true
+  security:
+    rate-limit-enabled: true
+  mail:
+    mode: brevo

@@ -24,3 +24,11 @@ management:
     web:
       exposure:
         include: health
+app:
+  public-base-url: ${PUBLIC_BASE_URL:http://127.0.0.1:5173}
+  mail:
+    mode: ${MAIL_MODE:file}
+    encryption-key: ${MAIL_ENCRYPTION_KEY:}
+    from: ${MAIL_FROM:}
+    api-key: ${BREVO_API_KEY:}
+    directory: ${MAIL_DIRECTORY:../.local/mail}

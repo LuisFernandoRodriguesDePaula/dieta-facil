@@ -1,3 +1,4 @@
+let authEpoch = 0;
 export class ApiError extends Error {
   status: number;
   constructor(status: number, message: string) {
@@ -22,6 +23,7 @@ export async function api<T>(
   body?: unknown,
   operationKey?: string,
 ): Promise<T> {
+  const requestEpoch = authEpoch;
   const headers: Record<string, string> = {};
   if (operationKey) headers["Idempotency-Key"] = operationKey;
   if (method !== "GET") {
@@ -42,10 +44,22 @@ export async function api<T>(
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   if (
+    requestEpoch === authEpoch &&
     response.status === 401 &&
     path !== "/api/me" &&
     !path.startsWith("/api/auth/")
   )
     window.dispatchEvent(new Event("dieta-facil-session-expired"));
+  if (
+    response.ok &&
+    ((method === "POST" &&
+      [
+        "/api/auth/login",
+        "/api/auth/logout",
+        "/api/auth/reset-password",
+      ].includes(path)) ||
+      (method === "DELETE" && path === "/api/account"))
+  )
+    authEpoch++;
   return readResponse<T>(response);
 }

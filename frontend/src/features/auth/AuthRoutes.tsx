@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -18,11 +18,13 @@ import "./auth.css";
 import { useSession, sessionKey } from "./session";
 import type { Profile } from "./session";
 import FoodsPage from "../foods/FoodsPage";
-import PlansPage from "../plans/PlansPage";
-import InventoryPage from "../inventory/InventoryPage";
-import ShoppingPage from "../shopping/ShoppingPage";
-import DashboardPage from "../dashboard/DashboardPage";
 
+const RecoveryPage = lazy(() => import("./RecoveryPage"));
+const SecurityPage = lazy(() => import("./SecurityPage"));
+const PlansPage = lazy(() => import("../plans/PlansPage"));
+const InventoryPage = lazy(() => import("../inventory/InventoryPage"));
+const ShoppingPage = lazy(() => import("../shopping/ShoppingPage"));
+const DashboardPage = lazy(() => import("../dashboard/DashboardPage"));
 const timezone = () =>
   Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Sao_Paulo";
 const emailField = z
@@ -76,19 +78,40 @@ export default function AuthRoutes() {
       window.removeEventListener("dieta-facil-session-expired", expired);
   }, [client, navigate]);
   return (
-    <Routes>
-      <Route path="/entrar" element={<AccessPage registerMode={false} />} />
-      <Route path="/cadastro" element={<AccessPage registerMode />} />
-      <Route path="/conta" element={<AccountPage />} />
-      <Route path="/conta/inicio" element={<DashboardPage />} />
-      <Route path="/conta/alimentos" element={<FoodsPage />} />
-      <Route path="/conta/dieta" element={<PlansPage />} />
-      <Route path="/conta/agenda" element={<PlansPage agenda />} />
-      <Route path="/conta/estoque" element={<InventoryPage />} />
-      <Route path="/conta/compras" element={<ShoppingPage />} />
-      <Route path="/conta/preparo" element={<InventoryPage preparation />} />
-      <Route path="*" element={<App />} />
-    </Routes>
+    <Suspense
+      fallback={
+        <main className="catalog-loading" role="status">
+          Carregando página…
+        </main>
+      }
+    >
+      <Routes>
+        <Route path="/entrar" element={<AccessPage registerMode={false} />} />
+        <Route path="/cadastro" element={<AccessPage registerMode />} />
+        <Route path="/conta" element={<AccountPage />} />
+        <Route path="/conta/seguranca" element={<SecurityPage />} />
+        <Route
+          path="/recuperar-senha"
+          element={<RecoveryPage mode="forgot" />}
+        />
+        <Route
+          path="/redefinir-senha"
+          element={<RecoveryPage mode="reset" />}
+        />
+        <Route
+          path="/confirmar-email"
+          element={<RecoveryPage mode="verify" />}
+        />
+        <Route path="/conta/inicio" element={<DashboardPage />} />
+        <Route path="/conta/alimentos" element={<FoodsPage />} />
+        <Route path="/conta/dieta" element={<PlansPage />} />
+        <Route path="/conta/agenda" element={<PlansPage agenda />} />
+        <Route path="/conta/estoque" element={<InventoryPage />} />
+        <Route path="/conta/compras" element={<ShoppingPage />} />
+        <Route path="/conta/preparo" element={<InventoryPage preparation />} />
+        <Route path="*" element={<App />} />
+      </Routes>
+    </Suspense>
   );
 }
 
@@ -171,9 +194,22 @@ function LoginForm() {
       <p className="eyebrow">BEM-VINDO DE VOLTA</p>
       <h2>Entre na sua conta.</h2>
       <p>Acesse seu espaço pessoal no Dieta Fácil.</p>
+      {(location.state?.deleted ||
+        new URLSearchParams(location.search).get("conta") === "excluida") && (
+        <p role="status" className="form-success">
+          Conta excluída. Os dados desta conta foram removidos do banco ativo.
+        </p>
+      )}
+      {location.state?.passwordChanged && (
+        <p role="status" className="form-success">
+          Senha atualizada. Entre com sua nova senha.
+        </p>
+      )}
       {location.state?.registered && (
         <p className="form-success" role="status">
-          Conta criada! Entre com seu e-mail e senha.
+          {location.state?.verificationRequired
+            ? "Conta criada! Confirme seu e-mail pelo link recebido e depois entre."
+            : "Conta criada! Entre com seu e-mail e senha."}
         </p>
       )}
       {location.state?.expired && (
@@ -230,7 +266,9 @@ function LoginForm() {
         Ainda não tem conta? <Link to="/cadastro">Criar conta</Link>
       </p>
       <p className="access-note">
-        A recuperação de senha ainda não está disponível nesta versão local.
+        <Link to="/recuperar-senha">
+          Esqueci minha senha ou preciso confirmar meu e-mail
+        </Link>
       </p>
     </section>
   );
@@ -253,11 +291,17 @@ function RegisterForm() {
     async ({ confirmation: _confirmation, ...values }) => {
       setError("");
       try {
-        await api<Profile>("/api/auth/register", "POST", values);
+        const registered = await api<
+          Profile & { emailVerificationRequired?: boolean }
+        >("/api/auth/register", "POST", values);
         form.reset();
         navigate("/entrar", {
           replace: true,
-          state: { registered: true, email: values.email },
+          state: {
+            registered: true,
+            email: values.email,
+            verificationRequired: registered.emailVerificationRequired,
+          },
         });
       } catch (failure) {
         setError(message(failure));
@@ -491,6 +535,9 @@ function AccountForm({ user }: { user: Profile }) {
       </button>
       <div className="account-next">
         <strong>Organize sua rotina.</strong>
+        <p>
+          <Link to="/conta/seguranca">Segurança e privacidade</Link>
+        </p>
         <p>
           <Link to="/conta/inicio">Abrir meu painel</Link> ·{" "}
           <Link to="/conta/estoque">Estoque</Link> ·{" "}
