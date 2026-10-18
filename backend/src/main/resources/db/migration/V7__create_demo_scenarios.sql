@@ -1,0 +1,1 @@
+CREATE TABLE demo_scenarios (user_id UUID PRIMARY KEY REFERENCES users(id), created_at TIMESTAMP WITH TIME ZONE NOT NULL);
