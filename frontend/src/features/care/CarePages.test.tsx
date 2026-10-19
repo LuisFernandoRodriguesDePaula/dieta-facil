@@ -115,7 +115,7 @@ it("separa convite expirado de vínculo ativo e busca nomes sem acento", async (
   await user.type(screen.getByRole("searchbox"), "jose");
   expect(screen.getByRole("article", { name: "José Expirado" })).toBeVisible();
   expect(
-    screen.queryByRole("link", { name: "Abrir acompanhamento →" }),
+    screen.queryByRole("link", { name: /Abrir acompanhamento de/ }),
   ).not.toBeInTheDocument();
 });
 it("permite recuperar uma lista indisponível sem recarregar a página", async () => {

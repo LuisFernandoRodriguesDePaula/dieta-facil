@@ -163,3 +163,7 @@ Avaliações mensais agora exibem peso, altura informada, percentual de gordura 
 Migração V12 acrescenta colunas opcionais body_fat, arm, thigh, calf e hip. Avaliações antigas permanecem com campos nulos. Validação de percentual 0–100 e medidas 1–300cm é aplicada na API e no banco. O profissional informa os valores; não há cálculo automático ou integração com bioimpedância. Novos campos acompanham edição mensal, troca de mês e recuperação de conflito. Consulta do cliente usa os mesmos cartões, mantendo avaliações somente para leitura.
 
 Backup anterior à aplicação local da migração foi restaurado em banco temporário com sucesso. Testes Java no PostgreSQL isolado: 48 aprovados; interface: 23 aprovados, incluindo comparação entre meses não consecutivos e ausência de medidas.
+
+## 2026-10-19 — Acesso visual ao cliente
+
+O link textual Abrir acompanhamento foi substituído por uma seta em botão circular à direita do nome/e-mail nos cartões de clientes vinculados. Mantém nome acessível específico por cliente, foco por teclado e área de toque de 48px. Convites ainda não aceitos continuam sem acesso ao acompanhamento. Build e lint aprovados; jornada existente atualizada para o nome acessível do link.

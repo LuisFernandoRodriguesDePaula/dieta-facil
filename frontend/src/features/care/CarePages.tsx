@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 import { api, ApiError } from "../../lib/api";
 import { localDate } from "../../lib/dates";
 import { CareLayout } from "./CareAccess";
@@ -561,13 +562,23 @@ function ProfessionalClients() {
                         ? "CONVITE EXPIRADO"
                         : "AGUARDANDO ACEITE"}
                   </span>
-                  <h2>{l.name}</h2>
-                  <p>{l.email}</p>
-                  {l.status === "ACTIVE" ? (
-                    <Link to={"/profissional/clientes/" + l.clientId}>
-                      Abrir acompanhamento →
-                    </Link>
-                  ) : (
+                  <div className="care-client-heading">
+                    <div className="care-client-identity">
+                      <h2>{l.name}</h2>
+                      <p>{l.email}</p>
+                    </div>
+                    {l.status === "ACTIVE" && (
+                      <Link
+                        className="care-client-open"
+                        to={"/profissional/clientes/" + l.clientId}
+                        aria-label={"Abrir acompanhamento de " + l.name}
+                        title={"Abrir acompanhamento de " + l.name}
+                      >
+                        <ArrowRight size={24} aria-hidden="true" />
+                      </Link>
+                    )}
+                  </div>
+                  {l.status !== "ACTIVE" && (
                     <>
                       <p className="access-note">
                         {status(l) === "expired"

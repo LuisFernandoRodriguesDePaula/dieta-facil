@@ -543,7 +543,9 @@ test("versão 1.0: nutricionista prepara, cliente consulta e acompanha resultado
       .click();
     await expect(clientPage.getByText("ACOMPANHAMENTO ATIVO")).toBeVisible();
     await page.reload();
-    await page.getByRole("link", { name: "Abrir acompanhamento →" }).click();
+    await page
+      .getByRole("link", { name: "Abrir acompanhamento de Pessoa Demo" })
+      .click();
     await expect(
       page.getByLabel("Arquivo de dieta", { exact: true }),
     ).toBeDisabled();

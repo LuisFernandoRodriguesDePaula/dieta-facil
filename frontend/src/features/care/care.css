@@ -209,3 +209,27 @@
     max-width: 140px;
   }
 }
+.care-client-heading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+}
+.care-client-identity {
+  flex: 1;
+  min-width: 0;
+}
+.care-client-grid a.care-client-open {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #284e3d;
+  color: #fff;
+}
+.care-client-grid a.care-client-open:hover {
+  background: #1d3c2e;
+}
