@@ -129,3 +129,20 @@
     grid-template-columns: 1fr;
   }
 }
+.care-import {
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px dashed #aab9a7;
+  border-radius: 12px;
+  background: #f4f7f1;
+  overflow-wrap: anywhere;
+}
+.care-import label {
+  margin-top: 16px;
+}
+.care-import input:disabled {
+  width: 100%;
+  min-width: 0;
+  opacity: 0.65;
+  cursor: not-allowed;
+}

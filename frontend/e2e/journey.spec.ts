@@ -544,7 +544,24 @@ test("versão 1.0: nutricionista prepara, cliente consulta e acompanha resultado
     await expect(clientPage.getByText("ACOMPANHAMENTO ATIVO")).toBeVisible();
     await page.reload();
     await page.getByRole("link", { name: "Abrir acompanhamento →" }).click();
+    await expect(
+      page.getByLabel("Arquivo de dieta", { exact: true }),
+    ).toBeDisabled();
+    await page
+      .getByRole("button", { name: "Bioimpedância e relatórios", exact: true })
+      .click();
+    await expect(
+      page.getByLabel("Arquivo de relatórios de bioimpedância", {
+        exact: true,
+      }),
+    ).toBeDisabled();
+    await expect(page.getByText(/Nenhum relatório é recebido/)).toBeVisible();
+    await screenshot(page, "bioimpedancia-reservada-" + info.project.name);
+
     await page.getByRole("button", { name: "Alimentos", exact: true }).click();
+    await expect(
+      page.getByLabel("Arquivo de alimentos", { exact: true }),
+    ).toBeDisabled();
     for (const [name, unit] of [
       ["Ovos", "UNIT"],
       ["Frango", "G"],
@@ -598,6 +615,9 @@ test("versão 1.0: nutricionista prepara, cliente consulta e acompanha resultado
     await page
       .getByRole("button", { name: "Registrar avaliação mensal" })
       .click();
+    await expect(
+      page.getByLabel("Arquivo de avaliações", { exact: true }),
+    ).toBeDisabled();
     await page.getByLabel("Peso (kg)", { exact: true }).fill("82");
     await page
       .getByLabel("Altura (cm) · opcional", { exact: true })
@@ -662,6 +682,7 @@ test("versão 1.0: nutricionista prepara, cliente consulta e acompanha resultado
     ).toEqual([]);
     await screenshot(page, "profissional-" + info.project.name);
     await clientPage.goto("/conta/dieta?editar=1");
+    await expect(clientPage.locator("input[type=file]")).toHaveCount(0);
     await expect(
       clientPage.getByRole("button", { name: "Editar dieta", exact: true }),
     ).toHaveCount(0);

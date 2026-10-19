@@ -174,3 +174,10 @@ Interface pt-BR; estoque individual; entrada manual da dieta; ciclo sugerido de 
 - [x] Estados vazios e nova tentativa em consultas do acompanhamento.
 - [x] Recuperação explícita de conflito de avaliação, preservando rascunho até carregar a versão atual.
 - [ ] Sessão humana com nutricionista e feedback continuam pendentes.
+
+### Importações futuras — campos reservados
+
+- [x] Campos desativados na área profissional: dieta, alimentos e avaliações.
+- [x] Aba Bioimpedância e relatórios com campo reservado, sem upload.
+- [ ] Definir sistemas de origem, exemplos autorizados e formatos suportados.
+- [ ] Implementar importação, revisão antes de gravar e acesso autorizado aos relatórios em entrega futura.

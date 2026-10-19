@@ -75,3 +75,7 @@ Busca/filtros na lista, renovação/cancelamento confirmado de convites, nova te
 ## Entrega local consolidada — 2026-10-19
 
 Começar por ENTREGA_V1.md. npm run demo:check em frontend confere contas fictícias e ambiente, sem preparar/resetar dados, e salva relatório privado em .local/demo-readiness.json. Conferência passou. O próximo marco continua sendo avaliação humana com nutricionista; publicação aguarda contas externas por escolha do usuário. Não acrescentar módulos para substituir esse teste. Credenciais continuam privadas em .local/.
+
+## Importações — escopo reservado (2026-10-19)
+
+Painel profissional possui campos desativados de importação de dieta, alimentos e avaliações e aba Bioimpedância e relatórios. São somente placeholders por orientação expressa do usuário. Não há backend de arquivos, extração de PDF, integração externa nem relatórios de bioimpedância disponíveis no cliente. Próxima definição dessa funcionalidade: obter exemplos de formatos e confirmar sistemas de origem antes de implementar. Não apresentar como importação funcional.

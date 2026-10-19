@@ -149,3 +149,7 @@ Testes novos cobrem convites expirados versus vínculos ativos, busca sem acento
 Adicionado docs/ENTREGA_V1.md com escopo fechado, acessos locais em perfis separados, roteiro curto, limites e pendências externas. README corrigido para o login direto ao painel. Nenhuma tela ou regra de domínio mudou.
 
 Novo comando npm run demo:check verifica apenas as contas fictícias conhecidas e o ambiente local: interface, saúde da API, login/perfis, vínculo ativo, mesma dieta e histórico nos dois perfis e bloqueios do Básico. Não chama o seed nem altera refeições, avaliações, convites, plano ou saldos. Cria sessões isoladas de conferência e faz logout ao finalizar. Relatório privado em .local/demo-readiness.json não inclui credenciais ou conteúdo clínico. Falhas não disparam resets. A conferência passou e o lint passou; não foram repetidas suítes de domínio já aprovadas, pois a mudança é em documentação e ferramenta de entrega.
+
+## Importações futuras no painel profissional — 2026-10-19
+
+Por solicitação do usuário, foram reservados campos de arquivo desativados nas seções Dieta, Alimentos e Avaliações mensais. Nova aba Bioimpedância e relatórios contém apenas a apresentação do espaço futuro e um campo igualmente desativado. Nenhum arquivo é recebido, armazenado ou processado, e nenhuma integração com sistema externo foi implementada ou prometida. Formatos e sistemas de origem serão definidos depois de analisar exemplos autorizados. O painel do cliente continua sem upload; dieta e avaliações manuais seguem funcionando.

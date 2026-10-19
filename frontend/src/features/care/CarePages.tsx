@@ -631,6 +631,7 @@ function ClientWorkspace({
           ["diet", "Dieta"],
           ["foods", "Alimentos"],
           ["results", "Avaliações mensais"],
+          ["reports", "Bioimpedância e relatórios"],
         ].map(([key, text]) => (
           <button
             aria-pressed={tab === key}
@@ -643,6 +644,10 @@ function ClientWorkspace({
       </div>
       {tab === "diet" ? (
         <>
+          <ImportPlaceholder
+            subject="dieta"
+            description="Espaço reservado para trazer uma dieta de outro sistema. Nesta versão, preencha as refeições e porções abaixo."
+          />
           <label className="plan-date">
             Revisão a partir de
             <input
@@ -678,9 +683,37 @@ function ClientWorkspace({
           </section>
         </>
       ) : tab === "foods" ? (
-        <ClientFoods id={id} prefix={prefix} />
+        <>
+          <ImportPlaceholder
+            subject="alimentos"
+            description="Espaço reservado para importar um catálogo de alimentos. O cadastro manual continua disponível abaixo."
+          />
+          <ClientFoods id={id} prefix={prefix} />
+        </>
+      ) : tab === "results" ? (
+        <>
+          <ImportPlaceholder
+            subject="avaliações"
+            description="Espaço reservado para importar avaliações anteriores. Por enquanto, registre os dados mensais manualmente."
+          />
+          <ProfessionalResults id={id} prefix={prefix} today={today} />
+        </>
       ) : (
-        <ProfessionalResults id={id} prefix={prefix} today={today} />
+        <section className="plan-meal">
+          <h2>Bioimpedância e relatórios</h2>
+          <p>
+            Este espaço reunirá os relatórios do cliente quando a importação
+            estiver disponível.
+          </p>
+          <ImportPlaceholder
+            subject="relatórios de bioimpedância"
+            description="Os formatos e os sistemas de origem serão definidos em uma próxima etapa. Nenhum relatório é recebido, armazenado ou exibido nesta versão."
+          />
+          <p>
+            Para o acompanhamento atual, use Avaliações mensais para registrar
+            peso, medidas opcionais e observações.
+          </p>
+        </section>
       )}{" "}
       {meal && (
         <SwapPanel
@@ -693,6 +726,27 @@ function ClientWorkspace({
         />
       )}
     </>
+  );
+}
+function ImportPlaceholder({
+  subject,
+  description,
+}: {
+  subject: string;
+  description: string;
+}) {
+  return (
+    <section className="care-import" aria-label={"Importação de " + subject}>
+      <p className="eyebrow">IMPORTAÇÃO · EM BREVE</p>
+      <p>{description}</p>
+      <label>
+        Arquivo de {subject}
+        <input type="file" disabled />
+      </label>
+      <p className="access-note">
+        Campo reservado. Importação indisponível nesta versão.
+      </p>
+    </section>
   );
 }
 function ClientFoods({ id, prefix }: { id: string; prefix: string }) {
