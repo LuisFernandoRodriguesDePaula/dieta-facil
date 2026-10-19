@@ -621,8 +621,116 @@ test("versão 1.0: nutricionista prepara, cliente consulta e acompanha resultado
       page.getByRole("checkbox", { name: "Sáb", exact: true }),
     ).toBeChecked();
     await screenshot(page, "editor-refeicoes-" + info.project.name);
-    await page.getByRole("button", { name: "Salvar dieta" }).click();
-    await expect(page.getByRole("status")).toContainText("Dieta salva");
+    await page.getByRole("button", { name: "Alterar para esta dieta" }).click();
+    await expect(page.getByRole("status")).toContainText(
+      "Dieta ativa para o cliente",
+    );
+    await expect(
+      page.getByRole("navigation", { name: "Área pessoal" }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("link", { name: "Dieta Fácil", exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("button", { name: "Dieta ativa", exact: true }),
+    ).toBeDisabled();
+    await page
+      .getByRole("button", { name: "Informações e versões da dieta" })
+      .click();
+    await expect(
+      page.getByRole("dialog", { name: "Versões da dieta" }),
+    ).toBeVisible();
+    await page
+      .getByRole("button", { name: "Fechar painel", exact: true })
+      .click();
+    await page
+      .getByRole("button", { name: "Editar refeição Café", exact: true })
+      .click();
+    await page.getByLabel("Nome da refeição 1").fill("Café alterado");
+    await expect(
+      page.getByRole("button", {
+        name: "Alterar para esta dieta",
+        exact: true,
+      }),
+    ).toBeEnabled();
+    await page.getByLabel("Nome da refeição 1").fill("Café");
+    await expect(
+      page.getByRole("button", { name: "Dieta ativa", exact: true }),
+    ).toBeDisabled();
+    await page
+      .getByRole("button", { name: "Editar refeição Café", exact: true })
+      .click();
+    await screenshot(page, "cliente-cabecalho-" + info.project.name);
+    const planPath = "/api/professional/clients/" + client.id + "/plan";
+    const currentDietDate = (
+      await (await clientPage.request.get("/api/schedule")).json()
+    ).date;
+    const savedPlan = await (
+      await page.request.get(planPath + "?date=" + currentDietDate)
+    ).json();
+    const upcoming = new Date();
+    upcoming.setUTCDate(upcoming.getUTCDate() + 7);
+    const upcomingDate = upcoming.toISOString().slice(0, 10);
+    const revisionCsrf = await (
+      await page.request.get("/api/auth/csrf")
+    ).json();
+    expect(
+      (
+        await page.request.put(planPath, {
+          headers: { [revisionCsrf.headerName]: revisionCsrf.token },
+          data: {
+            version: savedPlan.version,
+            effectiveFrom: upcomingDate,
+            meals: savedPlan.meals.map(
+              (m: {
+                id: string;
+                name: string;
+                time: string;
+                days: number[];
+                items: {
+                  foodId: string;
+                  quantity: string;
+                  unit: string;
+                  basis: string;
+                }[];
+              }) => ({
+                ...m,
+                time: "09:00",
+                items: m.items.map(({ foodId, quantity, unit, basis }) => ({
+                  foodId,
+                  quantity,
+                  unit,
+                  basis,
+                })),
+              }),
+            ),
+          },
+        })
+      ).ok(),
+    ).toBeTruthy();
+    await page.reload();
+    await page
+      .getByRole("button", { name: "Informações e versões da dieta" })
+      .click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", {
+        name: upcomingDate.split("-").reverse().join("/"),
+        exact: true,
+      })
+      .click();
+    await page
+      .getByRole("button", { name: "Alterar para esta dieta", exact: true })
+      .click();
+    await expect(
+      page.getByRole("button", { name: "Dieta ativa", exact: true }),
+    ).toBeDisabled();
+    const activatedPlan = await (
+      await page.request.get(planPath + "?date=" + currentDietDate)
+    ).json();
+    expect(activatedPlan.effectiveFrom).toBe(currentDietDate);
+    expect(activatedPlan.meals[0].time).toBe("09:00");
+
     await page
       .getByRole("button", { name: "Configurar trocas de Café", exact: true })
       .click();

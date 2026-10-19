@@ -5,6 +5,7 @@ import {
   CalendarDays,
   Plus,
   ChevronDown,
+  Info,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
@@ -19,6 +20,7 @@ import { PersonalNav } from "../personal";
 
 import DayPanel from "./DayPanel";
 import { useDietApi } from "./DietApi";
+import MealDialog from "./MealDialog";
 
 export type Item = {
   foodId: string;
@@ -147,10 +149,14 @@ export function EditorLoader({
   userId,
   date,
   today,
+  applyToday = false,
+  onDateChange,
 }: {
   userId: string;
   date: string;
   today: string;
+  applyToday?: boolean;
+  onDateChange?: (date: string) => void;
 }) {
   const prefix = useDietApi();
   const [notice, setNotice] = useState("");
@@ -160,6 +166,12 @@ export function EditorLoader({
     retry: false,
   });
   const foods = useFoods(userId, prefix);
+  const active = useQuery({
+    queryKey: ["plan", userId, today],
+    queryFn: () => api<Plan>(prefix + "/plan?date=" + today),
+    enabled: applyToday,
+    retry: false,
+  });
   if (plan.isPending || foods.isPending)
     return <p role="status">Carregando dieta e alimentos…</p>;
   if (plan.isError || foods.isError)
@@ -186,6 +198,9 @@ export function EditorLoader({
         today={today}
         refresh={() => plan.refetch()}
         onNotice={setNotice}
+        applyToday={applyToday}
+        onDateChange={onDateChange}
+        activeEffectiveFrom={active.data?.effectiveFrom}
       />
       {notice && (
         <p role="status" className="form-success">
@@ -202,6 +217,9 @@ function Editor({
   today,
   refresh,
   onNotice,
+  applyToday,
+  onDateChange,
+  activeEffectiveFrom,
 }: {
   initial: Plan;
   foods: Food[];
@@ -209,10 +227,20 @@ function Editor({
   today: string;
   refresh: () => unknown;
   onNotice: (value: string) => void;
+  applyToday?: boolean;
+  onDateChange?: (date: string) => void;
+  activeEffectiveFrom?: string | null;
 }) {
   const prefix = useDietApi();
   const client = useQueryClient();
   const [meals, setMeals] = useState<Meal[]>(initial.meals);
+  const [history, setHistory] = useState(false);
+  const clean = JSON.stringify(meals) === JSON.stringify(initial.meals);
+  const isActive =
+    applyToday &&
+    !!initial.effectiveFrom &&
+    initial.effectiveFrom === activeEffectiveFrom &&
+    clean;
   const [opened, setOpened] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -261,7 +289,7 @@ function Editor({
     try {
       await api<Plan>(prefix + "/plan", "PUT", {
         version: initial.version,
-        effectiveFrom: date,
+        effectiveFrom: applyToday ? today : date,
         meals: meals.map((m) => ({
           ...m,
           items: m.items.map(({ foodId, quantity, unit, basis }) => ({
@@ -272,9 +300,11 @@ function Editor({
           })),
         })),
       });
-      onNotice("Dieta salva.");
+      onNotice(applyToday ? "Dieta ativa para o cliente." : "Dieta salva.");
       await client.invalidateQueries({ queryKey: ["schedule"] });
+      await client.invalidateQueries({ queryKey: ["plan"] });
       refresh();
+      if (applyToday) onDateChange?.(today);
     } catch (err) {
       setError(failure(err));
     } finally {
@@ -293,25 +323,66 @@ function Editor({
             </p>
           )}
         </div>
-        <span className="plan-meal-count">
-          {meals.length} {meals.length === 1 ? "refeição" : "refeições"}
-        </span>
+        <div className="plan-editor-tools">
+          <span className="plan-meal-count">
+            {meals.length} {meals.length === 1 ? "refeição" : "refeições"}
+          </span>
+          {!!initial.revisionDates.length && (
+            <button
+              type="button"
+              className="plan-history-icon"
+              aria-label="Informações e versões da dieta"
+              title="Informações e versões da dieta"
+              onClick={() => setHistory(true)}
+            >
+              <Info size={20} aria-hidden="true" />
+            </button>
+          )}
+        </div>
       </div>
-      {!!initial.revisionDates.length && (
-        <details className="plan-versions">
-          <summary>Ver versões anteriores da dieta</summary>
-          <p>
-            {initial.revisionDates
-              .map((d) => d.split("-").reverse().join("/"))
-              .join(" · ")}
-          </p>
-          {initial.effectiveFrom && (
-            <p>
-              Dieta em vigor desde{" "}
-              {initial.effectiveFrom.split("-").reverse().join("/")}.
+      {history && (
+        <MealDialog title="Versões da dieta" onClose={() => setHistory(false)}>
+          <p>Deseja consultar outras versões da dieta deste cliente?</p>
+          {!clean && (
+            <p className="form-notice">
+              Ao escolher outra versão, as alterações ainda não aplicadas serão
+              descartadas.
             </p>
           )}
-        </details>
+          <div className="plan-history-options">
+            {initial.revisionDates.map((d) => (
+              <button
+                key={d}
+                type="button"
+                disabled={!onDateChange}
+                onClick={() => {
+                  onDateChange?.(d);
+                  setHistory(false);
+                }}
+              >
+                {d.split("-").reverse().join("/")}
+                {d === activeEffectiveFrom ? " · Ativa" : ""}
+              </button>
+            ))}
+          </div>
+          {applyToday && (
+            <button
+              type="button"
+              onClick={() => {
+                onDateChange?.(today);
+                setHistory(false);
+              }}
+            >
+              Voltar à dieta atual
+            </button>
+          )}
+        </MealDialog>
+      )}
+      {applyToday && date !== today && (
+        <p className="access-note">
+          Consultando versão de {date.split("-").reverse().join("/")}. Alterar
+          para esta dieta aplica as refeições a partir de hoje.
+        </p>
       )}
       {!foods.length && (
         <p className="form-notice">
@@ -653,8 +724,25 @@ function Editor({
           >
             Adicionar refeição
           </button>
-          <button className="button" type="submit" disabled={date < today}>
-            {saving ? "Salvando…" : "Salvar dieta"}
+          <button
+            className={
+              "button" +
+              (applyToday
+                ? isActive
+                  ? " plan-active-button"
+                  : " plan-apply-pending"
+                : "")
+            }
+            type="submit"
+            disabled={isActive || (date < today && !applyToday)}
+          >
+            {saving
+              ? "Aplicando…"
+              : applyToday
+                ? isActive
+                  ? "Dieta ativa"
+                  : "Alterar para esta dieta"
+                : "Salvar dieta"}
           </button>
         </div>
       </fieldset>

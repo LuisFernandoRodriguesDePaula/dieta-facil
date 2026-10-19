@@ -653,7 +653,7 @@ function ProfessionalClients() {
 }
 export function ProfessionalClientPage() {
   return (
-    <CareLayout professional>
+    <CareLayout professional focused>
       <ProfessionalClient />
     </CareLayout>
   );
@@ -711,8 +711,16 @@ function ClientWorkspace({
   });
   return (
     <>
-      <Link to="/profissional">← Meus clientes</Link>
-      <h1>{name}</h1>
+      <header className="care-focused-header">
+        <h1>{name}</h1>
+        <Link
+          to="/profissional"
+          aria-label="Voltar aos clientes"
+          title="Voltar aos clientes"
+        >
+          ←
+        </Link>
+      </header>
       <div
         className="care-tabs"
         role="group"
@@ -739,18 +747,14 @@ function ClientWorkspace({
             subject="dieta"
             description="Espaço reservado para trazer uma dieta de outro sistema. Nesta versão, preencha as refeições e porções abaixo."
           />
-          <label className="plan-date">
-            Aplicar dieta a partir de
-            <input
-              type="date"
-              required
-              value={date}
-              onChange={(e) => {
-                if (e.target.value) setDate(e.target.value);
-              }}
-            />
-          </label>
-          <EditorLoader key={date} userId={id} date={date} today={today} />
+          <EditorLoader
+            key={date}
+            userId={id}
+            date={date}
+            today={today}
+            applyToday
+            onDateChange={setDate}
+          />
           <section className="plan-meal">
             <h2>Alternativas autorizadas</h2>
             <p>

@@ -57,3 +57,7 @@ Em avaliação mensal, experimente gordura corporal, braço, coxa, panturrilha e
 Ao abrir uma dieta existente, conferir todos os cartões recolhidos. Abrir uma refeição e depois outra: o primeiro cartão recolhe sem apagar os campos. Nova refeição/cópia abre automaticamente. Expandir todas permite comparar, Recolher todas volta ao resumo. Salvar dieta grava todas as refeições, inclusive recolhidas. Se faltar campo obrigatório, o cartão correto deve abrir e focar o campo.
 
 Testar os atalhos Todos os dias, Segunda a sexta e Fim de semana e o ajuste individual de dias. Em histórico, pode abrir e ler os cartões, mas os campos e salvar permanecem desativados. Importações futuras ficam recolhidas em Importar · em breve.
+
+## Troca de dieta e navegação do acompanhamento
+
+Ao abrir cliente, verificar nome no cabeçalho e seta Voltar aos clientes; não deve aparecer a navegação global. Ícone i abre versões por data. Consultar uma versão não muda o que o cliente vê. Alterar para esta dieta aplica o conteúdo para hoje; após sucesso, Dieta ativa aparece em verde. Edite um campo e confira que o botão volta a oferecer aplicação. Recarregue para conferir persistência. Se houver versões futuras previamente agendadas, elas permanecem na linha do tempo.

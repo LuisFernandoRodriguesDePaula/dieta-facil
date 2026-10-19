@@ -175,3 +175,11 @@ Concluída a edição visual iniciada na etapa anterior. Cartões existentes com
 Removidos O que comer, texto PLANEJAMENTO ALIMENTAR, numeração redundante e contagem de dias no editor aberto. Título Dieta, instruções somente no vazio, Dias da semana e Salvar dieta. Seleção semanal estilizada com atalhos Todos os dias, Segunda a sexta e Fim de semana. Importações futuras agora são recolhidas por padrão. Mantidos quantidades, unidades, estado do alimento, vigência e erros.
 
 Validação: 25 testes de interface, build e lint; quatro jornadas aprovadas em computador/celular (editor profissional e trocas/consumo). Testes novos cobrem atalhos semanais, alternância sem perda, expansão/recolhimento e erro obrigatório em cartão fechado. Inspeção da captura móvel efetuada com dados fictícios. Nenhuma tabela, API, dieta real ou saldo foi alterado.
+
+## 2026-10-19 — Acompanhamento focado e ativação da dieta
+
+Ao abrir um cliente, o cabeçalho global é substituído pelo nome do cliente e uma seta acessível de retorno à lista. Permanecem apenas as abas de acompanhamento; Conta e Recursos Premium continuam na área geral, acessível após voltar.
+
+Histórico de dieta movido para ícone Info com tooltip e diálogo com versões por data. Consultar uma versão não grava mudanças. O diálogo permite retornar à dieta atual e avisa sobre descarte de rascunho antes da escolha de outra versão. O seletor de data deixou de ocupar a tela profissional. Alterar para esta dieta salva o conteúdo selecionado com vigência a partir de hoje, pelo contrato existente. Somente após confirmação/refetch do plano vigente aparece Dieta ativa em verde; editar o conteúdo volta a oferecer aplicação. Uma versão passada permanece sem edição direta, mas pode ser reaplicada como dieta de hoje. Revisões futuras existentes não são apagadas. Sem mudança de schema, de autorização ou dos snapshots consumidos.
+
+Validação: 25 testes de interface, build/lint e jornadas desktop/mobile aprovados. Jornada ampliada confere ausência da navegação global no cliente, ícone/modal, estado ativo e rascunho, seleção de outra versão e aplicação efetiva para hoje consultada pela API. Nenhuma conta real foi usada nos testes.

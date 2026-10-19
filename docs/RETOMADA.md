@@ -87,3 +87,7 @@ Catálogo profissional: unidade compacta, ações à direita e lista em Ver alim
 ## Editor minimalista e cartões recolhidos (2026-10-19)
 
 Refeições existentes começam fechadas. Cabeçalho resume nome, horário, dias e alimentos; abre uma por vez, preserva rascunho, permite expandir/recolher todas. Nova/cópia abrem; erro de campo obrigatório abre a refeição antes de focar. Dias estilizados com atalhos. Textos redundantes removidos, Salvar dieta substitui Salvar revisão, vigência permanece. Importações reservadas em detalhes recolhidos. Não há mudança de backend ou dados. Verificar o editor profissional no desktop e celular conforme V1_VALIDATION.md; publicação e feedback humano seguem pendentes.
+
+## Cabeçalho do cliente e ativação (2026-10-19)
+
+Dentro do acompanhamento profissional, cabeçalho com nome do cliente, abas e seta Voltar aos clientes; navegação geral só na lista. Histórico no ícone Informações e versões da dieta. No profissional, botão Alterar para esta dieta salva com effectiveFrom=hoje e vira Dieta ativa após conferir o plano vigente; mudanças locais voltam ao estado aplicável. Selecionar versão pelo diálogo apenas consulta; botão aplica para hoje. Datas passadas continuam sem edição direta e revisões futuras existentes são preservadas. Editor legado mantém sua seleção por data. Testes desktop/mobile verificam conteúdo ativo pela API.

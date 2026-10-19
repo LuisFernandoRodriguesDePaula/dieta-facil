@@ -12,9 +12,11 @@ const failure = (e: unknown) =>
 export function CareLayout({
   children,
   professional = false,
+  focused = false,
 }: {
   children: ReactNode;
   professional?: boolean;
+  focused?: boolean;
 }) {
   const session = useSession();
   if (session.isPending)
@@ -33,7 +35,7 @@ export function CareLayout({
   if (!session.data) return <Navigate to="/entrar" replace />;
   return (
     <main className="plan-page">
-      <PersonalNav />
+      {!focused && <PersonalNav />}
       {professional && session.data.role !== "NUTRITIONIST" ? (
         <>
           <h1>Área do nutricionista</h1>

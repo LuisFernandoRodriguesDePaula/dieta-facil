@@ -884,3 +884,45 @@
     font-size: 0.9rem;
   }
 }
+.plan-history-control {
+  display: flex;
+  justify-content: flex-end;
+  margin: 8px 0;
+}
+.plan-page button.plan-history-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+}
+.plan-history-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0;
+}
+.plan-page button.plan-apply-pending {
+  background: #fff;
+  color: #284e3d;
+  border-color: #284e3d;
+}
+.plan-page button.plan-active-button:disabled {
+  background: #284e3d;
+  color: #fff;
+  opacity: 1;
+}
+.plan-editor-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+@media (max-width: 700px) {
+  .plan-editor-intro {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+}
