@@ -135,3 +135,11 @@ Regressão cobre duas refeições, desfazer a primeira mantendo a segunda, desfa
 Por solicitação do usuário, desfazer uma refeição atualiza o cartão sem a mensagem de sucesso persistente; erros continuam visíveis. A revisão por teclado encontrou foco saindo do diálogo de troca ao completar o ciclo de Tab: o painel agora mantém o foco entre seus controles e devolve-o ao botão de origem após Escape. A largura mínima global foi ajustada a 320px para permitir reflow em telas estreitas.
 
 Validação: 19 testes de interface, build e lint aprovados. Jornadas em computador/viewport móvel verificam Tab e Shift+Tab, Escape, retorno do foco e ausência de rolagem lateral a 320 e 720px em Dieta, Resultados, Meu nutricionista e Conta. Essa cobertura não representa auditoria completa ou teste com leitor de tela/aparelho físico. FEEDBACK_V1.md prepara o registro de uma sessão com o nutricionista. O usuário escolheu continuar a validação local; as contas externas ainda não foram criadas.
+
+## 2026-10-19 — Continuidade da validação 1.0: área profissional
+
+A lista de clientes ganhou busca por nome/e-mail (ignorando acentos), filtros por vínculo ativo, convite pendente e convite expirado, contagem e estados vazios distintos. Renovação usa o endpoint existente de convites e substitui o convite anterior; cancelamento usa revogação existente, com confirmação e opção de manter. Não houve mudança de tabela, permissão ou envio de e-mail. Falhas na consulta de clientes, acompanhamento, alimentos e avaliações oferecem nova tentativa.
+
+O formulário de avaliação só abre após carregar o histórico. Conflitos de versão preservam os campos digitados e oferecem Carregar avaliação atual com aviso de substituição, permitindo revisar e salvar novamente. Jornada simula uma alteração concorrente em outro navegador e verifica a versão final na conta do cliente.
+
+Testes novos cobrem convites expirados versus vínculos ativos, busca sem acento, recuperação da lista indisponível e erro de renovação. Contas fictícias isoladas foram usadas nas jornadas; dados pessoais e contas de demonstração não foram editados. Backup local criado e restaurado com sucesso em banco temporário, preservando o original; arquivo privado em .local/backups.

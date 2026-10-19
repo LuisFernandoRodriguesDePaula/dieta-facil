@@ -37,3 +37,11 @@ Anote a tela, a ação esperada e o que aconteceu. Use apenas dados fictícios n
 Use [FEEDBACK_V1.md](FEEDBACK_V1.md) como ficha de observações. Registre a tarefa, se precisou de ajuda e passos para reproduzir problemas. Priorize falhas que impedem consulta da dieta, trocas autorizadas ou registro de avaliações antes de ajustes visuais.
 
 Na revisão por teclado, abrir Trocar alimento com Enter, navegar com Tab e Shift+Tab, fechar com Escape e conferir retorno ao botão de origem. Conferir também a leitura com zoom do navegador e em aparelho físico. Os testes automatizados de reflow a 320 e 720 pixels não substituem essas verificações nem uma sessão com leitor de tela.
+
+## Revisão do fluxo profissional — 2026-10-19
+
+Na lista Meus clientes, teste a busca por nome (com ou sem acento) ou e-mail e os filtros Vinculados, Aguardando aceite e Convites expirados. Convites pendentes/expirados oferecem Renovar convite; isso substitui o convite anterior e abre novo prazo de sete dias, sem envio de e-mail. Cancelar convite exige confirmação; Manter convite abandona a ação. Vínculos ativos continuam acessíveis pelo cartão.
+
+Ao editar avaliações em duas janelas, salve primeiro na segunda janela. A primeira deve rejeitar a versão antiga e manter os campos digitados. Carregar avaliação atual substitui os campos pela versão salva após a escolha explícita do profissional; copie observações que queira preservar antes dessa ação. Revise os valores antes de salvar novamente.
+
+Se uma consulta falhar, use Tentar novamente; não é necessário sair da conta. Registrar avaliação mensal permanece indisponível enquanto o histórico não estiver carregado.

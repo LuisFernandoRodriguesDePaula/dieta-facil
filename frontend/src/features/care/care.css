@@ -104,3 +104,28 @@
     gap: 24px;
   }
 }
+.care-client-tools {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 16px;
+  margin: 28px 0 12px;
+}
+.care-client-tools input,
+.care-client-tools select {
+  width: 100%;
+  min-width: 0;
+}
+.care-confirm {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid #c9d5c8;
+  border-radius: 12px;
+}
+.care-confirm button {
+  margin: 12px 12px 0 0;
+}
+@media (max-width: 700px) {
+  .care-client-tools {
+    grid-template-columns: 1fr;
+  }
+}

@@ -67,3 +67,7 @@ Desfazer refeição agora fica em cada refeição consumida e persiste após rec
 ## Continuidade — validação local 1.0 (2026-10-19)
 
 O usuário confirmou que ainda não criou Render/Neon/Brevo e quer continuar a validação local. Não iniciar publicação ou modificar o Portfólio. Mensagem de sucesso de estorno removida, com atualização apenas no cartão. Revisão local ampliou teclado e reflow em 320/720px; testes não substituem leitor de tela, zoom real ou aparelho físico. Ficha da sessão: FEEDBACK_V1.md. Próximo marco: executar V1_VALIDATION.md com o nutricionista, registrar feedback e priorizar mudanças; aguardar contas para publicação. CI da correção anterior e056940 concluída com sucesso (run 39194356375).
+
+## Continuidade — área profissional (2026-10-19)
+
+Busca/filtros na lista, renovação/cancelamento confirmado de convites, nova tentativa em consultas e recuperação explícita de conflito de avaliação implementados. Próximo teste humano deve incluir os cenários complementares de V1_VALIDATION.md; usar FEEDBACK_V1.md. Nenhuma migração ou alteração de contas pessoais/demonstração. Contas externas ainda pendentes; seguir local. Backup desta etapa restaurado em base temporária com sucesso. Não repetir criação de funcionalidades já implementadas antes de receber o feedback; o próximo marco continua sendo a sessão com o nutricionista.

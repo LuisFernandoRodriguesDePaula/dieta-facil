@@ -166,3 +166,11 @@ Interface pt-BR; estoque individual; entrada manual da dieta; ciclo sugerido de 
 - [x] Ficha de feedback para a sessão com o nutricionista (FEEDBACK_V1.md).
 - [ ] Teste humano com leitor de tela, zoom real e aparelho físico; revisão ampliada de acessibilidade permanece aberta.
 - Publicação aguarda contas externas; usuário optou por continuar a validação local.
+
+### Refinamento do acompanhamento profissional — 2026-10-19
+
+- [x] Busca por nome/e-mail e filtros por situação na lista de clientes.
+- [x] Renovação e cancelamento confirmado de convites pendentes/expirados.
+- [x] Estados vazios e nova tentativa em consultas do acompanhamento.
+- [x] Recuperação explícita de conflito de avaliação, preservando rascunho até carregar a versão atual.
+- [ ] Sessão humana com nutricionista e feedback continuam pendentes.

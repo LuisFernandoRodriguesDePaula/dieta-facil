@@ -607,6 +607,52 @@ test("versão 1.0: nutricionista prepara, cliente consulta e acompanha resultado
       .fill("Registro fictício para testar a versão 1.0.");
     await page.getByRole("button", { name: "Salvar avaliação" }).click();
     await expect(page.getByText("82 kg", { exact: true })).toBeVisible();
+
+    // Simulate another browser saving while this professional has an old form open.
+    await page
+      .getByRole("button", { name: "Editar avaliação deste mês", exact: true })
+      .click();
+    const resultPath = "/api/professional/clients/" + client.id + "/results";
+    const current = (await (await page.request.get(resultPath)).json())[0];
+    const token = await (await page.request.get("/api/auth/csrf")).json();
+    expect(
+      (
+        await page.request.put(resultPath, {
+          data: {
+            date: current.date,
+            version: current.version,
+            weight: 83,
+            height: 180,
+            waist: null,
+            goal: "Treino",
+            notes: "Registro atualizado em outro navegador.",
+          },
+          headers: { [token.headerName]: token.token },
+        })
+      ).ok(),
+    ).toBeTruthy();
+    await page.getByLabel("Peso (kg)", { exact: true }).fill("84");
+    await page
+      .getByRole("button", { name: "Salvar avaliação", exact: true })
+      .click();
+    await expect(page.getByRole("alert")).toBeVisible();
+    await expect(page.getByLabel("Peso (kg)", { exact: true })).toHaveValue(
+      "84",
+    );
+    await page
+      .getByRole("button", { name: "Carregar avaliação atual", exact: true })
+      .click();
+    await expect(page.getByLabel("Peso (kg)", { exact: true })).toHaveValue(
+      "83",
+    );
+    await expect(page.getByLabel("Observações da avaliação")).toHaveValue(
+      "Registro atualizado em outro navegador.",
+    );
+    await page.getByLabel("Peso (kg)", { exact: true }).fill("84");
+    await page
+      .getByRole("button", { name: "Salvar avaliação", exact: true })
+      .click();
+    await expect(page.getByText("84 kg", { exact: true })).toBeVisible();
     expect(
       (
         await new AxeBuilder({ page })
@@ -646,7 +692,7 @@ test("versão 1.0: nutricionista prepara, cliente consulta e acompanha resultado
     expect((await clientPage.request.get("/api/inventory")).status()).toBe(403);
     await screenshot(clientPage, "cliente-basico-" + info.project.name);
     await clientPage.goto("/conta/resultados");
-    await expect(clientPage.getByText("82 kg", { exact: true })).toBeVisible();
+    await expect(clientPage.getByText("84 kg", { exact: true })).toBeVisible();
     expect(
       (
         await new AxeBuilder({ page: clientPage })
@@ -803,4 +849,93 @@ test("dieta acessível por teclado e sem rolagem lateral em tela estreita", asyn
       ).toBeTruthy();
     }
   }
+});
+
+test("nutricionista busca clientes, renova e cancela convites", async ({
+  page,
+}, info) => {
+  await account(page, "NUTRITIONIST", false);
+  await page.goto("/profissional");
+  await expect(
+    page.getByText("Seu primeiro acompanhamento começa aqui"),
+  ).toBeVisible();
+  const firstEmail = "convite-" + crypto.randomUUID() + "@example.invalid";
+  for (const [name, email] of [
+    ["José de Teste", firstEmail],
+    ["Marina de Teste", "convite-" + crypto.randomUUID() + "@example.invalid"],
+  ]) {
+    await page.getByLabel("Nome do cliente", { exact: true }).fill(name);
+    await page.getByLabel("E-mail do cliente", { exact: true }).fill(email);
+    await page
+      .getByRole("button", { name: "Criar convite", exact: true })
+      .click();
+    await expect(
+      page.getByRole("article", { name, exact: true }),
+    ).toBeVisible();
+  }
+  const search = page.getByRole("searchbox", { name: "Buscar cliente" });
+  await search.fill("jose");
+  await expect(page.getByRole("article")).toHaveCount(1);
+  const first = page.getByRole("article", {
+    name: "José de Teste",
+    exact: true,
+  });
+  const before = await (
+    await page.request.get("/api/professional/clients")
+  ).json();
+  await first
+    .getByRole("button", { name: "Renovar convite", exact: true })
+    .click();
+  await expect(page.getByRole("status")).toContainText("Convite renovado");
+  const after = await (
+    await page.request.get("/api/professional/clients")
+  ).json();
+  expect(
+    after.find((l: { email: string }) => l.email === firstEmail).id,
+  ).not.toBe(before.find((l: { email: string }) => l.email === firstEmail).id);
+  await first
+    .getByRole("button", { name: "Cancelar convite", exact: true })
+    .click();
+  await first
+    .getByRole("button", { name: "Manter convite", exact: true })
+    .click();
+  await expect(
+    first.getByRole("button", { name: "Confirmar cancelamento", exact: true }),
+  ).toHaveCount(0);
+  await first
+    .getByRole("button", { name: "Cancelar convite", exact: true })
+    .click();
+  await first
+    .getByRole("button", { name: "Confirmar cancelamento", exact: true })
+    .click();
+  await expect(first).toHaveCount(0);
+  await expect(
+    page.getByText("Nenhum cliente encontrado", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Limpar busca e filtro", exact: true })
+    .click();
+  await page
+    .getByRole("combobox", { name: "Situação", exact: true })
+    .selectOption("active");
+  await expect(
+    page.getByText("Nenhum cliente encontrado", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("combobox", { name: "Situação", exact: true })
+    .selectOption("pending");
+  await expect(
+    page.getByRole("article", { name: "Marina de Teste", exact: true }),
+  ).toBeVisible();
+  await search.fill("@example.invalid");
+  await expect(page.getByRole("article")).toHaveCount(1);
+  await page.setViewportSize({ width: 320, height: 900 });
+  await screenshot(page, "clientes-revisao-" + info.project.name);
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
 });

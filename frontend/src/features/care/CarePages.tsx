@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 import { api, ApiError } from "../../lib/api";
@@ -62,7 +62,10 @@ function OwnResults() {
       {query.isPending ? (
         <p role="status">Carregando avaliações…</p>
       ) : query.isError ? (
-        <p role="alert">{failure(query.error)}</p>
+        <div role="alert">
+          <p>{failure(query.error)}</p>
+          <button onClick={() => query.refetch()}>Tentar novamente</button>
+        </div>
       ) : (
         <ResultsHistory evaluations={query.data} />
       )}
@@ -210,7 +213,13 @@ function Relationships() {
     }
   };
   if (query.isPending) return <p role="status">Carregando acompanhamento…</p>;
-  if (query.isError) return <p role="alert">{failure(query.error)}</p>;
+  if (query.isError)
+    return (
+      <div role="alert">
+        <p>{failure(query.error)}</p>
+        <button onClick={() => query.refetch()}>Tentar novamente</button>
+      </div>
+    );
   const links = query.data.filter((l) => l.status !== "REVOKED");
   return (
     <>
@@ -283,7 +292,11 @@ export function ProfessionalPage() {
   );
 }
 function ProfessionalClients() {
-  const [now] = useState(() => Date.now());
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(timer);
+  }, []);
   const query = useQuery({
     queryKey: ["clients"],
     queryFn: () => api<CareLink[]>("/api/professional/clients"),
@@ -295,26 +308,60 @@ function ProfessionalClients() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [notice, setNotice] = useState("");
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all");
+  const [confirm, setConfirm] = useState<string | null>(null);
+  const status = (l: CareLink) =>
+    l.status === "ACTIVE"
+      ? "active"
+      : new Date(l.expiresAt).getTime() <= now
+        ? "expired"
+        : "pending";
+  const links = (query.data ?? []).filter((l) => l.status !== "REVOKED");
+  const normalize = (text: string) =>
+    text
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLocaleLowerCase("pt-BR");
+  const visible = links.filter(
+    (l) =>
+      (filter === "all" || status(l) === filter) &&
+      normalize(l.name + " " + l.email).includes(normalize(search.trim())),
+  );
+  const act = async (path: string, body: unknown, message: string) => {
+    if (busy) return false;
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      await api(path, "POST", body);
+      setConfirm(null);
+      setNow(Date.now());
+      await client.invalidateQueries({ queryKey: ["clients"] });
+      setNotice(message);
+      return true;
+    } catch (err) {
+      setError(failure(err));
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  };
   return (
     <>
       <form
         className="plan-meal"
         onSubmit={async (e) => {
           e.preventDefault();
-          setBusy(true);
-          setError("");
-          try {
-            await api("/api/professional/clients", "POST", { name, email });
+          if (
+            await act(
+              "/api/professional/clients",
+              { name, email },
+              "Convite disponível na conta do cliente por sete dias. Nenhum e-mail foi enviado.",
+            )
+          ) {
             setName("");
             setEmail("");
-            setNotice(
-              "Convite disponível na conta do cliente por sete dias. Nenhum e-mail foi enviado.",
-            );
-            await client.invalidateQueries({ queryKey: ["clients"] });
-          } catch (err) {
-            setError(failure(err));
-          } finally {
-            setBusy(false);
           }
         }}
       >
@@ -345,7 +392,9 @@ function ProfessionalClients() {
               />
             </label>
           </div>
-          <button className="button care-submit">Criar convite</button>
+          <button className="button care-submit">
+            {busy ? "Aguarde…" : "Criar convite"}
+          </button>
         </fieldset>
       </form>
       {notice && (
@@ -357,30 +406,156 @@ function ProfessionalClients() {
       {query.isPending ? (
         <p role="status">Carregando clientes…</p>
       ) : query.isError ? (
-        <p role="alert">{failure(query.error)}</p>
-      ) : (
-        <div className="care-client-grid">
-          {query.data
-            .filter((l) => l.status !== "REVOKED")
-            .map((l) => (
-              <article className="plan-meal" key={l.id}>
-                <span className="eyebrow">
-                  {l.status === "ACTIVE"
-                    ? "VINCULADO"
-                    : new Date(l.expiresAt).getTime() < now
-                      ? "CONVITE EXPIRADO"
-                      : "AGUARDANDO ACEITE"}
-                </span>
-                <h2>{l.name}</h2>
-                <p>{l.email}</p>
-                {l.status === "ACTIVE" && (
-                  <Link to={"/profissional/clientes/" + l.clientId}>
-                    Abrir acompanhamento →
-                  </Link>
-                )}
-              </article>
-            ))}
+        <div role="alert">
+          <p>{failure(query.error)}</p>
+          <button onClick={() => query.refetch()}>
+            Tentar carregar clientes novamente
+          </button>
         </div>
+      ) : (
+        <section aria-label="Lista de clientes">
+          <div className="care-client-tools">
+            <label>
+              Buscar cliente
+              <input
+                type="search"
+                value={search}
+                placeholder="Nome ou e-mail"
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </label>
+            <label>
+              Situação
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+              >
+                <option value="all">Todos ({links.length})</option>
+                <option value="active">
+                  Vinculados (
+                  {links.filter((l) => status(l) === "active").length})
+                </option>
+                <option value="pending">
+                  Aguardando aceite (
+                  {links.filter((l) => status(l) === "pending").length})
+                </option>
+                <option value="expired">
+                  Convites expirados (
+                  {links.filter((l) => status(l) === "expired").length})
+                </option>
+              </select>
+            </label>
+          </div>
+          <p className="access-note" aria-live="polite">
+            {visible.length} de {links.length} clientes
+          </p>
+          {!links.length ? (
+            <div className="diet-empty">
+              <h2>Seu primeiro acompanhamento começa aqui</h2>
+              <p>
+                Crie um convite acima. Quando o cliente aceitar, você poderá
+                preparar a dieta e registrar as avaliações.
+              </p>
+            </div>
+          ) : !visible.length ? (
+            <div className="diet-empty">
+              <h2>Nenhum cliente encontrado</h2>
+              <p>Tente outro nome, e-mail ou situação.</p>
+              <button
+                onClick={() => {
+                  setSearch("");
+                  setFilter("all");
+                }}
+              >
+                Limpar busca e filtro
+              </button>
+            </div>
+          ) : (
+            <div className="care-client-grid">
+              {visible.map((l) => (
+                <article className="plan-meal" key={l.id} aria-label={l.name}>
+                  <span className="eyebrow">
+                    {status(l) === "active"
+                      ? "VINCULADO"
+                      : status(l) === "expired"
+                        ? "CONVITE EXPIRADO"
+                        : "AGUARDANDO ACEITE"}
+                  </span>
+                  <h2>{l.name}</h2>
+                  <p>{l.email}</p>
+                  {l.status === "ACTIVE" ? (
+                    <Link to={"/profissional/clientes/" + l.clientId}>
+                      Abrir acompanhamento →
+                    </Link>
+                  ) : (
+                    <>
+                      <p className="access-note">
+                        {status(l) === "expired"
+                          ? "Renove o convite para permitir o aceite."
+                          : "Disponível até " +
+                            new Intl.DateTimeFormat("pt-BR", {
+                              dateStyle: "short",
+                              timeStyle: "short",
+                            }).format(new Date(l.expiresAt)) +
+                            ". O convite aparece dentro da conta do cliente."}
+                      </p>
+                      <div className="plan-actions">
+                        <button
+                          disabled={busy}
+                          onClick={() =>
+                            act(
+                              "/api/professional/clients",
+                              { name: l.name, email: l.email },
+                              "Convite renovado por sete dias. Nenhum e-mail foi enviado.",
+                            )
+                          }
+                        >
+                          Renovar convite
+                        </button>
+                        <button
+                          disabled={busy}
+                          onClick={() => setConfirm(l.id)}
+                        >
+                          Cancelar convite
+                        </button>
+                      </div>
+                      {confirm === l.id && (
+                        <div
+                          className="care-confirm"
+                          role="group"
+                          aria-label={"Cancelar convite de " + l.name}
+                        >
+                          <p>
+                            Este convite deixará de permitir o aceite. Você
+                            poderá criar outro depois.
+                          </p>
+                          <button
+                            disabled={busy}
+                            onClick={() =>
+                              act(
+                                "/api/care/" + l.id + "/revoke",
+                                {},
+                                "Convite cancelado.",
+                              )
+                            }
+                          >
+                            Confirmar cancelamento
+                          </button>
+                          <button
+                            disabled={busy}
+                            onClick={() => setConfirm(null)}
+                          >
+                            Manter convite
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
       )}
     </>
   );
@@ -402,7 +577,14 @@ function ProfessionalClient() {
     retry: false,
   });
   if (profile.isPending) return <p role="status">Carregando cliente…</p>;
-  if (profile.isError) return <p role="alert">{failure(profile.error)}</p>;
+  if (profile.isError)
+    return (
+      <div role="alert">
+        <p>{failure(profile.error)}</p>
+        <button onClick={() => profile.refetch()}>Tentar novamente</button>
+        <Link to="/profissional">Voltar aos clientes</Link>
+      </div>
+    );
   return (
     <DietApiContext.Provider value={prefix}>
       <ClientWorkspace
@@ -581,7 +763,10 @@ function ClientFoods({ id, prefix }: { id: string; prefix: string }) {
         {error && <p role="alert">{error}</p>}
       </form>
       {query.isError ? (
-        <p role="alert">{failure(query.error)}</p>
+        <div role="alert">
+          <p>{failure(query.error)}</p>
+          <button onClick={() => query.refetch()}>Tentar novamente</button>
+        </div>
       ) : (
         <ul>
           {query.data?.map((f) => (
@@ -616,6 +801,7 @@ function ProfessionalResults({
       <div className="plan-actions">
         <button
           className="button"
+          disabled={!query.isSuccess}
           onClick={() =>
             setEditing(
               query.data?.find(
@@ -640,7 +826,10 @@ function ProfessionalResults({
       {query.isPending ? (
         <p role="status">Carregando avaliações…</p>
       ) : query.isError ? (
-        <p role="alert">{failure(query.error)}</p>
+        <div role="alert">
+          <p>{failure(query.error)}</p>
+          <button onClick={() => query.refetch()}>Tentar novamente</button>
+        </div>
       ) : (
         <ResultsHistory evaluations={query.data} onEdit={setEditing} />
       )}
@@ -669,6 +858,7 @@ function EvaluationForm({
   const [notes, setNotes] = useState(existing?.notes ?? "");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [conflict, setConflict] = useState(false);
   const client = useQueryClient();
   return (
     <form
@@ -691,6 +881,7 @@ function EvaluationForm({
           onClose();
         } catch (err) {
           setError(failure(err));
+          setConflict(err instanceof ApiError && err.status === 409);
         } finally {
           setBusy(false);
         }
@@ -775,6 +966,48 @@ function EvaluationForm({
         </div>
       </fieldset>
       {error && <p role="alert">{error}</p>}
+      {conflict && (
+        <div className="care-confirm">
+          <p>
+            Suas alterações continuam neste formulário. Você pode copiar suas
+            observações antes de carregar a avaliação salva. Carregar
+            substituirá os campos pela versão atual.
+          </p>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                const latest = await api<Evaluation[]>(prefix + "/results");
+                const found = latest.find(
+                  (e) => e.date.slice(0, 7) === date.slice(0, 7),
+                );
+                if (found) {
+                  setDate(found.date);
+                  setVersion(found.version);
+                  setWeight(String(found.weight));
+                  setHeight(String(found.height ?? ""));
+                  setWaist(String(found.waist ?? ""));
+                  setGoal(found.goal);
+                  setNotes(found.notes);
+                } else {
+                  setVersion(0);
+                }
+                await client.invalidateQueries({ queryKey: ["results"] });
+                setConflict(false);
+                setError("");
+              } catch (err) {
+                setError(failure(err));
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            Carregar avaliação atual
+          </button>
+        </div>
+      )}
     </form>
   );
 }
