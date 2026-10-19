@@ -4,7 +4,7 @@ Aplicativo de planejamento alimentar que conecta uma dieta já definida ao estoq
 
 **Versão 1.0 demonstrável local para feedback de um nutricionista.** O profissional convida o cliente, aguarda o aceite, prepara dieta/alternativas e registra avaliações mensais. O cliente consulta o plano e acompanha os resultados; registrar “Já comi” é opcional. Básico funciona sem estoque; Premium acrescenta estoque, compras e preparo com ativação explícita e preservação de saldos. Sem cobrança real. A demonstração usa dados fictícios e não prescreve alimentação. Publicação preparada em Docker/Render, aguardando ativação das contas externas. Veja docs/DEPLOYMENT.md; a integração com o Portfólio fica após validar a URL real.
 
-Comece pelo [roteiro da versão 1.0](docs/V1_VALIDATION.md). `npm run demo:care` em frontend prepara as contas fictícias de cliente e nutricionista; credenciais ficam exclusivamente em `.local/`.
+Comece pela [entrega local da versão 1.0](docs/ENTREGA_V1.md) e pelo [roteiro de validação](docs/V1_VALIDATION.md). `npm run demo:care` em frontend prepara as contas fictícias de cliente e nutricionista; credenciais ficam exclusivamente em `.local/`.
 
 ![Painel pessoal com cenário fictício](docs/images/demo-personal-desktop.png)
 
@@ -46,7 +46,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\Start-Backend.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\Start-Frontend.ps1
 ```
 
-Abra [Dieta Fácil local](http://127.0.0.1:5173/conta/inicio). Crie uma conta, entre e use **Abrir meu painel** no perfil. Para experimentar o exemplo funcional, carregue o cenário fictício em uma conta vazia.
+Abra [Dieta Fácil local](http://127.0.0.1:5173/conta/inicio). Ao entrar, você será encaminhado ao painel correspondente ao seu perfil. Para experimentar o exemplo funcional, carregue o cenário fictício em uma conta vazia.
 
 A API usa 8080; o PostgreSQL local usa 5433. Senha aleatória e dados ficam em .local/, ignorado pelo Git. A opção Bypass vale somente para o processo do script. Para encerrar interface/API, use Ctrl+C nos respectivos terminais; para parar o banco, execute scripts/Stop-Database.ps1.
 

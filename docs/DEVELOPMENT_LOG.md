@@ -143,3 +143,9 @@ A lista de clientes ganhou busca por nome/e-mail (ignorando acentos), filtros po
 O formulário de avaliação só abre após carregar o histórico. Conflitos de versão preservam os campos digitados e oferecem Carregar avaliação atual com aviso de substituição, permitindo revisar e salvar novamente. Jornada simula uma alteração concorrente em outro navegador e verifica a versão final na conta do cliente.
 
 Testes novos cobrem convites expirados versus vínculos ativos, busca sem acento, recuperação da lista indisponível e erro de renovação. Contas fictícias isoladas foram usadas nas jornadas; dados pessoais e contas de demonstração não foram editados. Backup local criado e restaurado com sucesso em banco temporário, preservando o original; arquivo privado em .local/backups.
+
+## 2026-10-19 — Preparação da entrega local
+
+Adicionado docs/ENTREGA_V1.md com escopo fechado, acessos locais em perfis separados, roteiro curto, limites e pendências externas. README corrigido para o login direto ao painel. Nenhuma tela ou regra de domínio mudou.
+
+Novo comando npm run demo:check verifica apenas as contas fictícias conhecidas e o ambiente local: interface, saúde da API, login/perfis, vínculo ativo, mesma dieta e histórico nos dois perfis e bloqueios do Básico. Não chama o seed nem altera refeições, avaliações, convites, plano ou saldos. Cria sessões isoladas de conferência e faz logout ao finalizar. Relatório privado em .local/demo-readiness.json não inclui credenciais ou conteúdo clínico. Falhas não disparam resets. A conferência passou e o lint passou; não foram repetidas suítes de domínio já aprovadas, pois a mudança é em documentação e ferramenta de entrega.

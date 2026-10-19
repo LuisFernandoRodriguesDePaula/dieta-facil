@@ -71,3 +71,7 @@ O usuário confirmou que ainda não criou Render/Neon/Brevo e quer continuar a v
 ## Continuidade — área profissional (2026-10-19)
 
 Busca/filtros na lista, renovação/cancelamento confirmado de convites, nova tentativa em consultas e recuperação explícita de conflito de avaliação implementados. Próximo teste humano deve incluir os cenários complementares de V1_VALIDATION.md; usar FEEDBACK_V1.md. Nenhuma migração ou alteração de contas pessoais/demonstração. Contas externas ainda pendentes; seguir local. Backup desta etapa restaurado em base temporária com sucesso. Não repetir criação de funcionalidades já implementadas antes de receber o feedback; o próximo marco continua sendo a sessão com o nutricionista.
+
+## Entrega local consolidada — 2026-10-19
+
+Começar por ENTREGA_V1.md. npm run demo:check em frontend confere contas fictícias e ambiente, sem preparar/resetar dados, e salva relatório privado em .local/demo-readiness.json. Conferência passou. O próximo marco continua sendo avaliação humana com nutricionista; publicação aguarda contas externas por escolha do usuário. Não acrescentar módulos para substituir esse teste. Credenciais continuam privadas em .local/.

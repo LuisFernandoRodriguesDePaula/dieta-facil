@@ -11,7 +11,8 @@
     "test": "vitest run src",
     "test:e2e": "playwright test",
     "demo:hypertrophy": "node scripts/seed-care.mjs",
-    "demo:care": "node scripts/seed-care.mjs"
+    "demo:care": "node scripts/seed-care.mjs",
+    "demo:check": "node scripts/check-demo.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
