@@ -1,4 +1,11 @@
 import { useState } from "react";
+import {
+  Clock3,
+  Utensils,
+  CalendarDays,
+  Plus,
+  ChevronDown,
+} from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { api, ApiError } from "../../lib/api";
@@ -106,7 +113,7 @@ function Workspace({
           : "O que comer, na hora certa. Troque um alimento ou confirme sua refeição por aqui."}
       </p>
       <label className="plan-date">
-        {editing ? "Revisão a partir de" : "Consultar dia"}
+        {editing ? "Aplicar dieta a partir de" : "Consultar dia"}
         <input
           type="date"
           required
@@ -206,26 +213,47 @@ function Editor({
   const prefix = useDietApi();
   const client = useQueryClient();
   const [meals, setMeals] = useState<Meal[]>(initial.meals);
+  const [opened, setOpened] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const patch = (id: string, change: Partial<Meal>) =>
     setMeals((old) => old.map((m) => (m.id === id ? { ...m, ...change } : m)));
-  const add = () =>
+  const add = () => {
+    const id = crypto.randomUUID();
     setMeals((old) => [
       ...old,
-      {
-        id: crypto.randomUUID(),
-        name: "",
-        time: "08:00",
-        days: [1, 2, 3, 4, 5, 6, 7],
-        items: [],
-      },
+      { id, name: "", time: "08:00", days: [1, 2, 3, 4, 5, 6, 7], items: [] },
     ]);
+    setOpened([id]);
+  };
   const save = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     onNotice("");
-    if (meals.some((m) => !m.days.length || !m.items.length)) {
+    const form = e.currentTarget;
+    const invalid = Array.from(
+      form.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
+        "input,select",
+      ),
+    ).find((field) => !field.validity.valid);
+    if (invalid) {
+      const id = invalid.closest<HTMLElement>("[data-meal-id]")?.dataset.mealId;
+      if (id) setOpened([id]);
+      requestAnimationFrame(() => {
+        invalid.focus();
+        invalid.reportValidity();
+      });
+      return;
+    }
+    const incomplete = meals.find((m) => !m.days.length || !m.items.length);
+    if (incomplete) {
+      setOpened([incomplete.id]);
+      requestAnimationFrame(() =>
+        document
+          .getElementById("meal-fields-" + incomplete.id)
+          ?.querySelector<HTMLInputElement>("input")
+          ?.focus(),
+      );
       setError("Escolha pelo menos um dia e um alimento em cada refeição.");
       return;
     }
@@ -244,7 +272,7 @@ function Editor({
           })),
         })),
       });
-      onNotice("Revisão salva.");
+      onNotice("Dieta salva.");
       await client.invalidateQueries({ queryKey: ["schedule"] });
       refresh();
     } catch (err) {
@@ -254,21 +282,48 @@ function Editor({
     }
   };
   return (
-    <form onSubmit={save} className="plan-editor">
-      <p>
-        Revisões registradas:{" "}
-        {initial.revisionDates.length
-          ? initial.revisionDates.join(" · ")
-          : "nenhuma"}
-        .{" "}
-        {initial.effectiveFrom &&
-          "Exibindo a dieta vigente desde " + initial.effectiveFrom + "."}
-      </p>
+    <form onSubmit={save} noValidate className="plan-editor">
+      <div className="plan-editor-intro">
+        <div>
+          <h2>Dieta</h2>
+          {!meals.length && (
+            <p>
+              Defina o horário, escolha os dias e adicione as porções de cada
+              alimento.
+            </p>
+          )}
+        </div>
+        <span className="plan-meal-count">
+          {meals.length} {meals.length === 1 ? "refeição" : "refeições"}
+        </span>
+      </div>
+      {!!initial.revisionDates.length && (
+        <details className="plan-versions">
+          <summary>Ver versões anteriores da dieta</summary>
+          <p>
+            {initial.revisionDates
+              .map((d) => d.split("-").reverse().join("/"))
+              .join(" · ")}
+          </p>
+          {initial.effectiveFrom && (
+            <p>
+              Dieta em vigor desde{" "}
+              {initial.effectiveFrom.split("-").reverse().join("/")}.
+            </p>
+          )}
+        </details>
+      )}
       {!foods.length && (
         <p className="form-notice">
-          Cadastre alimentos no{" "}
-          <Link to="/conta/alimentos">catálogo pessoal</Link> para montar suas
-          refeições.
+          {prefix === "/api" ? (
+            <>
+              Cadastre alimentos no{" "}
+              <Link to="/conta/alimentos">catálogo pessoal</Link> para montar
+              suas refeições.
+            </>
+          ) : (
+            "Abra a aba Alimentos e cadastre os alimentos do cliente antes de montar as refeições."
+          )}
         </p>
       )}
       {date < today && (
@@ -276,210 +331,330 @@ function Editor({
           Consulta de histórico. Para editar, escolha hoje ou uma data futura.
         </p>
       )}
-      <fieldset disabled={saving || date < today}>
+      {!!meals.length && (
+        <div className="plan-expand-actions">
+          <button
+            type="button"
+            onClick={() => setOpened(meals.map((m) => m.id))}
+          >
+            Expandir todas
+          </button>
+          <button type="button" onClick={() => setOpened([])}>
+            Recolher todas
+          </button>
+        </div>
+      )}
+      <fieldset disabled={saving}>
         {meals.map((meal, index) => (
-          <section className="plan-meal" key={meal.id}>
-            <div className="plan-row">
-              <label>
-                Nome da refeição
-                <input
-                  aria-label={"Nome da refeição " + (index + 1)}
-                  required
-                  maxLength={100}
-                  value={meal.name}
-                  onChange={(e) => patch(meal.id, { name: e.target.value })}
-                />
-              </label>
-              <label>
-                Horário
-                <input
-                  type="time"
-                  required
-                  value={meal.time.slice(0, 5)}
-                  onChange={(e) => patch(meal.id, { time: e.target.value })}
-                />
-              </label>
-            </div>
-            <div
-              className="plan-days"
-              role="group"
-              aria-label={"Dias de " + (meal.name || "refeição " + (index + 1))}
-            >
-              {weekdays.map((day, i) => (
-                <label key={day}>
-                  <input
-                    type="checkbox"
-                    checked={meal.days.includes(i + 1)}
-                    onChange={(e) =>
-                      patch(meal.id, {
-                        days: e.target.checked
-                          ? [...meal.days, i + 1]
-                          : meal.days.filter((d) => d !== i + 1),
-                      })
-                    }
+          <section
+            className="plan-meal plan-meal-editor"
+            key={meal.id}
+            data-meal-id={meal.id}
+            aria-label={"Editar " + (meal.name || "refeição " + (index + 1))}
+          >
+            <header className="plan-meal-banner">
+              <h2>
+                <button
+                  type="button"
+                  className="plan-meal-toggle"
+                  aria-label={"Editar refeição " + (meal.name || index + 1)}
+                  aria-expanded={opened.includes(meal.id)}
+                  aria-controls={"meal-fields-" + meal.id}
+                  onClick={() =>
+                    setOpened((old) =>
+                      old.includes(meal.id)
+                        ? old.filter((id) => id !== meal.id)
+                        : [meal.id],
+                    )
+                  }
+                >
+                  <span className="plan-meal-symbol">
+                    <Utensils size={23} aria-hidden="true" />
+                  </span>
+                  <span className="plan-meal-identity">
+                    <span className="plan-meal-title">
+                      {meal.name || "Nova refeição"}
+                    </span>
+                    <span className="plan-meal-meta">
+                      {meal.days.length === 7
+                        ? "Todos os dias"
+                        : meal.days.length
+                          ? weekdays
+                              .filter((_, i) => meal.days.includes(i + 1))
+                              .join(" · ")
+                          : "Sem dias selecionados"}{" "}
+                      · {meal.items.length}{" "}
+                      {meal.items.length === 1 ? "alimento" : "alimentos"}
+                    </span>
+                  </span>
+                  <span className="plan-time-badge">
+                    <Clock3 size={16} aria-hidden="true" />
+                    {meal.time.slice(0, 5)}
+                  </span>
+                  <ChevronDown
+                    size={20}
+                    aria-hidden="true"
+                    className={opened.includes(meal.id) ? "is-open" : ""}
                   />
-                  {day}
-                </label>
-              ))}
-            </div>
-            {meal.items.map((item, i) => (
-              <div className="plan-item" key={i}>
-                <label>
-                  Alimento
-                  <select
-                    required
-                    value={item.foodId}
-                    onChange={(e) => {
-                      const food = foods.find((f) => f.id === e.target.value)!;
+                </button>
+              </h2>
+            </header>
+            <div
+              id={"meal-fields-" + meal.id}
+              hidden={!opened.includes(meal.id)}
+            >
+              <fieldset disabled={date < today}>
+                <div className="plan-meal-fields">
+                  <label>
+                    Nome da refeição
+                    <input
+                      aria-label={"Nome da refeição " + (index + 1)}
+                      required
+                      maxLength={100}
+                      value={meal.name}
+                      onChange={(e) => patch(meal.id, { name: e.target.value })}
+                    />
+                  </label>
+                  <label>
+                    Horário
+                    <input
+                      type="time"
+                      required
+                      value={meal.time.slice(0, 5)}
+                      onChange={(e) => patch(meal.id, { time: e.target.value })}
+                    />
+                  </label>
+                </div>
+                <div className="plan-week-heading">
+                  <h3>
+                    <CalendarDays size={18} aria-hidden="true" /> Dias da semana
+                  </h3>
+                </div>
+                <div className="plan-day-shortcuts">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      patch(meal.id, { days: [1, 2, 3, 4, 5, 6, 7] })
+                    }
+                  >
+                    Todos os dias
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => patch(meal.id, { days: [1, 2, 3, 4, 5] })}
+                  >
+                    Segunda a sexta
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => patch(meal.id, { days: [6, 7] })}
+                  >
+                    Fim de semana
+                  </button>
+                </div>
+                <div
+                  className="plan-days"
+                  role="group"
+                  aria-label={
+                    "Dias de " + (meal.name || "refeição " + (index + 1))
+                  }
+                >
+                  {weekdays.map((day, i) => (
+                    <label key={day}>
+                      <input
+                        type="checkbox"
+                        checked={meal.days.includes(i + 1)}
+                        onChange={(e) =>
+                          patch(meal.id, {
+                            days: e.target.checked
+                              ? [...meal.days, i + 1]
+                              : meal.days.filter((d) => d !== i + 1),
+                          })
+                        }
+                      />
+                      <span>{day}</span>
+                    </label>
+                  ))}
+                </div>
+                {!meal.items.length && (
+                  <p className="plan-no-ingredients">
+                    Adicione o primeiro alimento desta refeição.
+                  </p>
+                )}
+                <div className="plan-ingredients">
+                  {meal.items.map((item, i) => (
+                    <div className="plan-item" key={i}>
+                      <label>
+                        Alimento
+                        <select
+                          required
+                          value={item.foodId}
+                          onChange={(e) => {
+                            const food = foods.find(
+                              (f) => f.id === e.target.value,
+                            )!;
+                            patch(meal.id, {
+                              items: meal.items.map((v, k) =>
+                                k === i
+                                  ? { ...v, foodId: food.id, unit: food.unit }
+                                  : v,
+                              ),
+                            });
+                          }}
+                        >
+                          {!foods.some((f) => f.id === item.foodId) && (
+                            <option value={item.foodId}>
+                              {item.name || "Alimento indisponível"} (arquivado)
+                            </option>
+                          )}
+                          {foods.map((f) => (
+                            <option key={f.id} value={f.id}>
+                              {f.name}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label>
+                        Quantidade
+                        <input
+                          type="number"
+                          required
+                          min={item.unit === "UNIT" ? 1 : 0.000001}
+                          step={item.unit === "UNIT" ? 1 : "0.000001"}
+                          value={item.quantity}
+                          onChange={(e) =>
+                            patch(meal.id, {
+                              items: meal.items.map((v, k) =>
+                                k === i
+                                  ? { ...v, quantity: e.target.value }
+                                  : v,
+                              ),
+                            })
+                          }
+                        />
+                      </label>
+                      <label>
+                        Unidade
+                        <select
+                          value={item.unit}
+                          onChange={(e) =>
+                            patch(meal.id, {
+                              items: meal.items.map((v, k) =>
+                                k === i
+                                  ? { ...v, unit: e.target.value as Unit }
+                                  : v,
+                              ),
+                            })
+                          }
+                        >
+                          {compatibleUnits(item.unit).map((u) => (
+                            <option key={u} value={u}>
+                              {units[u]}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label>
+                        Estado
+                        <select
+                          value={item.basis}
+                          onChange={(e) =>
+                            patch(meal.id, {
+                              items: meal.items.map((v, k) =>
+                                k === i
+                                  ? { ...v, basis: e.target.value as Basis }
+                                  : v,
+                              ),
+                            })
+                          }
+                        >
+                          {Object.entries(bases).map(([v, text]) => (
+                            <option key={v} value={v}>
+                              {text}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <button
+                        type="button"
+                        aria-label={
+                          "Remover alimento " + (i + 1) + " de " + meal.name
+                        }
+                        onClick={() =>
+                          patch(meal.id, {
+                            items: meal.items.filter((_, k) => k !== i),
+                          })
+                        }
+                      >
+                        Remover
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="plan-actions">
+                  <button
+                    type="button"
+                    disabled={!foods.length || meal.items.length >= 40}
+                    onClick={() => {
+                      const f = foods[0];
                       patch(meal.id, {
-                        items: meal.items.map((v, k) =>
-                          k === i
-                            ? { ...v, foodId: food.id, unit: food.unit }
-                            : v,
-                        ),
+                        items: [
+                          ...meal.items,
+                          {
+                            foodId: f.id,
+                            quantity: "1",
+                            unit: f.unit,
+                            basis: "AS_SOLD",
+                          },
+                        ],
                       });
                     }}
                   >
-                    {!foods.some((f) => f.id === item.foodId) && (
-                      <option value={item.foodId}>
-                        {item.name || "Alimento indisponível"} (arquivado)
-                      </option>
-                    )}
-                    {foods.map((f) => (
-                      <option key={f.id} value={f.id}>
-                        {f.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  Quantidade
-                  <input
-                    type="number"
-                    required
-                    min={item.unit === "UNIT" ? 1 : 0.000001}
-                    step={item.unit === "UNIT" ? 1 : "0.000001"}
-                    value={item.quantity}
-                    onChange={(e) =>
-                      patch(meal.id, {
-                        items: meal.items.map((v, k) =>
-                          k === i ? { ...v, quantity: e.target.value } : v,
-                        ),
-                      })
-                    }
-                  />
-                </label>
-                <label>
-                  Unidade
-                  <select
-                    value={item.unit}
-                    onChange={(e) =>
-                      patch(meal.id, {
-                        items: meal.items.map((v, k) =>
-                          k === i ? { ...v, unit: e.target.value as Unit } : v,
-                        ),
-                      })
+                    <Plus size={16} aria-hidden="true" /> Adicionar alimento
+                  </button>
+                  <button
+                    type="button"
+                    disabled={meals.length >= 20}
+                    onClick={() => {
+                      const id = crypto.randomUUID();
+                      setMeals((old) => [
+                        ...old,
+                        {
+                          ...meal,
+                          id,
+                          name: meal.name + " (cópia)",
+                          items: meal.items.map((i) => ({ ...i })),
+                          days: [...meal.days],
+                        },
+                      ]);
+                      setOpened([id]);
+                    }}
+                  >
+                    Duplicar refeição
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setMeals((old) => old.filter((m) => m.id !== meal.id))
                     }
                   >
-                    {compatibleUnits(item.unit).map((u) => (
-                      <option key={u} value={u}>
-                        {units[u]}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  Estado
-                  <select
-                    value={item.basis}
-                    onChange={(e) =>
-                      patch(meal.id, {
-                        items: meal.items.map((v, k) =>
-                          k === i
-                            ? { ...v, basis: e.target.value as Basis }
-                            : v,
-                        ),
-                      })
-                    }
-                  >
-                    {Object.entries(bases).map(([v, text]) => (
-                      <option key={v} value={v}>
-                        {text}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <button
-                  type="button"
-                  aria-label={
-                    "Remover alimento " + (i + 1) + " de " + meal.name
-                  }
-                  onClick={() =>
-                    patch(meal.id, {
-                      items: meal.items.filter((_, k) => k !== i),
-                    })
-                  }
-                >
-                  Remover
-                </button>
-              </div>
-            ))}
-            <div className="plan-actions">
-              <button
-                type="button"
-                disabled={!foods.length || meal.items.length >= 40}
-                onClick={() => {
-                  const f = foods[0];
-                  patch(meal.id, {
-                    items: [
-                      ...meal.items,
-                      {
-                        foodId: f.id,
-                        quantity: "1",
-                        unit: f.unit,
-                        basis: "AS_SOLD",
-                      },
-                    ],
-                  });
-                }}
-              >
-                Adicionar alimento
-              </button>
-              <button
-                type="button"
-                disabled={meals.length >= 20}
-                onClick={() =>
-                  setMeals((old) => [
-                    ...old,
-                    {
-                      ...meal,
-                      id: crypto.randomUUID(),
-                      name: meal.name + " (cópia)",
-                      items: meal.items.map((i) => ({ ...i })),
-                      days: [...meal.days],
-                    },
-                  ])
-                }
-              >
-                Duplicar refeição
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setMeals((old) => old.filter((m) => m.id !== meal.id))
-                }
-              >
-                Excluir refeição
-              </button>
+                    Excluir refeição
+                  </button>
+                </div>
+              </fieldset>
             </div>
           </section>
         ))}
-        <div className="plan-actions">
-          <button type="button" disabled={meals.length >= 20} onClick={add}>
+        <div className="plan-actions plan-editor-footer">
+          <button
+            type="button"
+            disabled={meals.length >= 20 || date < today}
+            onClick={add}
+          >
             Adicionar refeição
           </button>
-          <button className="button" type="submit">
-            {saving ? "Salvando…" : "Salvar revisão"}
+          <button className="button" type="submit" disabled={date < today}>
+            {saving ? "Salvando…" : "Salvar dieta"}
           </button>
         </div>
       </fieldset>

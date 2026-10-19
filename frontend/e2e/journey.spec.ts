@@ -557,6 +557,11 @@ test("versão 1.0: nutricionista prepara, cliente consulta e acompanha resultado
         exact: true,
       }),
     ).toBeDisabled();
+    await page
+      .getByText("Importar relatórios de bioimpedância · em breve", {
+        exact: true,
+      })
+      .click();
     await expect(page.getByText(/Nenhum relatório é recebido/)).toBeVisible();
     await screenshot(page, "bioimpedancia-reservada-" + info.project.name);
 
@@ -603,8 +608,21 @@ test("versão 1.0: nutricionista prepara, cliente consulta e acompanha resultado
     await page
       .getByRole("spinbutton", { name: "Quantidade", exact: true })
       .fill("2");
-    await page.getByRole("button", { name: "Salvar revisão" }).click();
-    await expect(page.getByRole("status")).toContainText("Revisão salva");
+    await page
+      .getByRole("button", { name: "Segunda a sexta", exact: true })
+      .click();
+    await expect(
+      page.getByRole("checkbox", { name: "Sáb", exact: true }),
+    ).not.toBeChecked();
+    await page
+      .getByRole("button", { name: "Todos os dias", exact: true })
+      .click();
+    await expect(
+      page.getByRole("checkbox", { name: "Sáb", exact: true }),
+    ).toBeChecked();
+    await screenshot(page, "editor-refeicoes-" + info.project.name);
+    await page.getByRole("button", { name: "Salvar dieta" }).click();
+    await expect(page.getByRole("status")).toContainText("Dieta salva");
     await page
       .getByRole("button", { name: "Configurar trocas de Café", exact: true })
       .click();

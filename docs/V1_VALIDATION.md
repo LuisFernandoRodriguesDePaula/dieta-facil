@@ -51,3 +51,9 @@ Se uma consulta falhar, use Tentar novamente; não é necessário sair da conta.
 No profissional, Alimentos → Ver alimentos cadastrados abre o catálogo em um pop-up. Confira fechamento por Escape e retorno ao botão. A lista não ocupa mais a área abaixo do cadastro.
 
 Em avaliação mensal, experimente gordura corporal, braço, coxa, panturrilha e quadril opcionais. Salve, recarregue e confira no profissional e cliente. O cartão mostra o resumo; Ver medidas e evolução expande detalhes e variação frente ao registro anterior. Para dados ausentes, espere Sem comparação. Confira a edição de um mês antigo e a recuperação de conflito sem perder os novos campos. As medidas devem ser informadas pelo profissional; não há interpretação automática.
+
+## Editor compacto de refeições
+
+Ao abrir uma dieta existente, conferir todos os cartões recolhidos. Abrir uma refeição e depois outra: o primeiro cartão recolhe sem apagar os campos. Nova refeição/cópia abre automaticamente. Expandir todas permite comparar, Recolher todas volta ao resumo. Salvar dieta grava todas as refeições, inclusive recolhidas. Se faltar campo obrigatório, o cartão correto deve abrir e focar o campo.
+
+Testar os atalhos Todos os dias, Segunda a sexta e Fim de semana e o ajuste individual de dias. Em histórico, pode abrir e ler os cartões, mas os campos e salvar permanecem desativados. Importações futuras ficam recolhidas em Importar · em breve.

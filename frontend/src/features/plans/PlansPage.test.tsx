@@ -116,7 +116,7 @@ it("cria uma refeição com dias e quantidades e envia a revisão", async () => 
   );
   await user.type(screen.getByLabelText("Nome da refeição 1"), "Café");
   await user.click(screen.getByRole("button", { name: "Adicionar alimento" }));
-  await user.click(screen.getByRole("button", { name: "Salvar revisão" }));
+  await user.click(screen.getByRole("button", { name: "Salvar dieta" }));
   await waitFor(() => expect(saved).toBeDefined());
   expect(saved?.meals).toEqual([
     expect.objectContaining({
@@ -138,4 +138,56 @@ it("pula uma ocorrência sem chamar qualquer API de estoque", async () => {
       .mocked(fetch)
       .mock.calls.some(([url]) => String(url).includes("inventory")),
   ).toBe(false);
+});
+
+it("aplica atalhos semanais e permite ajustar um dia antes de salvar", async () => {
+  open("/conta/dieta?editar=1");
+  const user = userEvent.setup();
+  await user.click(
+    await screen.findByRole("button", { name: "Adicionar refeição" }),
+  );
+  await user.type(screen.getByLabelText("Nome da refeição 1"), "Almoço");
+  await user.click(screen.getByRole("button", { name: "Adicionar alimento" }));
+  await user.click(screen.getByRole("button", { name: "Fim de semana" }));
+  expect(screen.getByRole("checkbox", { name: "Sáb" })).toBeChecked();
+  expect(screen.getByRole("checkbox", { name: "Seg" })).not.toBeChecked();
+  await user.click(screen.getByRole("button", { name: "Segunda a sexta" }));
+  await user.click(screen.getByRole("checkbox", { name: "Qua" }));
+  await user.click(screen.getByRole("button", { name: "Salvar dieta" }));
+  await waitFor(() => expect(saved).toBeDefined());
+  expect(saved?.meals).toEqual([
+    expect.objectContaining({ days: [1, 2, 4, 5] }),
+  ]);
+});
+
+it("abre uma refeição por vez, preserva campos e revela um erro recolhido ao salvar", async () => {
+  open("/conta/dieta?editar=1");
+  const user = userEvent.setup();
+  await user.click(
+    await screen.findByRole("button", { name: "Adicionar refeição" }),
+  );
+  await user.type(screen.getByLabelText("Nome da refeição 1"), "Café");
+  await user.click(screen.getByRole("button", { name: "Adicionar alimento" }));
+  await user.click(screen.getByRole("button", { name: "Adicionar refeição" }));
+  await user.type(screen.getByLabelText("Nome da refeição 2"), "Almoço");
+  await user.click(screen.getByRole("button", { name: "Adicionar alimento" }));
+  expect(screen.getByLabelText("Nome da refeição 1")).not.toBeVisible();
+  await user.click(
+    screen.getByRole("button", { name: /Editar refeição Café/ }),
+  );
+  expect(screen.getByLabelText("Nome da refeição 1")).toHaveValue("Café");
+  expect(screen.getByLabelText("Nome da refeição 2")).not.toBeVisible();
+  await user.clear(screen.getByLabelText("Nome da refeição 1"));
+  await user.click(
+    screen.getByRole("button", { name: /Editar refeição Almoço/ }),
+  );
+  await user.click(screen.getByRole("button", { name: "Salvar dieta" }));
+  await waitFor(() =>
+    expect(screen.getByLabelText("Nome da refeição 1")).toBeVisible(),
+  );
+  expect(saved).toBeUndefined();
+  await user.click(screen.getByRole("button", { name: "Expandir todas" }));
+  expect(screen.getByLabelText("Nome da refeição 2")).toBeVisible();
+  await user.click(screen.getByRole("button", { name: "Recolher todas" }));
+  expect(screen.getByLabelText("Nome da refeição 1")).not.toBeVisible();
 });

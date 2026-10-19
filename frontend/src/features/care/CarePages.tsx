@@ -740,7 +740,7 @@ function ClientWorkspace({
             description="Espaço reservado para trazer uma dieta de outro sistema. Nesta versão, preencha as refeições e porções abaixo."
           />
           <label className="plan-date">
-            Revisão a partir de
+            Aplicar dieta a partir de
             <input
               type="date"
               required
@@ -827,8 +827,8 @@ function ImportPlaceholder({
   description: string;
 }) {
   return (
-    <section className="care-import" aria-label={"Importação de " + subject}>
-      <p className="eyebrow">IMPORTAÇÃO · EM BREVE</p>
+    <details className="care-import" aria-label={"Importação de " + subject}>
+      <summary>Importar {subject} · em breve</summary>
       <p>{description}</p>
       <label>
         Arquivo de {subject}
@@ -837,7 +837,7 @@ function ImportPlaceholder({
       <p className="access-note">
         Campo reservado. Importação indisponível nesta versão.
       </p>
-    </section>
+    </details>
   );
 }
 function ClientFoods({ id, prefix }: { id: string; prefix: string }) {

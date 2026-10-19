@@ -233,3 +233,15 @@
 .care-client-grid a.care-client-open:hover {
   background: #1d3c2e;
 }
+.care-import summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #284e3d;
+}
+.care-import summary:focus-visible {
+  outline: 3px solid #b19442;
+  outline-offset: 3px;
+}
+.care-import[open] > p {
+  margin-top: 14px;
+}

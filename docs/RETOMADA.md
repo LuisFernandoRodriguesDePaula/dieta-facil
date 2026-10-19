@@ -83,3 +83,7 @@ Painel profissional possui campos desativados de importação de dieta, alimento
 ## Avaliações e catálogo — V12 (2026-10-19)
 
 Catálogo profissional: unidade compacta, ações à direita e lista em Ver alimentos cadastrados (diálogo). Avaliações: resumo mensal e expansão de medidas/variações. Novos campos opcionais persistidos: bodyFat (%), arm/thigh/calf/hip (cm), além de cintura já existente. Percentual é informado pelo profissional, sem estimativa ou importação. Comparação com registro anterior disponível, gordura em pontos percentuais; valores ausentes sem comparação. Campos antigos preservados. Backup pré-migração validado. API reiniciada para aplicar V12; sessões anteriores precisam de novo login.
+
+## Editor minimalista e cartões recolhidos (2026-10-19)
+
+Refeições existentes começam fechadas. Cabeçalho resume nome, horário, dias e alimentos; abre uma por vez, preserva rascunho, permite expandir/recolher todas. Nova/cópia abrem; erro de campo obrigatório abre a refeição antes de focar. Dias estilizados com atalhos. Textos redundantes removidos, Salvar dieta substitui Salvar revisão, vigência permanece. Importações reservadas em detalhes recolhidos. Não há mudança de backend ou dados. Verificar o editor profissional no desktop e celular conforme V1_VALIDATION.md; publicação e feedback humano seguem pendentes.

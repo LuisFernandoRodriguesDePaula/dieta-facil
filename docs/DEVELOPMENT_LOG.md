@@ -167,3 +167,11 @@ Backup anterior à aplicação local da migração foi restaurado em banco tempo
 ## 2026-10-19 — Acesso visual ao cliente
 
 O link textual Abrir acompanhamento foi substituído por uma seta em botão circular à direita do nome/e-mail nos cartões de clientes vinculados. Mantém nome acessível específico por cliente, foco por teclado e área de toque de 48px. Convites ainda não aceitos continuam sem acesso ao acompanhamento. Build e lint aprovados; jornada existente atualizada para o nome acessível do link.
+
+## 2026-10-19 — Editor de dieta simplificado e refeições recolhidas
+
+Concluída a edição visual iniciada na etapa anterior. Cartões existentes começam recolhidos; resumo com nome, horário, dias e quantidade de alimentos. Abre uma refeição por vez, com Expandir todas/Recolher todas opcionais. Nova refeição e cópia abrem automaticamente. Campos ficam montados ao recolher para preservar o rascunho; envio continua incluindo a dieta inteira. Validação revela a refeição com campo obrigatório inválido antes de focar o campo, evitando erro invisível em formulário recolhido. Histórico permite abrir cartões para consulta, mantendo campos e gravação bloqueados em datas passadas.
+
+Removidos O que comer, texto PLANEJAMENTO ALIMENTAR, numeração redundante e contagem de dias no editor aberto. Título Dieta, instruções somente no vazio, Dias da semana e Salvar dieta. Seleção semanal estilizada com atalhos Todos os dias, Segunda a sexta e Fim de semana. Importações futuras agora são recolhidas por padrão. Mantidos quantidades, unidades, estado do alimento, vigência e erros.
+
+Validação: 25 testes de interface, build e lint; quatro jornadas aprovadas em computador/celular (editor profissional e trocas/consumo). Testes novos cobrem atalhos semanais, alternância sem perda, expansão/recolhimento e erro obrigatório em cartão fechado. Inspeção da captura móvel efetuada com dados fictícios. Nenhuma tabela, API, dieta real ou saldo foi alterado.
