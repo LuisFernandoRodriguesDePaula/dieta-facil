@@ -129,3 +129,9 @@ Validação: testes de interface para login, sessão já aberta, retorno à Cont
 Corrigido o controle que guardava somente a última ação: cada refeição consumida agora oferece seu próprio Desfazer refeição. GET /api/meals/checkins?date=AAAA-MM-DD recupera apenas os registros ativos da conta, incluindo consumos anteriores feitos diretamente pelo estoque. A opção permanece disponível após recarregar a página. A atualização aguarda a consulta dos registros e da agenda; o estorno usa o modo original e mantém a proteção contra repetição.
 
 Regressão cobre duas refeições, desfazer a primeira mantendo a segunda, desfazer ambas, recarregar, registrar novamente e impedir que um estorno antigo remova o novo registro. Dados pessoais e de demonstração preservados; os testes criam contas fictícias isoladas.
+
+## 2026-10-19 — Revisão local da versão 1.0
+
+Por solicitação do usuário, desfazer uma refeição atualiza o cartão sem a mensagem de sucesso persistente; erros continuam visíveis. A revisão por teclado encontrou foco saindo do diálogo de troca ao completar o ciclo de Tab: o painel agora mantém o foco entre seus controles e devolve-o ao botão de origem após Escape. A largura mínima global foi ajustada a 320px para permitir reflow em telas estreitas.
+
+Validação: 19 testes de interface, build e lint aprovados. Jornadas em computador/viewport móvel verificam Tab e Shift+Tab, Escape, retorno do foco e ausência de rolagem lateral a 320 e 720px em Dieta, Resultados, Meu nutricionista e Conta. Essa cobertura não representa auditoria completa ou teste com leitor de tela/aparelho físico. FEEDBACK_V1.md prepara o registro de uma sessão com o nutricionista. O usuário escolheu continuar a validação local; as contas externas ainda não foram criadas.

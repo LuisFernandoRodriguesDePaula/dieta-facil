@@ -31,3 +31,9 @@ Use navegadores/perfis separados para manter os dois acessos simultâneos. Troca
 - Qual seria a primeira melhoria necessária para um segundo teste?
 
 Anote a tela, a ação esperada e o que aconteceu. Use apenas dados fictícios neste teste. A verificação de identidade profissional, auditoria clínica completa, retenção operacional e publicação ainda precisam de definição antes do uso com dados reais.
+
+## Registrar a sessão
+
+Use [FEEDBACK_V1.md](FEEDBACK_V1.md) como ficha de observações. Registre a tarefa, se precisou de ajuda e passos para reproduzir problemas. Priorize falhas que impedem consulta da dieta, trocas autorizadas ou registro de avaliações antes de ajustes visuais.
+
+Na revisão por teclado, abrir Trocar alimento com Enter, navegar com Tab e Shift+Tab, fechar com Escape e conferir retorno ao botão de origem. Conferir também a leitura com zoom do navegador e em aparelho físico. Os testes automatizados de reflow a 320 e 720 pixels não substituem essas verificações nem uma sessão com leitor de tela.

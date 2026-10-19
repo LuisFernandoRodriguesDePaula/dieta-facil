@@ -158,3 +158,11 @@ Interface pt-BR; estoque individual; entrada manual da dieta; ciclo sugerido de 
 - [ ] Receber feedback de um nutricionista e priorizar a próxima revisão.
 - [ ] Antes de uso clínico real: identidade profissional, auditoria e operação/retenção de dados definidas.
 
+
+### Revisão local complementar — 2026-10-19
+
+- [x] Ciclo de foco com Tab/Shift+Tab no painel de troca e retorno após Escape.
+- [x] Reflow a 320/720px nas telas principais do cliente, em navegador automatizado.
+- [x] Ficha de feedback para a sessão com o nutricionista (FEEDBACK_V1.md).
+- [ ] Teste humano com leitor de tela, zoom real e aparelho físico; revisão ampliada de acessibilidade permanece aberta.
+- Publicação aguarda contas externas; usuário optou por continuar a validação local.

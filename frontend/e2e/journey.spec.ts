@@ -737,6 +737,7 @@ test("duas refeições podem ser desfeitas separadamente após recarregar", asyn
     breakfast.getByRole("button", { name: "Já comi", exact: true }),
   ).toBeVisible();
   await expect(lunch.getByText("Consumida", { exact: true })).toBeVisible();
+  await expect(page.locator(".diet-feedback")).toHaveCount(0);
   await lunch
     .getByRole("button", { name: "Desfazer consumo de Almoço" })
     .click();
@@ -750,4 +751,56 @@ test("duas refeições podem ser desfeitas separadamente após recarregar", asyn
   await expect(
     page.getByRole("button", { name: /^Desfazer consumo de/ }),
   ).toHaveCount(0);
+});
+
+test("dieta acessível por teclado e sem rolagem lateral em tela estreita", async ({
+  page,
+}) => {
+  await account(page, "CLIENT", false);
+  expect(
+    (
+      await post(page.request, "/api/onboarding/scenario?type=hypertrophy", {})
+    ).ok(),
+  ).toBeTruthy();
+  await page.goto("/conta/dieta");
+  const card = page.getByRole("article", {
+    name: "Café da manhã",
+    exact: true,
+  });
+  const swap = card.getByRole("button", {
+    name: "Trocar alimento",
+    exact: true,
+  });
+  await swap.focus();
+  await page.keyboard.press("Enter");
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  for (let i = 0; i < 12; i++) {
+    await page.keyboard.press(i < 6 ? "Tab" : "Shift+Tab");
+    expect(
+      await dialog.evaluate((el) => el.contains(document.activeElement)),
+    ).toBeTruthy();
+  }
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(swap).toBeFocused();
+  // CSS viewport widths exercise reflow, including 1280px at 400% browser zoom.
+  for (const width of [720, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const path of [
+      "/conta/dieta",
+      "/conta/resultados",
+      "/conta/nutricionista",
+      "/conta",
+    ]) {
+      await page.goto(path);
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+        path + " width=" + width,
+      ).toBeTruthy();
+    }
+  }
 });

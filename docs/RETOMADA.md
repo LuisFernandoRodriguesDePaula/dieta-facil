@@ -63,3 +63,7 @@ Login e sessão já aberta em /entrar encaminham para /conta/inicio (destino de 
 ## Correção de 2026-10-19 — registros de refeição
 
 Desfazer refeição agora fica em cada refeição consumida e persiste após recarregar a página. Corrigida a perda da primeira ação ao registrar duas refeições. Endpoint de consulta: GET /api/meals/checkins?date=AAAA-MM-DD, restrito à conta autenticada. Testes novos verificam isolamento, estorno independente e proteção de registros novos contra repetição de estorno antigo.
+
+## Continuidade — validação local 1.0 (2026-10-19)
+
+O usuário confirmou que ainda não criou Render/Neon/Brevo e quer continuar a validação local. Não iniciar publicação ou modificar o Portfólio. Mensagem de sucesso de estorno removida, com atualização apenas no cartão. Revisão local ampliou teclado e reflow em 320/720px; testes não substituem leitor de tela, zoom real ou aparelho físico. Ficha da sessão: FEEDBACK_V1.md. Próximo marco: executar V1_VALIDATION.md com o nutricionista, registrar feedback e priorizar mudanças; aguardar contas para publicação. CI da correção anterior e056940 concluída com sucesso (run 39194356375).

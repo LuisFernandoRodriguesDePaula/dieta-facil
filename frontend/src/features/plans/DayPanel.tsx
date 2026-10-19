@@ -97,7 +97,7 @@ export default function DayPanel({
         requestKey.current.key,
       );
       requestKey.current = { signature: "", key: "" };
-      setNotice(result?.message || success);
+      setNotice(success ? result?.message || success : "");
       setLast(null);
       await refresh();
       return true;
@@ -263,7 +263,7 @@ export default function DayPanel({
                           action.kind === "checkin"
                             ? { id: action.id }
                             : { operationId: action.id },
-                          "Registro da refeição desfeito.",
+                          "",
                         )
                       }
                     >
