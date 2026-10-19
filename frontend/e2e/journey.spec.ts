@@ -474,7 +474,12 @@ test("dieta simplificada: configurar, trocar, desfazer e consumir", async ({
     .getByRole("button", { name: "Confirmar e baixar estoque" })
     .click();
   await expect(card.getByText("Consumida", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Desfazer", exact: true }).click();
+  await card
+    .getByRole("button", {
+      name: "Desfazer consumo de Café da manhã",
+      exact: true,
+    })
+    .click();
   await expect(
     card.getByRole("button", { name: "Confirmar consumo", exact: true }),
   ).toBeVisible();
@@ -695,4 +700,54 @@ test("versão 1.0: nutricionista prepara, cliente consulta e acompanha resultado
   } finally {
     await context.close();
   }
+});
+
+test("duas refeições podem ser desfeitas separadamente após recarregar", async ({
+  page,
+}) => {
+  await account(page, "CLIENT", false);
+  expect(
+    (
+      await post(page.request, "/api/onboarding/scenario?type=hypertrophy", {})
+    ).ok(),
+  ).toBeTruthy();
+  await page.goto("/conta/dieta");
+  const breakfast = page.getByRole("article", {
+    name: "Café da manhã",
+    exact: true,
+  });
+  const lunch = page.getByRole("article", { name: "Almoço", exact: true });
+  for (const card of [breakfast, lunch]) {
+    await card.getByRole("button", { name: "Já comi", exact: true }).click();
+    await expect(card.getByText("Consumida", { exact: true })).toBeVisible();
+  }
+  await page.reload();
+  await expect(
+    breakfast.getByRole("button", {
+      name: "Desfazer consumo de Café da manhã",
+    }),
+  ).toBeVisible();
+  await expect(
+    lunch.getByRole("button", { name: "Desfazer consumo de Almoço" }),
+  ).toBeVisible();
+  await breakfast
+    .getByRole("button", { name: "Desfazer consumo de Café da manhã" })
+    .click();
+  await expect(
+    breakfast.getByRole("button", { name: "Já comi", exact: true }),
+  ).toBeVisible();
+  await expect(lunch.getByText("Consumida", { exact: true })).toBeVisible();
+  await lunch
+    .getByRole("button", { name: "Desfazer consumo de Almoço" })
+    .click();
+  await expect(page.getByText("0 de 5 refeições consumidas")).toBeVisible();
+  await breakfast.getByRole("button", { name: "Já comi", exact: true }).click();
+  await breakfast
+    .getByRole("button", { name: "Desfazer consumo de Café da manhã" })
+    .click();
+  await page.reload();
+  await expect(page.getByText("0 de 5 refeições consumidas")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /^Desfazer consumo de/ }),
+  ).toHaveCount(0);
 });

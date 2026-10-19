@@ -47,6 +47,33 @@ public class MealTrackingController {
 
   public record Result(UUID id, String mode, String message) {}
 
+  public record Active(UUID occurrenceId, UUID id, String kind) {}
+
+  @GetMapping("/api/meals/checkins")
+  public List<Active> active(Authentication auth, @RequestParam LocalDate date) {
+    var owner = access.owner(auth.getName());
+    return access.db.query(
+        "select m.id as occurrence_id,c.id as action_id,'checkin' as kind from meal_occurrences m"
+            + " join meal_checkins c on c.occurrence_id=m.id and c.user_id=m.user_id where"
+            + " m.user_id=? and m.local_date=? and m.status='CONSUMED' and c.undone=false and"
+            + " (c.operation_id is null or not exists(select 1 from inventory_operations r where"
+            + " r.reversal_of=c.operation_id)) union all select m.id as occurrence_id,o.id as"
+            + " action_id,'consumption' as kind from meal_occurrences m join inventory_operations o"
+            + " on o.source_id=m.id and o.user_id=m.user_id where m.user_id=? and m.local_date=?"
+            + " and m.status='CONSUMED' and o.kind='CONSUME' and not exists(select 1 from"
+            + " inventory_operations r where r.reversal_of=o.id) and not exists(select 1 from"
+            + " meal_checkins c where c.operation_id=o.id and c.user_id=m.user_id)",
+        (r, n) ->
+            new Active(
+                r.getObject("occurrence_id", UUID.class),
+                r.getObject("action_id", UUID.class),
+                r.getString("kind")),
+        owner,
+        date,
+        owner,
+        date);
+  }
+
   @PostMapping("/api/meals/checkins")
   @Transactional
   public Result checkin(Authentication auth, @Valid @RequestBody Checkin input) {

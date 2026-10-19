@@ -14,8 +14,9 @@ beforeEach(() => {
   vi.stubGlobal(
     "fetch",
     vi.fn(async (path: string, options?: RequestInit) => {
-      const data =
-        path === "/api/features"
+      const data = path.startsWith("/api/meals/checkins?")
+        ? []
+        : path === "/api/features"
           ? {
               role: "NUTRITIONIST",
               tier: "PREMIUM",

@@ -59,3 +59,7 @@ Validação desta etapa: 45 testes Java aprovados no PostgreSQL isolado, 18 test
 ## Ajuste de acesso
 
 Login e sessão já aberta em /entrar encaminham para /conta/inicio (destino de acordo com o perfil). /conta é a configuração pessoal, na navegação do aplicativo, sem o bloco antigo de atalhos. Saída em Conta → Deslogar. Gerenciar senha e conta mantém acesso à recuperação, verificação e exclusão. O tempo de sessão permanece inalterado.
+
+## Correção de 2026-10-19 — registros de refeição
+
+Desfazer refeição agora fica em cada refeição consumida e persiste após recarregar a página. Corrigida a perda da primeira ação ao registrar duas refeições. Endpoint de consulta: GET /api/meals/checkins?date=AAAA-MM-DD, restrito à conta autenticada. Testes novos verificam isolamento, estorno independente e proteção de registros novos contra repetição de estorno antigo.

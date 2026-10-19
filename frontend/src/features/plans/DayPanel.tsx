@@ -21,7 +21,12 @@ function message(error: unknown) {
     ? error.message
     : "Não foi possível conectar. Tente novamente.";
 }
-type LastAction = { kind: "swap" | "consumption" | "checkin"; id: string };
+type LastAction = { kind: "swap"; id: string };
+type MealAction = {
+  occurrenceId: string;
+  id: string;
+  kind: "checkin" | "consumption";
+};
 export default function DayPanel({
   userId,
   date,
@@ -40,6 +45,11 @@ export default function DayPanel({
   const schedule = useQuery({
     queryKey: ["schedule", userId, date],
     queryFn: () => api<Schedule>("/api/schedule?date=" + date),
+    retry: false,
+  });
+  const actions = useQuery({
+    queryKey: ["meal-actions", userId, date],
+    queryFn: () => api<MealAction[]>("/api/meals/checkins?date=" + date),
     retry: false,
   });
   const [consuming, setConsuming] = useState<Occurrence | null>(null);
@@ -88,11 +98,7 @@ export default function DayPanel({
       );
       requestKey.current = { signature: "", key: "" };
       setNotice(result?.message || success);
-      setLast(
-        kind && (result?.operationId || result?.id)
-          ? { kind, id: (result.operationId || result.id)! }
-          : null,
-      );
+      setLast(null);
       await refresh();
       return true;
     } catch (e) {
@@ -103,16 +109,17 @@ export default function DayPanel({
       setBusy(false);
     }
   };
-  if (schedule.isPending || features.isPending)
+  if (schedule.isPending || features.isPending || actions.isPending)
     return <p role="status">Carregando suas refeições…</p>;
-  if (schedule.isError || features.isError)
+  if (schedule.isError || features.isError || actions.isError)
     return (
       <div role="alert">
-        <p>{message(schedule.error || features.error)}</p>
+        <p>{message(schedule.error || features.error || actions.error)}</p>
         <button
           onClick={() => {
             void schedule.refetch();
             void features.refetch();
+            void actions.refetch();
           }}
         >
           Tentar novamente
@@ -171,19 +178,9 @@ export default function DayPanel({
               disabled={busy}
               onClick={() =>
                 run(
-                  last.kind === "swap"
-                    ? "/api/schedule/substitute/undo"
-                    : last.kind === "checkin"
-                      ? "/api/meals/checkins/undo"
-                      : "/api/inventory/reversals",
-                  last.kind === "swap"
-                    ? { actionId: last.id }
-                    : last.kind === "checkin"
-                      ? { id: last.id }
-                      : { operationId: last.id },
-                  last.kind === "swap"
-                    ? "Troca desfeita."
-                    : "Consumo desfeito e estoque devolvido.",
+                  "/api/schedule/substitute/undo",
+                  { actionId: last.id },
+                  "Troca desfeita.",
                 )
               }
             >
@@ -250,6 +247,29 @@ export default function DayPanel({
               ))}
             </ul>
             <footer className="daily-meal-actions">
+              {meal.status === "CONSUMED" &&
+                actions.data
+                  .filter((a) => a.occurrenceId === meal.id)
+                  .map((action) => (
+                    <button
+                      key={action.id}
+                      disabled={busy}
+                      aria-label={"Desfazer consumo de " + meal.name}
+                      onClick={() =>
+                        run(
+                          action.kind === "checkin"
+                            ? "/api/meals/checkins/undo"
+                            : "/api/inventory/reversals",
+                          action.kind === "checkin"
+                            ? { id: action.id }
+                            : { operationId: action.id },
+                          "Registro da refeição desfeito.",
+                        )
+                      }
+                    >
+                      <Undo2 size={16} /> Desfazer refeição
+                    </button>
+                  ))}
               {meal.status === "PENDING" && date >= today && (
                 <button
                   disabled={busy}

@@ -43,6 +43,7 @@ beforeEach(() => {
           inventoryEnabled: false,
           reviewRequired: true,
         });
+      if (url.startsWith("/api/meals/checkins?")) return response([]);
       if (url.startsWith("/api/schedule?"))
         return response({ timezone: profile.timezone, meals: [] });
       if (url === "/api/auth/login") {

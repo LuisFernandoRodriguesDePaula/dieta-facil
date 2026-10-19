@@ -123,3 +123,9 @@ Simulação de plano e cargas fictícias existem somente fora de prod. Nenhum ch
 Login bem-sucedido e visita a Entrar com sessão ativa agora encaminham para /conta/inicio, que mantém o destino apropriado ao perfil. Conta usa a navegação pessoal, sem a moldura de login. Removidos o bloco Organize sua rotina, os atalhos de catálogo/estoque/compras/preparo e a nota técnica de sessão. A saída fica em Conta → Deslogar; gerenciamento de senha/exclusão continua acessível por Gerenciar senha e conta.
 
 Validação: testes de interface para login, sessão já aberta, retorno à Conta e logout; jornada de recuperação/exclusão atualizada para passar pelo painel. Nenhuma mudança na duração ou segurança das sessões.
+
+## 2026-10-19 — Desfazer refeições individualmente
+
+Corrigido o controle que guardava somente a última ação: cada refeição consumida agora oferece seu próprio Desfazer refeição. GET /api/meals/checkins?date=AAAA-MM-DD recupera apenas os registros ativos da conta, incluindo consumos anteriores feitos diretamente pelo estoque. A opção permanece disponível após recarregar a página. A atualização aguarda a consulta dos registros e da agenda; o estorno usa o modo original e mantém a proteção contra repetição.
+
+Regressão cobre duas refeições, desfazer a primeira mantendo a segunda, desfazer ambas, recarregar, registrar novamente e impedir que um estorno antigo remova o novo registro. Dados pessoais e de demonstração preservados; os testes criam contas fictícias isoladas.

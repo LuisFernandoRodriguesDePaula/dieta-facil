@@ -269,6 +269,78 @@ class CareWorkflowTest {
   }
 
   @Test
+  void activeCheckinsRemainIndependentAndOldUndoCannotRemoveNewRegistration() throws Exception {
+    var client = person("CLIENT");
+    var other = person("CLIENT");
+    var today = LocalDate.now(ZoneOffset.UTC);
+    var food =
+        foods
+            .create(
+                client.email,
+                new FoodDtos.Create("Ovos", Unit.UNIT, Category.PROTEIN, Frequency.WEEKLY))
+            .id();
+    var item = new PlanDtos.ItemInput(food, new BigDecimal("2"), Unit.UNIT, Basis.AS_SOLD);
+    var first = UUID.randomUUID();
+    var second = UUID.randomUUID();
+    plans.save(
+        client.email,
+        new PlanDtos.Save(
+            0L,
+            today,
+            List.of(
+                new PlanDtos.MealInput(
+                    first, "Café", LocalTime.of(8, 0), Set.of(1, 2, 3, 4, 5, 6, 7), List.of(item)),
+                new PlanDtos.MealInput(
+                    second,
+                    "Almoço",
+                    LocalTime.of(12, 0),
+                    Set.of(1, 2, 3, 4, 5, 6, 7),
+                    List.of(item)))));
+    var a = new MealTrackingController.Checkin(UUID.randomUUID(), today, first, List.of(item));
+    var b = new MealTrackingController.Checkin(UUID.randomUUID(), today, second, List.of(item));
+    for (var input : List.of(a, b))
+      assertThat(request(client.http, "POST", "/api/meals/checkins", input).statusCode())
+          .isEqualTo(200);
+    String path = "/api/meals/checkins?date=" + today;
+    assertThat(json.readTree(request(client.http, "GET", path, null).body()).size()).isEqualTo(2);
+    assertThat(json.readTree(request(other.http, "GET", path, null).body()).size()).isZero();
+    assertThat(
+            request(
+                    client.http,
+                    "POST",
+                    "/api/meals/checkins/undo",
+                    new MealTrackingController.Undo(a.requestId()))
+                .statusCode())
+        .isEqualTo(200);
+    var remaining = json.readTree(request(client.http, "GET", path, null).body());
+    assertThat(remaining.size()).isEqualTo(1);
+    assertThat(remaining.get(0).get("id").asText()).isEqualTo(b.requestId().toString());
+    assertThat(
+            request(
+                    client.http,
+                    "POST",
+                    "/api/meals/checkins/undo",
+                    new MealTrackingController.Undo(b.requestId()))
+                .statusCode())
+        .isEqualTo(200);
+    assertThat(json.readTree(request(client.http, "GET", path, null).body()).size()).isZero();
+    var next = new MealTrackingController.Checkin(UUID.randomUUID(), today, first, List.of(item));
+    assertThat(request(client.http, "POST", "/api/meals/checkins", next).statusCode())
+        .isEqualTo(200);
+    assertThat(
+            request(
+                    client.http,
+                    "POST",
+                    "/api/meals/checkins/undo",
+                    new MealTrackingController.Undo(a.requestId()))
+                .statusCode())
+        .isEqualTo(200);
+    remaining = json.readTree(request(client.http, "GET", path, null).body());
+    assertThat(remaining.size()).isEqualTo(1);
+    assertThat(remaining.get(0).get("id").asText()).isEqualTo(next.requestId().toString());
+  }
+
+  @Test
   void evaluationsAreMonthlyVersionedAndRemainReadableAfterRevocation() throws Exception {
     var pro = person("NUTRITIONIST");
     var client = person("CLIENT");
