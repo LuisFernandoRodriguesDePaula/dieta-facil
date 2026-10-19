@@ -126,7 +126,8 @@ try {
         : "Não foi possível concluir. Confira os servidores locais e os arquivos de demonstração; detalhes sensíveis não são exibidos.";
   console.error("Verificação incompleta: " + failure);
   process.exitCode = 1;
-} finally {
+}
+{
   try {
     for (const client of authenticated) {
       const csrf = await get(client, "/api/auth/csrf");
