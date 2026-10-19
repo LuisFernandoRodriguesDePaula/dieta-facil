@@ -5,7 +5,7 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
-import { ProfessionalPage } from "./CarePages";
+import { ProfessionalPage, ResultsPage } from "./CarePages";
 vi.mock("../auth/session", () => ({
   useSession: () => ({
     data: { id: "pro", role: "NUTRITIONIST" },
@@ -19,6 +19,7 @@ vi.mock("./features", () => ({
 let listFails = false;
 let renewalFails = false;
 let lists = 0;
+let evaluations: Record<string, unknown>[] = [];
 const links = [
   {
     id: "expired",
@@ -41,9 +42,12 @@ beforeEach(() => {
   listFails = false;
   renewalFails = false;
   lists = 0;
+  evaluations = [];
   vi.stubGlobal(
     "fetch",
     vi.fn(async (path: string, options?: RequestInit) => {
+      if (path === "/api/results")
+        return new Response(JSON.stringify(evaluations));
       if (path === "/api/auth/csrf")
         return new Response(
           JSON.stringify({ token: "csrf", headerName: "X-CSRF-TOKEN" }),
@@ -148,4 +152,59 @@ it("mantém convite e apresenta erro quando a renovação falha", async () => {
   expect(
     within(expired).getByRole("button", { name: "Renovar convite" }),
   ).toBeEnabled();
+});
+
+it("expande medidas e compara apenas valores informados com a avaliação anterior", async () => {
+  evaluations = [
+    {
+      id: "now",
+      date: "2026-10-01",
+      weight: 82,
+      height: 180,
+      bodyFat: 18.5,
+      arm: 35,
+      waist: null,
+      thigh: null,
+      calf: null,
+      hip: null,
+      goal: "Treino",
+      notes: "",
+      authorName: "Profissional",
+    },
+    {
+      id: "old",
+      date: "2026-08-01",
+      weight: 81,
+      height: 180,
+      bodyFat: 20,
+      arm: 34,
+      waist: null,
+      thigh: null,
+      calf: null,
+      hip: null,
+      goal: "",
+      notes: "",
+      authorName: "Profissional",
+    },
+  ];
+  render(
+    <QueryClientProvider
+      client={
+        new QueryClient({ defaultOptions: { queries: { retry: false } } })
+      }
+    >
+      <MemoryRouter>
+        <ResultsPage />
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+  await screen.findByText("18,5%", { exact: true });
+  const card = screen.getAllByRole("article")[0];
+  expect(within(card).getByText("35 cm", { exact: true })).not.toBeVisible();
+  await userEvent.click(within(card).getByText("Ver medidas e evolução"));
+  expect(within(card).getByText("35 cm", { exact: true })).toBeVisible();
+  expect(within(card).getByText("+1 cm", { exact: true })).toBeVisible();
+  expect(within(card).getByText("-1,5 p.p.", { exact: true })).toBeVisible();
+  expect(within(card).getByText("Comparação com 01/08/2026")).toBeVisible();
+  expect(within(card).getAllByText("Sem comparação")).toHaveLength(4);
 });

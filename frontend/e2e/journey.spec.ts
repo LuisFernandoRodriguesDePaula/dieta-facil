@@ -573,9 +573,19 @@ test("versão 1.0: nutricionista prepara, cliente consulta e acompanha resultado
       await page
         .getByRole("button", { name: "Adicionar alimento", exact: true })
         .click();
+      await page
+        .getByRole("button", { name: "Ver alimentos cadastrados", exact: true })
+        .click();
       await expect(
-        page.getByRole("listitem").filter({ hasText: name }),
+        page
+          .getByRole("dialog")
+          .getByRole("listitem")
+          .filter({ hasText: name }),
       ).toBeVisible();
+      await page
+        .getByRole("button", { name: "Fechar painel", exact: true })
+        .click();
+      await expect(page.getByRole("dialog")).toHaveCount(0);
     }
     await page.getByRole("button", { name: "Dieta", exact: true }).click();
     await page
@@ -618,6 +628,11 @@ test("versão 1.0: nutricionista prepara, cliente consulta e acompanha resultado
     await expect(
       page.getByLabel("Arquivo de avaliações", { exact: true }),
     ).toBeDisabled();
+    await page
+      .getByLabel("Gordura corporal (%) · opcional", { exact: true })
+      .fill("18.5");
+    await page.getByLabel("Braço (cm) · opcional", { exact: true }).fill("35");
+    await page.getByLabel("Coxa (cm) · opcional", { exact: true }).fill("55");
     await page.getByLabel("Peso (kg)", { exact: true }).fill("82");
     await page
       .getByLabel("Altura (cm) · opcional", { exact: true })
@@ -626,7 +641,9 @@ test("versão 1.0: nutricionista prepara, cliente consulta e acompanha resultado
       .getByLabel("Observações da avaliação")
       .fill("Registro fictício para testar a versão 1.0.");
     await page.getByRole("button", { name: "Salvar avaliação" }).click();
-    await expect(page.getByText("82 kg", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText("82 kg", { exact: true }).filter({ visible: true }),
+    ).toBeVisible();
 
     // Simulate another browser saving while this professional has an old form open.
     await page
@@ -642,6 +659,11 @@ test("versão 1.0: nutricionista prepara, cliente consulta e acompanha resultado
             date: current.date,
             version: current.version,
             weight: 83,
+            bodyFat: current.bodyFat,
+            arm: current.arm,
+            thigh: current.thigh,
+            calf: current.calf,
+            hip: current.hip,
             height: 180,
             waist: null,
             goal: "Treino",
@@ -672,7 +694,14 @@ test("versão 1.0: nutricionista prepara, cliente consulta e acompanha resultado
     await page
       .getByRole("button", { name: "Salvar avaliação", exact: true })
       .click();
-    await expect(page.getByText("84 kg", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText("84 kg", { exact: true }).filter({ visible: true }),
+    ).toBeVisible();
+    await expect(page.getByText("18,5%", { exact: true })).toBeVisible();
+    await page.getByText("Ver medidas e evolução", { exact: true }).click();
+    await expect(page.getByText("35 cm", { exact: true })).toBeVisible();
+    await page.getByText("Ver medidas e evolução", { exact: true }).click();
+    await expect(page.getByText("35 cm", { exact: true })).not.toBeVisible();
     expect(
       (
         await new AxeBuilder({ page })
@@ -713,7 +742,9 @@ test("versão 1.0: nutricionista prepara, cliente consulta e acompanha resultado
     expect((await clientPage.request.get("/api/inventory")).status()).toBe(403);
     await screenshot(clientPage, "cliente-basico-" + info.project.name);
     await clientPage.goto("/conta/resultados");
-    await expect(clientPage.getByText("84 kg", { exact: true })).toBeVisible();
+    await expect(
+      clientPage.getByText("84 kg", { exact: true }).filter({ visible: true }),
+    ).toBeVisible();
     expect(
       (
         await new AxeBuilder({ page: clientPage })

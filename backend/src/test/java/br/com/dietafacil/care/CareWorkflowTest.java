@@ -341,6 +341,59 @@ class CareWorkflowTest {
   }
 
   @Test
+  void optionalMeasurementsPersistAndRejectInvalidPercentages() throws Exception {
+    var pro = person("NUTRITIONIST");
+    var client = person("CLIENT");
+    link(pro, client);
+    var date = LocalDate.now(ZoneOffset.UTC);
+    var input =
+        new CareService.EvaluationInput(
+            date,
+            0,
+            new BigDecimal("82"),
+            new BigDecimal("180"),
+            new BigDecimal("80"),
+            "Hipertrofia",
+            "Exemplo",
+            new BigDecimal("18.5"),
+            new BigDecimal("35"),
+            new BigDecimal("55"),
+            new BigDecimal("37"),
+            new BigDecimal("95"));
+    String path = "/api/professional/clients/" + client.id + "/results";
+    assertThat(request(pro.http, "PUT", path, input).statusCode()).isEqualTo(200);
+    var result = json.readTree(request(client.http, "GET", "/api/results", null).body()).get(0);
+    assertThat(result.get("bodyFat").decimalValue()).isEqualByComparingTo("18.5");
+    assertThat(result.get("arm").decimalValue()).isEqualByComparingTo("35");
+    assertThat(result.get("thigh").decimalValue()).isEqualByComparingTo("55");
+    assertThat(result.get("calf").decimalValue()).isEqualByComparingTo("37");
+    assertThat(result.get("hip").decimalValue()).isEqualByComparingTo("95");
+    var invalid =
+        new CareService.EvaluationInput(
+            date,
+            1,
+            new BigDecimal("82"),
+            null,
+            null,
+            "",
+            "",
+            new BigDecimal("101"),
+            null,
+            null,
+            null,
+            null);
+    assertThat(request(pro.http, "PUT", path, invalid).statusCode()).isEqualTo(400);
+    assertThat(request(client.http, "PUT", path, input).statusCode()).isEqualTo(403);
+    var cleared =
+        new CareService.EvaluationInput(
+            date, 1, new BigDecimal("83"), null, null, "", "", null, null, null, null, null);
+    assertThat(request(pro.http, "PUT", path, cleared).statusCode()).isEqualTo(200);
+    result = json.readTree(request(client.http, "GET", "/api/results", null).body()).get(0);
+    assertThat(result.get("bodyFat").isNull()).isTrue();
+    assertThat(result.get("arm").isNull()).isTrue();
+  }
+
+  @Test
   void evaluationsAreMonthlyVersionedAndRemainReadableAfterRevocation() throws Exception {
     var pro = person("NUTRITIONIST");
     var client = person("CLIENT");

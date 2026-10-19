@@ -45,3 +45,9 @@ Na lista Meus clientes, teste a busca por nome (com ou sem acento) ou e-mail e o
 Ao editar avaliações em duas janelas, salve primeiro na segunda janela. A primeira deve rejeitar a versão antiga e manter os campos digitados. Carregar avaliação atual substitui os campos pela versão salva após a escolha explícita do profissional; copie observações que queira preservar antes dessa ação. Revise os valores antes de salvar novamente.
 
 Se uma consulta falhar, use Tentar novamente; não é necessário sair da conta. Registrar avaliação mensal permanece indisponível enquanto o histórico não estiver carregado.
+
+## Avaliações resumidas e catálogo
+
+No profissional, Alimentos → Ver alimentos cadastrados abre o catálogo em um pop-up. Confira fechamento por Escape e retorno ao botão. A lista não ocupa mais a área abaixo do cadastro.
+
+Em avaliação mensal, experimente gordura corporal, braço, coxa, panturrilha e quadril opcionais. Salve, recarregue e confira no profissional e cliente. O cartão mostra o resumo; Ver medidas e evolução expande detalhes e variação frente ao registro anterior. Para dados ausentes, espere Sem comparação. Confira a edição de um mês antigo e a recuperação de conflito sem perder os novos campos. As medidas devem ser informadas pelo profissional; não há interpretação automática.

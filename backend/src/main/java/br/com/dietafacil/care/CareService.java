@@ -33,7 +33,23 @@ public class CareService {
       @DecimalMin("1") @DecimalMax("300") @Digits(integer = 3, fraction = 2) BigDecimal height,
       @DecimalMin("1") @DecimalMax("300") @Digits(integer = 3, fraction = 2) BigDecimal waist,
       @NotNull @Size(max = 500) String goal,
-      @NotNull @Size(max = 2000) String notes) {}
+      @NotNull @Size(max = 2000) String notes,
+      @DecimalMin("0") @DecimalMax("100") @Digits(integer = 3, fraction = 2) BigDecimal bodyFat,
+      @DecimalMin("1") @DecimalMax("300") @Digits(integer = 3, fraction = 2) BigDecimal arm,
+      @DecimalMin("1") @DecimalMax("300") @Digits(integer = 3, fraction = 2) BigDecimal thigh,
+      @DecimalMin("1") @DecimalMax("300") @Digits(integer = 3, fraction = 2) BigDecimal calf,
+      @DecimalMin("1") @DecimalMax("300") @Digits(integer = 3, fraction = 2) BigDecimal hip) {
+    public EvaluationInput(
+        LocalDate date,
+        long version,
+        BigDecimal weight,
+        BigDecimal height,
+        BigDecimal waist,
+        String goal,
+        String notes) {
+      this(date, version, weight, height, waist, goal, notes, null, null, null, null, null);
+    }
+  }
 
   public record Link(
       UUID id,
@@ -53,7 +69,12 @@ public class CareService {
       BigDecimal height,
       BigDecimal waist,
       String goal,
-      String notes) {}
+      String notes,
+      BigDecimal bodyFat,
+      BigDecimal arm,
+      BigDecimal thigh,
+      BigDecimal calf,
+      BigDecimal hip) {}
 
   public List<Link> links(String email, boolean professional) {
     var owner = access.owner(email);
@@ -181,7 +202,12 @@ public class CareService {
                 r.getBigDecimal("height"),
                 r.getBigDecimal("waist"),
                 r.getString("goal"),
-                r.getString("notes")),
+                r.getString("notes"),
+                r.getBigDecimal("body_fat"),
+                r.getBigDecimal("arm"),
+                r.getBigDecimal("thigh"),
+                r.getBigDecimal("calf"),
+                r.getBigDecimal("hip")),
         owner);
   }
 
@@ -205,7 +231,9 @@ public class CareService {
         access.db.queryForObject(
             "select name from users where id=?", String.class, access.owner(professional));
     access.db.update(
-        "insert into care_evaluations values (?,?,?,?,?,?,?,?,?,?,?,?)",
+        "insert into care_evaluations"
+            + " (id,user_id,author_id,author_name,observed_on,month_date,version,weight,height,waist,goal,notes,body_fat,arm,thigh,calf,hip)"
+            + " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
         old.isEmpty() ? UUID.randomUUID() : old.getFirst().get("id"),
         client,
         access.owner(professional),
@@ -217,7 +245,12 @@ public class CareService {
         input.height(),
         input.waist(),
         input.goal().strip(),
-        input.notes().strip());
+        input.notes().strip(),
+        input.bodyFat(),
+        input.arm(),
+        input.thigh(),
+        input.calf(),
+        input.hip());
     return evaluations(client);
   }
 }

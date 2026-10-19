@@ -9,6 +9,7 @@ import { EditorLoader } from "../plans/PlansPage";
 import type { Occurrence, Schedule } from "../plans/PlansPage";
 import { DietApiContext } from "../plans/DietApi";
 import SwapPanel from "../plans/SwapPanel";
+import MealDialog from "../plans/MealDialog";
 import { useFoods } from "../foods/useFoods";
 import { units, categories } from "../foods/food-types";
 import type { Stock } from "../inventory/InventoryPage";
@@ -32,6 +33,11 @@ type Evaluation = {
   weight: number;
   height: number | null;
   waist: number | null;
+  bodyFat: number | null;
+  arm: number | null;
+  thigh: number | null;
+  calf: number | null;
+  hip: number | null;
   goal: string;
   notes: string;
 };
@@ -132,7 +138,7 @@ function ResultsHistory({
         )}
       </section>
       <div className="care-evaluations">
-        {evaluations.map((e) => (
+        {evaluations.map((e, index) => (
           <article className="plan-meal" key={e.id}>
             <header className="plan-row">
               <h2>
@@ -155,19 +161,32 @@ function ResultsHistory({
                   <dd>{Number(e.height).toLocaleString("pt-BR")} cm</dd>
                 </div>
               )}
-              {e.waist != null && (
-                <div>
-                  <dt>Cintura</dt>
-                  <dd>{Number(e.waist).toLocaleString("pt-BR")} cm</dd>
-                </div>
-              )}
+              <div>
+                <dt>Gordura corporal</dt>
+                <dd>
+                  {e.bodyFat == null
+                    ? "Não informada"
+                    : Number(e.bodyFat).toLocaleString("pt-BR") + "%"}
+                </dd>
+              </div>
             </dl>
             {e.goal && (
               <p>
                 <strong>Objetivo:</strong> {e.goal}
               </p>
             )}
-            {e.notes && <p className="care-notes">{e.notes}</p>}
+            <details className="care-details">
+              <summary>Ver medidas e evolução</summary>
+              <MeasurementChanges
+                current={e}
+                previous={evaluations[index + 1]}
+              />
+              {e.notes && <p className="care-notes">{e.notes}</p>}
+              <p className="access-note">
+                Variações em relação à avaliação anterior disponível; não
+                representam uma interpretação clínica.
+              </p>
+            </details>
             <p className="access-note">Registrado por {e.authorName}</p>
             {onEdit && (
               <button onClick={() => onEdit(e)}>
@@ -177,6 +196,67 @@ function ResultsHistory({
           </article>
         ))}
       </div>
+    </>
+  );
+}
+function MeasurementChanges({
+  current,
+  previous,
+}: {
+  current: Evaluation;
+  previous?: Evaluation;
+}) {
+  const measures = [
+    ["weight", "Peso", "kg"],
+    ["height", "Altura", "cm"],
+    ["bodyFat", "Gordura corporal", "p.p."],
+    ["waist", "Cintura", "cm"],
+    ["arm", "Braço", "cm"],
+    ["thigh", "Coxa", "cm"],
+    ["calf", "Panturrilha", "cm"],
+    ["hip", "Quadril", "cm"],
+  ] as const;
+  return (
+    <>
+      <p>
+        {previous
+          ? "Comparação com " + previous.date.split("-").reverse().join("/")
+          : "Primeira avaliação disponível. Ainda não há comparação."}
+      </p>
+      <dl className="care-detail-measures">
+        {measures.map(([key, label, unit]) => {
+          const value = current[key],
+            old = previous?.[key];
+          const delta =
+            value != null && old != null
+              ? Math.round((Number(value) - Number(old)) * 100) / 100
+              : null;
+          return (
+            <div key={key}>
+              <dt>{label}</dt>
+              <dd>
+                <span>
+                  {value == null
+                    ? "Não informado"
+                    : Number(value).toLocaleString("pt-BR") +
+                      " " +
+                      (key === "bodyFat" ? "%" : unit)}
+                </span>
+                <small>
+                  {delta == null
+                    ? "Sem comparação"
+                    : delta === 0
+                      ? "Sem alteração"
+                      : (delta > 0 ? "+" : "") +
+                        delta.toLocaleString("pt-BR") +
+                        " " +
+                        unit}
+                </small>
+              </dd>
+            </div>
+          );
+        })}
+      </dl>
     </>
   );
 }
@@ -754,6 +834,7 @@ function ClientFoods({ id, prefix }: { id: string; prefix: string }) {
   const client = useQueryClient();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showFoods, setShowFoods] = useState(false);
   return (
     <>
       <form
@@ -790,7 +871,7 @@ function ClientFoods({ id, prefix }: { id: string; prefix: string }) {
             Nome do alimento
             <input name="name" required maxLength={120} />
           </label>
-          <div className="plan-row">
+          <div className="care-food-fields">
             <label>
               Unidade
               <select name="unit">
@@ -812,23 +893,43 @@ function ClientFoods({ id, prefix }: { id: string; prefix: string }) {
               </select>
             </label>
           </div>
-          <button className="button care-submit">Adicionar alimento</button>
+          <div className="care-food-actions">
+            <button type="button" onClick={() => setShowFoods(true)}>
+              Ver alimentos cadastrados
+            </button>
+            <button className="button">Adicionar alimento</button>
+          </div>
         </fieldset>
         {error && <p role="alert">{error}</p>}
       </form>
-      {query.isError ? (
-        <div role="alert">
-          <p>{failure(query.error)}</p>
-          <button onClick={() => query.refetch()}>Tentar novamente</button>
-        </div>
-      ) : (
-        <ul>
-          {query.data?.map((f) => (
-            <li key={f.id}>
-              {f.name} · {units[f.unit]}
-            </li>
-          ))}
-        </ul>
+      {showFoods && (
+        <MealDialog
+          title="Alimentos cadastrados"
+          onClose={() => setShowFoods(false)}
+        >
+          <p>
+            Catálogo disponível para refeições e alternativas deste cliente.
+          </p>
+          {query.isPending ? (
+            <p role="status">Carregando alimentos…</p>
+          ) : query.isError ? (
+            <div role="alert">
+              <p>{failure(query.error)}</p>
+              <button onClick={() => query.refetch()}>Tentar novamente</button>
+            </div>
+          ) : !query.data?.length ? (
+            <p>Nenhum alimento cadastrado.</p>
+          ) : (
+            <ul className="care-food-list">
+              {query.data.map((f) => (
+                <li key={f.id}>
+                  <strong>{f.name}</strong>
+                  <span>{units[f.unit]}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </MealDialog>
       )}
     </>
   );
@@ -908,6 +1009,22 @@ function EvaluationForm({
   const [weight, setWeight] = useState(String(existing?.weight ?? ""));
   const [height, setHeight] = useState(String(existing?.height ?? ""));
   const [waist, setWaist] = useState(String(existing?.waist ?? ""));
+  const [extra, setExtra] = useState<Record<string, string>>({
+    bodyFat: String(existing?.bodyFat ?? ""),
+    arm: String(existing?.arm ?? ""),
+    thigh: String(existing?.thigh ?? ""),
+    calf: String(existing?.calf ?? ""),
+    hip: String(existing?.hip ?? ""),
+  });
+  const loadExtra = (found?: Evaluation) =>
+    setExtra(
+      Object.fromEntries(
+        ["bodyFat", "arm", "thigh", "calf", "hip"].map((key) => [
+          key,
+          String(found?.[key as keyof Evaluation] ?? ""),
+        ]),
+      ),
+    );
   const [goal, setGoal] = useState(existing?.goal ?? "");
   const [notes, setNotes] = useState(existing?.notes ?? "");
   const [error, setError] = useState("");
@@ -928,6 +1045,12 @@ function EvaluationForm({
             weight: Number(weight),
             height: height ? Number(height) : null,
             waist: waist ? Number(waist) : null,
+            ...Object.fromEntries(
+              Object.entries(extra).map(([k, v]) => [
+                k,
+                v === "" ? null : Number(v),
+              ]),
+            ),
             goal,
             notes,
           });
@@ -960,6 +1083,7 @@ function EvaluationForm({
                   (v) => v.date.slice(0, 7) === next.slice(0, 7),
                 );
                 setVersion(found?.version ?? 0);
+                loadExtra(found);
                 setWeight(String(found?.weight ?? ""));
                 setHeight(String(found?.height ?? ""));
                 setWaist(String(found?.waist ?? ""));
@@ -986,6 +1110,29 @@ function EvaluationForm({
                 value={value as string}
                 onChange={(e) =>
                   (setter as (v: string) => void)(e.target.value)
+                }
+              />
+            </label>
+          ))}
+        </div>
+        <div className="care-form-grid">
+          {[
+            ["bodyFat", "Gordura corporal (%)", 100],
+            ["arm", "Braço (cm)", 300],
+            ["thigh", "Coxa (cm)", 300],
+            ["calf", "Panturrilha (cm)", 300],
+            ["hip", "Quadril (cm)", 300],
+          ].map(([key, label, max]) => (
+            <label key={key as string}>
+              {label as string} · opcional
+              <input
+                type="number"
+                step="0.01"
+                min={key === "bodyFat" ? 0 : 1}
+                max={max as number}
+                value={extra[key as string]}
+                onChange={(e) =>
+                  setExtra((old) => ({ ...old, [key]: e.target.value }))
                 }
               />
             </label>
@@ -1040,6 +1187,7 @@ function EvaluationForm({
                 if (found) {
                   setDate(found.date);
                   setVersion(found.version);
+                  loadExtra(found);
                   setWeight(String(found.weight));
                   setHeight(String(found.height ?? ""));
                   setWaist(String(found.waist ?? ""));

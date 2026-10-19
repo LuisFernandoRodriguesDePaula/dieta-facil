@@ -146,3 +146,66 @@
   opacity: 0.65;
   cursor: not-allowed;
 }
+.care-food-fields {
+  display: grid;
+  grid-template-columns: minmax(100px, 140px) minmax(0, 1fr);
+  gap: 16px;
+}
+.care-food-fields select {
+  width: 100%;
+  min-width: 0;
+}
+.care-food-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+.care-food-list {
+  list-style: none;
+  padding: 0;
+}
+.care-food-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #d8e2d7;
+}
+.care-details {
+  margin: 20px 0;
+}
+.care-details summary {
+  cursor: pointer;
+  padding: 12px 0;
+  color: #284e3d;
+  font-weight: 600;
+}
+.care-details summary:focus-visible {
+  outline: 3px solid #b19442;
+  outline-offset: 3px;
+}
+.care-detail-measures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin: 20px 0;
+}
+.care-detail-measures dd {
+  margin: 6px 0 0;
+}
+.care-detail-measures small {
+  display: block;
+  color: #52654e;
+  margin-top: 5px;
+}
+@media (max-width: 420px) {
+  .care-food-fields,
+  .care-detail-measures {
+    grid-template-columns: 1fr;
+  }
+  .care-food-fields label:first-child {
+    max-width: 140px;
+  }
+}

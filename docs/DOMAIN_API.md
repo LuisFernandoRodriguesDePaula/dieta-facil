@@ -111,3 +111,9 @@ Cliente não pode escrever /api/plan, /api/foods ou /api/plan/substitutions. Sub
 BASIC ou controle desativado bloqueia /api/inventory e /api/shopping, incluindo preparo, entradas e estornos. Escritas também revalidam a ativação dentro da transação sob o bloqueio da conta. ONLY não consulta/exige/baixa estoque; INVENTORY usa as porções e os lotes existentes. Nenhuma ativação baixa refeições retroativamente. Não registrar uma refeição não significa que ela não foi realizada.
 
 Contas novas iniciam em CLIENT/BASIC com estoque desativado. A migração preserva Premium e ativação dos usuários preexistentes para não apagar acesso/saldos. O script da demonstração muda apenas seu cliente fictício para Básico; nunca a conta pessoal.
+
+## Medidas opcionais da avaliação (V12)
+
+PUT /api/professional/clients/{id}/results aceita também bodyFat (0 a 100, percentual), arm, thigh, calf e hip (1 a 300, centímetros), todos opcionais com até duas casas decimais. Campos ausentes/nulos são gravados como não informados. GET profissional e GET /api/results retornam esses campos. waist continua representando a cintura em centímetros. Versão mensal e autorização permanecem obrigatórias; o cliente não ganha permissão de escrita.
+
+A interface compara apenas valores informados com a avaliação anterior disponível, inclusive quando há meses sem avaliação. Variação de gordura é expressa em pontos percentuais. Diferenças não classificam melhora/piora ou estado nutricional. Não há cálculo automático de gordura ou integração de relatórios.

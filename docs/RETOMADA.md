@@ -79,3 +79,7 @@ Começar por ENTREGA_V1.md. npm run demo:check em frontend confere contas fictí
 ## Importações — escopo reservado (2026-10-19)
 
 Painel profissional possui campos desativados de importação de dieta, alimentos e avaliações e aba Bioimpedância e relatórios. São somente placeholders por orientação expressa do usuário. Não há backend de arquivos, extração de PDF, integração externa nem relatórios de bioimpedância disponíveis no cliente. Próxima definição dessa funcionalidade: obter exemplos de formatos e confirmar sistemas de origem antes de implementar. Não apresentar como importação funcional.
+
+## Avaliações e catálogo — V12 (2026-10-19)
+
+Catálogo profissional: unidade compacta, ações à direita e lista em Ver alimentos cadastrados (diálogo). Avaliações: resumo mensal e expansão de medidas/variações. Novos campos opcionais persistidos: bodyFat (%), arm/thigh/calf/hip (cm), além de cintura já existente. Percentual é informado pelo profissional, sem estimativa ou importação. Comparação com registro anterior disponível, gordura em pontos percentuais; valores ausentes sem comparação. Campos antigos preservados. Backup pré-migração validado. API reiniciada para aplicar V12; sessões anteriores precisam de novo login.

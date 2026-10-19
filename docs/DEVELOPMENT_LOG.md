@@ -153,3 +153,13 @@ Novo comando npm run demo:check verifica apenas as contas fictícias conhecidas 
 ## Importações futuras no painel profissional — 2026-10-19
 
 Por solicitação do usuário, foram reservados campos de arquivo desativados nas seções Dieta, Alimentos e Avaliações mensais. Nova aba Bioimpedância e relatórios contém apenas a apresentação do espaço futuro e um campo igualmente desativado. Nenhum arquivo é recebido, armazenado ou processado, e nenhuma integração com sistema externo foi implementada ou prometida. Formatos e sistemas de origem serão definidos depois de analisar exemplos autorizados. O painel do cliente continua sem upload; dieta e avaliações manuais seguem funcionando.
+
+## 2026-10-19 — Alimentos compactos e avaliações expansíveis (V12)
+
+Seletor de unidade do catálogo profissional compactado; ações alinhadas à direita. A lista de alimentos cadastrados foi movida para diálogo acessível (Fechar, Escape e retorno de foco), sem alterar o catálogo ou a seleção de alimentos no editor de dieta.
+
+Avaliações mensais agora exibem peso, altura informada, percentual de gordura informado e objetivo no resumo. Ver medidas e evolução expande cintura, braço, coxa, panturrilha e quadril, observações e diferenças em relação à avaliação anterior disponível. Não há interpretação clínica; gordura varia em pontos percentuais. Ausência de valor em um dos registros resulta em Sem comparação, nunca em zero.
+
+Migração V12 acrescenta colunas opcionais body_fat, arm, thigh, calf e hip. Avaliações antigas permanecem com campos nulos. Validação de percentual 0–100 e medidas 1–300cm é aplicada na API e no banco. O profissional informa os valores; não há cálculo automático ou integração com bioimpedância. Novos campos acompanham edição mensal, troca de mês e recuperação de conflito. Consulta do cliente usa os mesmos cartões, mantendo avaliações somente para leitura.
+
+Backup anterior à aplicação local da migração foi restaurado em banco temporário com sucesso. Testes Java no PostgreSQL isolado: 48 aprovados; interface: 23 aprovados, incluindo comparação entre meses não consecutivos e ausência de medidas.
