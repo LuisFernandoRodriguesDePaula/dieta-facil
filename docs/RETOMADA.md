@@ -91,3 +91,7 @@ Refeições existentes começam fechadas. Cabeçalho resume nome, horário, dias
 ## Cabeçalho do cliente e ativação (2026-10-19)
 
 Dentro do acompanhamento profissional, cabeçalho com nome do cliente, abas e seta Voltar aos clientes; navegação geral só na lista. Histórico no ícone Informações e versões da dieta. No profissional, botão Alterar para esta dieta salva com effectiveFrom=hoje e vira Dieta ativa após conferir o plano vigente; mudanças locais voltam ao estado aplicável. Selecionar versão pelo diálogo apenas consulta; botão aplica para hoje. Datas passadas continuam sem edição direta e revisões futuras existentes são preservadas. Editor legado mantém sua seleção por data. Testes desktop/mobile verificam conteúdo ativo pela API.
+
+## Revisão externa temporária de design (2026-10-19)
+
+Veja DESIGN_REVIEW.md. Start-DesignReview.ps1 cria/reutiliza banco dieta_facil_review separado e contas fictícias exclusivas, compila app e publica via túnel HTTPS temporário. Padrão 8h com encerramento automático; Stop-DesignReview.ps1 encerra antecipadamente. Link atual/prazo/credenciais somente em .local/design-review/, nunca no Git. API8081 e static build; não expor Vite nem banco pessoal. O endereço anterior deixa de funcionar após encerrar e reiniciar. Mensagens são locais e somente dados fictícios devem ser usados. Testes externos em 1440/390/320px aprovados para os dois perfis; ainda aguardar feedback humano do designer. Hospedagem permanente e Portfólio continuam separados.

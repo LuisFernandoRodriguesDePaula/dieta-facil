@@ -183,3 +183,11 @@ Ao abrir um cliente, o cabeçalho global é substituído pelo nome do cliente e 
 Histórico de dieta movido para ícone Info com tooltip e diálogo com versões por data. Consultar uma versão não grava mudanças. O diálogo permite retornar à dieta atual e avisa sobre descarte de rascunho antes da escolha de outra versão. O seletor de data deixou de ocupar a tela profissional. Alterar para esta dieta salva o conteúdo selecionado com vigência a partir de hoje, pelo contrato existente. Somente após confirmação/refetch do plano vigente aparece Dieta ativa em verde; editar o conteúdo volta a oferecer aplicação. Uma versão passada permanece sem edição direta, mas pode ser reaplicada como dieta de hoje. Revisões futuras existentes não são apagadas. Sem mudança de schema, de autorização ou dos snapshots consumidos.
 
 Validação: 25 testes de interface, build/lint e jornadas desktop/mobile aprovados. Jornada ampliada confere ausência da navegação global no cliente, ícone/modal, estado ativo e rascunho, seleção de outra versão e aplicação efetiva para hoje consultada pela API. Nenhuma conta real foi usada nos testes.
+
+## 2026-10-19 — Link temporário para revisão de design
+
+Preparado compartilhamento com Cloudflare Quick Tunnel, API empacotada em 8081 e banco exclusivo dieta_facil_review, sem copiar o banco pessoal ou expor Vite. Seed pode operar em modo DIETA_DESIGN_REVIEW=1 com contas e arquivos separados. Interface compilada preserva aparência da aplicação; simulação de plano de desenvolvimento não aparece. Mensagens permanecem em arquivos privados, sem envio real.
+
+Scripts Start/Stop-DesignReview e instalador do conector oficial com verificação SHA-256. Encerramento automático após prazo (8h padrão) e checagem de identidade/início do processo para evitar interromper outros serviços. Testado encerramento pelo caminho de expiração e liberação da porta antes de reiniciar. Não há reset de dados por visitante.
+
+Conferência externa com navegador real: HTTPS, login e logout dos dois perfis, cookie Secure/HttpOnly, bloqueio de dados anônimos/configuração privada e ausência de rolagem lateral nas telas verificadas em 1440/390/320px. Relatórios e capturas apenas em .local/design-review/.

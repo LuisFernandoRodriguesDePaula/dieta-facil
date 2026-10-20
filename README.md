@@ -26,6 +26,8 @@ Comece pela [entrega local da versão 1.0](docs/ENTREGA_V1.md) e pelo [roteiro d
 
 O [roteiro da demonstração](docs/DEMO_GUIDE.md) explica como experimentar cada etapa. Há também um [cenário fictício de hipertrofia, 82 kg e 1,80 m](docs/HYPERTROPHY_DEMO.md), com conta separada criada pelo script npm run demo:hypertrophy.
 
+Para uma revisão remota temporária com dados fictícios e banco separado, consulte [DESIGN_REVIEW.md](docs/DESIGN_REVIEW.md). O endereço e as credenciais da revisão ficam privados.
+
 ## Executar no Windows
 
 Pré-requisitos: Node.js LTS, JDK 21 e PostgreSQL 17. Abra o PowerShell na pasta do repositório, atualmente chamada **Dieta Fácil**.

@@ -2,7 +2,14 @@ import { request } from "@playwright/test";
 import { randomUUID, randomBytes } from "node:crypto";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-const directory = fileURLToPath(new URL("../../.local/", import.meta.url));
+const review = process.env.DIETA_DESIGN_REVIEW === "1";
+const directory = fileURLToPath(
+  new URL(
+    review ? "../../.local/design-review/" : "../../.local/",
+    import.meta.url,
+  ),
+);
+const baseURL = review ? "http://127.0.0.1:8081" : "http://127.0.0.1:5173";
 await mkdir(directory, { recursive: true });
 async function call(client, path, data, method = "POST") {
   const csrf = await (await client.get("/api/auth/csrf")).json();
@@ -17,7 +24,7 @@ async function call(client, path, data, method = "POST") {
   return text ? JSON.parse(text) : null;
 }
 async function account(file, role, prefix, name) {
-  const client = await request.newContext({ baseURL: "http://127.0.0.1:5173" });
+  const client = await request.newContext({ baseURL });
   let credentials;
   try {
     credentials = JSON.parse(await readFile(directory + file, "utf8"));
@@ -166,6 +173,15 @@ try {
         weight,
         height: 180,
         waist: null,
+        ...(review
+          ? {
+              bodyFat: observed === schedule.date ? 18.5 : 19.1,
+              arm: 35,
+              thigh: 55,
+              calf: 37,
+              hip: 95,
+            }
+          : {}),
         goal: "Exemplo fictício de acompanhamento",
         notes:
           "Dados exclusivamente ilustrativos para demonstrar a avaliação mensal. Não correspondem a uma avaliação clínica.",

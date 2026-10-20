@@ -12,7 +12,8 @@
     "test:e2e": "playwright test",
     "demo:hypertrophy": "node scripts/seed-care.mjs",
     "demo:care": "node scripts/seed-care.mjs",
-    "demo:check": "node scripts/check-demo.mjs"
+    "demo:check": "node scripts/check-demo.mjs",
+    "review:check": "node scripts/check-design-review.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
