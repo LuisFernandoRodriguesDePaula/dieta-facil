@@ -1,32 +1,78 @@
 # Dieta Fácil
 
-Aplicativo de planejamento alimentar que conecta uma dieta já definida ao estoque doméstico, às compras e ao preparo. Interface em português para computador e celular, com React, Java/Spring Boot e PostgreSQL.
+[![Validar projeto](https://github.com/LuisFernandoRodriguesDePaula/dieta-facil/actions/workflows/ci.yml/badge.svg)](https://github.com/LuisFernandoRodriguesDePaula/dieta-facil/actions/workflows/ci.yml)
 
-**Versão 1.0 demonstrável local para feedback de um nutricionista.** O profissional convida o cliente, aguarda o aceite, prepara dieta/alternativas e registra avaliações mensais. O cliente consulta o plano e acompanha os resultados; registrar “Já comi” é opcional. Básico funciona sem estoque; Premium acrescenta estoque, compras e preparo com ativação explícita e preservação de saldos. Sem cobrança real. A demonstração usa dados fictícios e não prescreve alimentação. Publicação preparada em Docker/Render, aguardando ativação das contas externas. Veja docs/DEPLOYMENT.md; a integração com o Portfólio fica após validar a URL real.
+Aplicativo Full Stack de acompanhamento alimentar: o nutricionista prepara a dieta e registra avaliações; o cliente consulta refeições, alternativas autorizadas e resultados. Interface em português para computador e celular, com React/TypeScript, Java 21/Spring Boot e PostgreSQL.
 
-Comece pela [entrega local da versão 1.0](docs/ENTREGA_V1.md) e pelo [roteiro de validação](docs/V1_VALIDATION.md). `npm run demo:care` em frontend prepara as contas fictícias de cliente e nutricionista; credenciais ficam exclusivamente em `.local/`.
+**Versão 1.0 em avaliação, com dados fictícios.** O fluxo principal está implementado e validado por testes automatizados. O teste humano com designer e nutricionista ainda está pendente. Existe compartilhamento temporário por HTTPS para revisão; a hospedagem permanente ainda não foi ativada. Este projeto não está apresentado como sistema clínico pronto para pacientes reais.
 
-![Painel pessoal com cenário fictício](docs/images/demo-personal-desktop.png)
+## Experiência dos dois perfis
 
-## O que funciona
+| Nutricionista | Cliente |
+|---|---|
+| Convida e acompanha clientes após aceite | Aceita ou revoga o acompanhamento |
+| Monta dieta com horários, dias e porções | Consulta as refeições em ordem de horário |
+| Define alternativas e permite/bloqueia trocas | Escolhe apenas alternativas autorizadas para a refeição |
+| Consulta versões e aplica a dieta para hoje | Vê a dieta vigente, sem editor de prescrição |
+| Registra peso, medidas opcionais e objetivo por mês | Consulta histórico, medidas e variações |
 
-- Perfis de cliente/nutricionista, convite interno, aceite e revogação de acesso. Dieta e alternativas são configuradas pelo profissional vinculado.
-- Avaliações mensais com peso, medidas opcionais, objetivo, observações e histórico de resultados somente para consulta pelo cliente.
-- Conta com sessão HttpOnly, CSRF, senha BCrypt e dados separados por usuário.
-- Recuperação de senha, confirmação de e-mail e exclusão da conta; envio local por arquivo ou produção pela API HTTPS do Brevo.
-- Catálogo pessoal, busca, arquivamento e conversões exatas de unidades.
-- Dieta com revisões por data, refeições recorrentes e agenda no fuso do perfil.
-- Painel diário por horário, alternativas com porções cadastradas, troca única ou recorrente e opção de desfazer. Editor completo em “Editar dieta”.
-- Estoque por lotes, com quantidade, validade, origem da data e armazenamento; conferência conhecida, parcial ou desconhecida.
-- Compras calculadas por dia, considerando os lotes pela validade mais próxima, com listas salvas, ajustes e recebimentos parciais.
-- Ciclo semanal ou mensal salvo na conta, com dia configurável e período manual para o cálculo.
-- Preparo medido de cru para preparado, consumo confirmado e estornos sem saldo negativo ou baixa duplicada.
-- Painel de cobertura até a próxima compra e de validades próximas/desconhecidas.
-- Carga opcional de cenário fictício em conta vazia, sem sobrescrever dados existentes.
+### Acompanhamento profissional
 
-O [roteiro da demonstração](docs/DEMO_GUIDE.md) explica como experimentar cada etapa. Há também um [cenário fictício de hipertrofia, 82 kg e 1,80 m](docs/HYPERTROPHY_DEMO.md), com conta separada criada pelo script npm run demo:hypertrophy.
+Refeições recolhidas, edição por cartão, atalhos semanais e estado de dieta ativa confirmado pelo servidor.
 
-Para uma revisão remota temporária com dados fictícios e banco separado, consulte [DESIGN_REVIEW.md](docs/DESIGN_REVIEW.md). O endereço e as credenciais da revisão ficam privados.
+![Acompanhamento profissional com cliente e refeições fictícias](docs/images/v1-professional-desktop.png)
+
+### Consulta do cliente
+
+Horários, alimentos e porções; registrar Já comi é opcional e pode ser desfeito por refeição.
+
+![Painel diário do cliente com dieta fictícia](docs/images/v1-client-diet-desktop.png)
+
+<details>
+<summary>Ver as telas no celular</summary>
+
+<img src="docs/images/v1-professional-mobile.png" width="320" alt="Acompanhamento profissional em viewport móvel, com dados fictícios" />
+<img src="docs/images/v1-client-diet-mobile.png" width="320" alt="Dieta do cliente em viewport móvel, com dados fictícios" />
+
+Capturas em viewport de 390 pixels. Não substituem conferência em aparelho físico.
+
+</details>
+
+<details>
+<summary>Ver o histórico de avaliações</summary>
+
+![Resultados mensais fictícios com resumo e expansão de medidas](docs/images/v1-client-results-desktop.png)
+
+Peso, altura, gordura corporal e objetivo no resumo; cintura, braço, coxa, panturrilha, quadril e comparação com a avaliação anterior ao expandir. Valores são informados pelo profissional, sem interpretação clínica ou cálculo automático de gordura.
+
+</details>
+
+As imagens mostram contas fictícias da cópia isolada de revisão. Não incluem senhas, endereço temporário ou dados de pacientes.
+
+## Básico e recursos opcionais
+
+O Básico oferece dieta e acompanhamento sem movimentar estoque. Premium acrescenta controle opcional de estoque, compras e preparo, com ativação explícita e saldos preservados. Não há contratação nem cobrança implementada.
+
+Os módulos opcionais incluem lotes/validade, projeção de faltas até a próxima compra, recebimentos parciais e preparo de cru para preparado sem baixa duplicada. Não são necessários para o cliente consultar a dieta.
+
+## Decisões técnicas
+
+- Autorização pelo vínculo profissional ativo, além da proteção das rotas. O cliente não escreve a própria prescrição nem as avaliações.
+- Dietas com vigência e snapshots de ocorrências; refeições já registradas preservam seu histórico.
+- Versão nas gravações para rejeitar conflitos entre janelas, com recuperação explícita na interface.
+- Registro de refeição separado da baixa de estoque; desativar o controle preserva saldos e não gera consumo retroativo.
+- Quantidades com BigDecimal, transações e bloqueio por conta, repetição segura e estornos.
+- Sessão HttpOnly, CSRF e senhas BCrypt; recuperação, confirmação de e-mail e exclusão de conta.
+- API e interface compilada servidas na mesma origem; pacote Docker validado pela CI.
+
+## Experimentar e avaliar
+
+- [Entrega da versão 1.0](docs/ENTREGA_V1.md): execução e demonstração local dos dois perfis.
+- [Roteiro de validação](docs/V1_VALIDATION.md) e [ficha de feedback](docs/FEEDBACK_V1.md).
+- [Revisão temporária remota](docs/DESIGN_REVIEW.md): cópia isolada, com banco e contas fictícias próprios. Link e credenciais ficam privados; o computador precisa continuar ligado e o link expira.
+- [Publicação permanente preparada](docs/DEPLOYMENT.md): ainda depende das contas externas e da validação do ambiente real.
+
+Não existe um botão público de demonstração permanente neste momento. O endereço temporário não é colocado no README porque muda e expira. Para um novo avaliador executar o projeto, siga as instruções abaixo.
 
 ## Executar no Windows
 
@@ -87,8 +133,8 @@ Consulte [arquitetura](docs/ARCHITECTURE.md), [API](docs/API.md), [regras de est
 
 ## Limites desta versão
 
-Recuperação, confirmação de e-mail e exclusão estão implementadas. Na execução local, os links ficam em .local/mail; envio real requer configuração do provedor. Publicação, TLS na plataforma, entrega real de e-mail e revisão operacional aguardam ativação externa. Sessões expiram após 30 minutos sem atividade e são perdidas ao reiniciar a API.
+Recuperação, confirmação de e-mail e exclusão estão implementadas. Na execução local, os links ficam em .local/mail; envio real requer configuração do provedor. Publicação permanente, TLS na hospedagem definitiva, entrega real de e-mail e backup externo aguardam ativação e validação. O túnel de revisão já usa HTTPS, mas é temporário. Sessões expiram após 30 minutos sem atividade e são perdidas ao reiniciar a API.
 
 Cru, preparado e como vendido permanecem separados. Rendimento e validade são informados explicitamente; não há estimativa por IA. Receitas compostas, importação de dieta, nutrientes e embalagens/arredondamento comercial ficam para evolução posterior. O cálculo não reserva estoque. O histórico da tela mostra as 100 operações mais recentes, preservadas integralmente no banco.
 
-Não há chamada de API de IA, hospedagem contratada ou serviço pago na aplicação.
+O perfil profissional é autodeclarado. Identidade profissional, auditoria e operação/retenção de dados ainda precisam de definição antes de pacientes reais. Importações e bioimpedância permanecem como campos reservados desativados. Não há chamada de API de IA, hospedagem contratada ou serviço pago na aplicação.

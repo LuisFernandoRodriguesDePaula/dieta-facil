@@ -95,3 +95,7 @@ Dentro do acompanhamento profissional, cabeçalho com nome do cliente, abas e se
 ## Revisão externa temporária de design (2026-10-19)
 
 Veja DESIGN_REVIEW.md. Start-DesignReview.ps1 cria/reutiliza banco dieta_facil_review separado e contas fictícias exclusivas, compila app e publica via túnel HTTPS temporário. Padrão 8h com encerramento automático; Stop-DesignReview.ps1 encerra antecipadamente. Link atual/prazo/credenciais somente em .local/design-review/, nunca no Git. API8081 e static build; não expor Vite nem banco pessoal. O endereço anterior deixa de funcionar após encerrar e reiniciar. Mensagens são locais e somente dados fictícios devem ser usados. Testes externos em 1440/390/320px aprovados para os dois perfis; ainda aguardar feedback humano do designer. Hospedagem permanente e Portfólio continuam separados.
+
+## Apresentação 1.0 atualizada — 2026-10-20
+
+Usuário respondeu Ainda não testamos ao perguntar sobre a revisão do designer. Não inventar feedback nem ampliar módulos para substituir essa avaliação. README e PROJECT_CASE agora apresentam o fluxo profissional/cliente, imagens atuais e limites; ROADMAP prioriza sessão humana, correções e depois ativação permanente quando houver contas. Portfólio separado não foi alterado. Conferência externa repetida sem renovar o link ou alterar dados de revisão; seguir o prazo original registrado em session.json. Capturas públicas v1-* são fictícias e não contêm credenciais. Próximo marco permanece o teste do designer e do nutricionista, com FEEDBACK_V1.md.

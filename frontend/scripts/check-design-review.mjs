@@ -84,7 +84,7 @@ try {
       const context = await browser.newContext({
         baseURL: state.url,
         storageState: await api.storageState(),
-        viewport: { width, height: 900 },
+        viewport: { width, height: width < 700 ? 1400 : 1000 },
         locale: "pt-BR",
       });
       try {
@@ -106,6 +106,32 @@ try {
               () => document.documentElement.scrollWidth <= innerWidth,
             ),
           );
+          if (path === "/profissional")
+            await page.getByRole("article").first().waitFor();
+          else if (path.startsWith("/profissional/clientes/"))
+            await page
+              .getByRole("button", { name: "Dieta ativa", exact: true })
+              .waitFor();
+          else if (path === "/conta/dieta")
+            await page.getByRole("article").first().waitFor();
+          else
+            await page.locator(".care-evaluations article").first().waitFor();
+          await page.evaluate(() => document.fonts.ready);
+          const screen = path.startsWith("/profissional/clientes/")
+            ? "acompanhamento"
+            : path.split("/").pop();
+          await page.screenshot({
+            path:
+              directory +
+              "screen-" +
+              role +
+              "-" +
+              screen +
+              "-" +
+              width +
+              ".png",
+            fullPage: false,
+          });
         }
         await page.screenshot({
           path: directory + "review-" + role + "-" + width + ".png",

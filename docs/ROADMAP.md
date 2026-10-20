@@ -1,6 +1,16 @@
 # Plano de evolução do Dieta Fácil
 
-Revisão de 2026-10-16. Este backlog substitui a ordem genérica da especificação inicial. Estoque passa a integrar o MVP por decisão do usuário. Cada entrega pode ocupar várias sessões; não há promessa de concluir o MVP em um mês.
+Revisão de 2026-10-20. A prioridade da versão 1.0 é a avaliação do fluxo nutricionista–cliente. Estoque, compras e preparo permanecem implementados como extras opcionais; não ampliar esses módulos antes do feedback.
+
+## Próximos marcos da versão 1.0
+
+1. Designer e proprietário avaliarem a cópia temporária e registrarem dificuldades em FEEDBACK_V1.md.
+2. Nutricionista executar V1_VALIDATION.md com dados fictícios.
+3. Corrigir os problemas do fluxo principal e fechar a apresentação da versão avaliada.
+4. Quando as contas externas estiverem disponíveis, ativar e validar hospedagem permanente, e-mail e backup.
+5. Integrar ao Portfólio separado após validar o endereço definitivo.
+
+Importações continuam somente como espaços reservados. O feedback humano ainda não foi recebido. Este backlog conserva abaixo o histórico das entregas; itens implementados não significam prontidão para uso com pacientes reais.
 
 ## Forma de trabalhar
 

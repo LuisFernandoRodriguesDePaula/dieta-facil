@@ -191,3 +191,11 @@ Preparado compartilhamento com Cloudflare Quick Tunnel, API empacotada em 8081 e
 Scripts Start/Stop-DesignReview e instalador do conector oficial com verificação SHA-256. Encerramento automático após prazo (8h padrão) e checagem de identidade/início do processo para evitar interromper outros serviços. Testado encerramento pelo caminho de expiração e liberação da porta antes de reiniciar. Não há reset de dados por visitante.
 
 Conferência externa com navegador real: HTTPS, login e logout dos dois perfis, cookie Secure/HttpOnly, bloqueio de dados anônimos/configuração privada e ausência de rolagem lateral nas telas verificadas em 1440/390/320px. Relatórios e capturas apenas em .local/design-review/.
+
+## 2026-10-20 — Apresentação atual da versão 1.0
+
+Usuário informou que ainda não testou com o designer. Mantido o fluxo funcional sem novas funcionalidades. README e PROJECT_CASE foram alinhados ao acompanhamento nutricionista–cliente, com estoque/compras/preparo como extras e limites explícitos de importação, cobrança, uso clínico e publicação permanente. ROADMAP passou a priorizar a avaliação humana e correções do fluxo principal antes de ampliar escopo.
+
+A conferência externa passou novamente, preservando o endereço temporário existente e os dados fictícios de revisão. A captura passou a aguardar o conteúdo da tela (não apenas o título) e gera prévias por rota; cinco imagens atuais dos dois perfis foram selecionadas para docs/images após inspeção, sem endereço temporário, senhas ou dados pessoais. Viewports de captura: desktop1440 e móvel390; conferência também inclui320. Não se trata de teste em dispositivo físico.
+
+Verificações desta etapa: login/logout HTTPS, Secure/HttpOnly, autorização e ausência de rolagem lateral nas páginas verificadas; lint e referências locais da documentação. Não foram repetidas suítes do domínio sem mudança correspondente. CI da base anterior df2f22a aprovada (run39346483715). Feedback do designer/nutricionista e ativação permanente continuam pendentes.
