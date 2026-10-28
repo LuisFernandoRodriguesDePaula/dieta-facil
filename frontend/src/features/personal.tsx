@@ -10,7 +10,6 @@ export function PersonalNav() {
         ["/conta/dieta", "Minha dieta"],
         ["/conta/resultados", "Resultados"],
         ["/conta/nutricionista", "Meu nutricionista"],
-        ["/conta/premium", "Recursos Premium"],
         ["/conta", "Conta"],
       ]
     : [

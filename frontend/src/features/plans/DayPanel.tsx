@@ -143,28 +143,32 @@ export default function DayPanel({
       : undefined;
   return (
     <section className="daily-diet" aria-label="Refeições do dia">
-      <div className="diet-summary">
-        <div>
-          <span className="eyebrow">NO SEU RITMO</span>
-          <h2>
-            {date === today
-              ? "Seu dia, refeição por refeição"
-              : "Seu planejamento do dia"}
-          </h2>
-          <p>
-            {consumed} de {meals.length} refeições consumidas
-          </p>
+      {!clientView && (
+        <div className="diet-summary">
+          <div>
+            <span className="eyebrow">NO SEU RITMO</span>
+            <h2>
+              {date === today
+                ? "Seu dia, refeição por refeição"
+                : "Seu planejamento do dia"}
+            </h2>
+            <p>
+              {consumed} de {meals.length} refeições consumidas
+            </p>
+          </div>
+          <progress
+            aria-label="Refeições consumidas"
+            value={consumed}
+            max={meals.length || 1}
+          />
         </div>
-        <progress
-          aria-label="Refeições consumidas"
-          value={consumed}
-          max={meals.length || 1}
-        />
-      </div>
-      <p className="diet-timezone">
-        Horários em {schedule.data.timezone}. Registrar “Já comi” é opcional;
-        uma refeição sem registro não significa que você deixou de comer.
-      </p>
+      )}
+      {!clientView && (
+        <p className="diet-timezone">
+          Horários em {schedule.data.timezone}. Registrar “Já comi” é opcional;
+          uma refeição sem registro não significa que você deixou de comer.
+        </p>
+      )}
       {error && (
         <p role="alert" className="form-error">
           {error}
@@ -434,6 +438,22 @@ export default function DayPanel({
             )}
           </form>
         </MealDialog>
+      )}
+      {clientView && (
+        <footer className="diet-client-footer">
+          <p>
+            {consumed} de {meals.length} refeições registradas
+          </p>
+          <progress
+            aria-label="Refeições consumidas"
+            value={consumed}
+            max={meals.length || 1}
+          />
+          <small>
+            O registro “Já comi” é opcional. Horários em{" "}
+            {schedule.data.timezone}.
+          </small>
+        </footer>
       )}
       {swap && (
         <SwapPanel

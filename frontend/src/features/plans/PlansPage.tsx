@@ -94,7 +94,7 @@ function Workspace({
   return (
     <main className="plan-page">
       <PersonalNav />
-      <p className="eyebrow">SUA ROTINA</p>
+      {professional && <p className="eyebrow">SUA ROTINA</p>}
       <div className="diet-title-row">
         <h1>
           {editing
@@ -109,22 +109,26 @@ function Workspace({
           </button>
         )}
       </div>
-      <p>
-        {editing
-          ? "Organize refeições e porções. As mudanças começam na data escolhida."
-          : "O que comer, na hora certa. Troque um alimento ou confirme sua refeição por aqui."}
-      </p>
-      <label className="plan-date">
-        {editing ? "Aplicar dieta a partir de" : "Consultar dia"}
-        <input
-          type="date"
-          required
-          value={date}
-          onChange={(e) => {
-            if (e.target.value) setDate(e.target.value);
-          }}
-        />
-      </label>
+      {professional && (
+        <p>
+          {editing
+            ? "Organize refeições e porções. As mudanças começam na data escolhida."
+            : "O que comer, na hora certa. Troque um alimento ou confirme sua refeição por aqui."}
+        </p>
+      )}
+      {professional && (
+        <label className="plan-date">
+          {editing ? "Aplicar dieta a partir de" : "Consultar dia"}
+          <input
+            type="date"
+            required
+            value={date}
+            onChange={(e) => {
+              if (e.target.value) setDate(e.target.value);
+            }}
+          />
+        </label>
+      )}
       {editing ? (
         <EditorLoader key={date} userId={userId} date={date} today={today} />
       ) : (
@@ -136,6 +140,22 @@ function Workspace({
           timezone={timezone}
           clientView={!professional}
         />
+      )}
+      {!professional && (
+        <details className="diet-secondary-controls">
+          <summary>Consultar outro dia</summary>
+          <label className="plan-date">
+            Consultar dia
+            <input
+              type="date"
+              required
+              value={date}
+              onChange={(e) => {
+                if (e.target.value) setDate(e.target.value);
+              }}
+            />
+          </label>
+        </details>
       )}
     </main>
   );

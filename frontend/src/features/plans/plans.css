@@ -926,3 +926,30 @@
     align-items: center;
   }
 }
+.diet-client-footer {
+  margin-top: 28px;
+  color: #53655b;
+  font-size: 0.875rem;
+}
+.diet-client-footer progress {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  height: 6px;
+  margin: 12px 0;
+  accent-color: #284e3d;
+}
+.diet-client-footer small {
+  display: block;
+}
+.diet-secondary-controls {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #d8e2d5;
+  color: #53655b;
+  font-size: 0.875rem;
+}
+.diet-secondary-controls summary {
+  cursor: pointer;
+  padding: 8px 0;
+}

@@ -199,3 +199,9 @@ Usuário informou que ainda não testou com o designer. Mantido o fluxo funciona
 A conferência externa passou novamente, preservando o endereço temporário existente e os dados fictícios de revisão. A captura passou a aguardar o conteúdo da tela (não apenas o título) e gera prévias por rota; cinco imagens atuais dos dois perfis foram selecionadas para docs/images após inspeção, sem endereço temporário, senhas ou dados pessoais. Viewports de captura: desktop1440 e móvel390; conferência também inclui320. Não se trata de teste em dispositivo físico.
 
 Verificações desta etapa: login/logout HTTPS, Secure/HttpOnly, autorização e ausência de rolagem lateral nas páginas verificadas; lint e referências locais da documentação. Não foram repetidas suítes do domínio sem mudança correspondente. CI da base anterior df2f22a aprovada (run39346483715). Feedback do designer/nutricionista e ativação permanente continuam pendentes.
+
+## 2026-10-27 — Consulta da dieta com foco nas refeições
+
+A tela do cliente apresenta as refeições logo após o título. Progresso e orientação de registro opcional passaram para um rodapé discreto; consulta de outra data permanece disponível em seção recolhida no final. Removido o link Recursos Premium do menu do cliente, mantendo as permissões e recursos existentes. Motivação: reduzir distrações na consulta diária e apresentar a funcionalidade principal com clareza.
+
+Validação: build TypeScript/Vite, lint e navegador Edge em 320, 390 e 1440px. Conferidos ausência de rolagem horizontal, menu sem Premium, posição do rodapé e seleção de outra data. Captura móvel atualizada com dados fictícios; ambiente de revisão iniciado apenas localmente em 8081.
