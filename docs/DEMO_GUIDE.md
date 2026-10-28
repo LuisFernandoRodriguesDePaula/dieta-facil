@@ -64,3 +64,7 @@ O fluxo principal mudou para nutricionista → convite/aceite → catálogo/diet
 `npm run demo:care` prepara as duas contas de exemplo. `demo:hypertrophy` é um alias para o mesmo roteiro. A conta fictícia anterior e seus saldos são preservados; é explicitamente colocada no Básico, com estoque congelado. Credenciais do profissional ficam em .local/demo-professional.json. Use perfis de navegador separados para testar simultaneamente.
 
 Os recursos Premium podem ser simulados somente na demonstração local; não há cobrança. Ao ativar controle, confirme os saldos preservados. Não são descontadas refeições anteriores. A publicação pública continua pendente da configuração externa.
+
+### Botão Importar dieta no editor profissional
+
+No acompanhamento do cliente, a aba Dieta reúne contagem de refeições, histórico e o botão Importar dieta. O botão abre um painel informativo com campo de link desativado: a importação ainda está em planejamento. Não ocorre leitura de links ou alteração de dados. Feche por Escape, pelo botão de fechar ou por Voltar à dieta. Expandir todas e Recolher todas permanecem disponíveis como controles secundários; cada cartão também pode ser aberto individualmente.

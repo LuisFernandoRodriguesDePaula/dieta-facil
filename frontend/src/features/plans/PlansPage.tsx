@@ -6,6 +6,8 @@ import {
   Plus,
   ChevronDown,
   Info,
+  Upload,
+  ChevronUp,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
@@ -255,6 +257,7 @@ function Editor({
   const client = useQueryClient();
   const [meals, setMeals] = useState<Meal[]>(initial.meals);
   const [history, setHistory] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const clean = JSON.stringify(meals) === JSON.stringify(initial.meals);
   const isActive =
     applyToday &&
@@ -358,8 +361,41 @@ function Editor({
               <Info size={20} aria-hidden="true" />
             </button>
           )}
+          {applyToday && (
+            <button
+              type="button"
+              className="plan-import-button"
+              onClick={() => setImportOpen(true)}
+            >
+              <Upload size={18} aria-hidden="true" /> Importar dieta
+            </button>
+          )}
         </div>
       </div>
+      {importOpen && (
+        <MealDialog title="Importar dieta" onClose={() => setImportOpen(false)}>
+          <p>
+            A importação por link está em planejamento. Nesta versão, monte ou
+            edite as refeições no painel.
+          </p>
+          <label>
+            Link da dieta
+            <input
+              type="url"
+              placeholder="https://…"
+              disabled
+              aria-describedby="diet-import-note"
+            />
+          </label>
+          <p id="diet-import-note" className="access-note">
+            Nenhum link é enviado ou armazenado. A dieta atual permanece
+            intacta.
+          </p>
+          <button type="button" onClick={() => setImportOpen(false)}>
+            Voltar à dieta
+          </button>
+        </MealDialog>
+      )}
       {history && (
         <MealDialog title="Versões da dieta" onClose={() => setHistory(false)}>
           <p>Deseja consultar outras versões da dieta deste cliente?</p>
@@ -428,10 +464,10 @@ function Editor({
             type="button"
             onClick={() => setOpened(meals.map((m) => m.id))}
           >
-            Expandir todas
+            <ChevronDown size={16} aria-hidden="true" /> Expandir todas
           </button>
           <button type="button" onClick={() => setOpened([])}>
-            Recolher todas
+            <ChevronUp size={16} aria-hidden="true" /> Recolher todas
           </button>
         </div>
       )}

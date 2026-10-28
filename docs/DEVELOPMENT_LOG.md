@@ -205,3 +205,11 @@ Verificações desta etapa: login/logout HTTPS, Secure/HttpOnly, autorização e
 A tela do cliente apresenta as refeições logo após o título. Progresso e orientação de registro opcional passaram para um rodapé discreto; consulta de outra data permanece disponível em seção recolhida no final. Removido o link Recursos Premium do menu do cliente, mantendo as permissões e recursos existentes. Motivação: reduzir distrações na consulta diária e apresentar a funcionalidade principal com clareza.
 
 Validação: build TypeScript/Vite, lint e navegador Edge em 320, 390 e 1440px. Conferidos ausência de rolagem horizontal, menu sem Premium, posição do rodapé e seleção de outra data. Captura móvel atualizada com dados fictícios; ambiente de revisão iniciado apenas localmente em 8081.
+
+## 2026-10-27 — Layout aprovado do editor profissional
+
+Aplicado ao código o layout aprovado na prévia visual: removida a faixa de importação acima do editor, inserido botão compacto Importar dieta ao lado da contagem de refeições e do histórico, e convertidas as ações Expandir todas/Recolher todas em controles secundários com ícones. Reduzido o espaçamento dos cartões fechados para mostrar as cinco refeições da demonstração no desktop de 1440×1000; ferramentas reorganizam-se no celular sem rolagem lateral.
+
+O botão abre um modal acessível reutilizando MealDialog (Escape, retenção e retorno do foco). O campo Link da dieta fica desativado e o painel informa que a integração está em planejamento. Não há envio, busca remota, armazenamento de URL nem aplicação de dieta externa. Essa etapa implementa a apresentação e o acesso à informação; parsers, formatos e integração continuam fora da versão 1.0. As outras áreas de importação reservadas permanecem como estavam.
+
+Validação: 25 testes de frontend em 7 arquivos aprovados, build TypeScript/Vite e lint. Conferência em Edge com dados fictícios em 1440, 390 e 320px: abertura/fechamento do modal, Escape com retorno do foco, campo desativado, expandir/recolher e ausência de requisições de gravação ou rolagem horizontal. Capturas reais do editor substituem a prévia na documentação e na pasta local de imagens para LinkedIn.

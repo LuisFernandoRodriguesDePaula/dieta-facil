@@ -953,3 +953,59 @@
   cursor: pointer;
   padding: 8px 0;
 }
+/* Ferramentas secundárias compactas do editor profissional. */
+.plan-editor-intro {
+  margin: 20px 0 8px;
+}
+.plan-editor-tools {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.plan-page button.plan-import-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  color: #284e3d;
+  background: transparent;
+  border-color: #9aafa0;
+}
+.plan-expand-actions {
+  gap: 8px;
+  margin: 0 0 12px;
+}
+.plan-page .plan-expand-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 6px 8px;
+  border: 0;
+  background: transparent;
+  color: #53655b;
+  font-size: 0.85rem;
+}
+.plan-page .plan-expand-actions button:hover {
+  background: #edf3e8;
+}
+.plan-meal-editor {
+  padding: 22px 28px;
+}
+@media (max-width: 700px) {
+  .plan-editor-tools {
+    gap: 8px;
+  }
+  .plan-meal-editor {
+    padding: 18px;
+  }
+}
+@media (max-width: 420px) {
+  .plan-editor-intro {
+    align-items: flex-start;
+  }
+  .plan-editor-tools {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+  }
+}

@@ -743,10 +743,6 @@ function ClientWorkspace({
       </div>
       {tab === "diet" ? (
         <>
-          <ImportPlaceholder
-            subject="dieta"
-            description="Espaço reservado para trazer uma dieta de outro sistema. Nesta versão, preencha as refeições e porções abaixo."
-          />
           <EditorLoader
             key={date}
             userId={id}
