@@ -546,9 +546,23 @@ test("versão 1.0: nutricionista prepara, cliente consulta e acompanha resultado
     await page
       .getByRole("link", { name: "Abrir acompanhamento de Pessoa Demo" })
       .click();
+    const importButton = page.getByRole("button", {
+      name: "Importar dieta",
+      exact: true,
+    });
+    await importButton.click();
+    const importDialog = page.getByRole("dialog", {
+      name: "Importar dieta",
+      exact: true,
+    });
+    await expect(importDialog).toBeVisible();
+    await expect(importDialog.getByLabel("Link da dieta")).toBeDisabled();
     await expect(
-      page.getByLabel("Arquivo de dieta", { exact: true }),
-    ).toBeDisabled();
+      importDialog.getByText(/importação por link está em planejamento/),
+    ).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(importDialog).toHaveCount(0);
+    await expect(importButton).toBeFocused();
     await page
       .getByRole("button", { name: "Bioimpedância e relatórios", exact: true })
       .click();
@@ -967,13 +981,13 @@ test("duas refeições podem ser desfeitas separadamente após recarregar", asyn
   await lunch
     .getByRole("button", { name: "Desfazer consumo de Almoço" })
     .click();
-  await expect(page.getByText("0 de 5 refeições consumidas")).toBeVisible();
+  await expect(page.getByText("0 de 5 refeições registradas")).toBeVisible();
   await breakfast.getByRole("button", { name: "Já comi", exact: true }).click();
   await breakfast
     .getByRole("button", { name: "Desfazer consumo de Café da manhã" })
     .click();
   await page.reload();
-  await expect(page.getByText("0 de 5 refeições consumidas")).toBeVisible();
+  await expect(page.getByText("0 de 5 refeições registradas")).toBeVisible();
   await expect(
     page.getByRole("button", { name: /^Desfazer consumo de/ }),
   ).toHaveCount(0);
@@ -989,6 +1003,26 @@ test("dieta acessível por teclado e sem rolagem lateral em tela estreita", asyn
     ).ok(),
   ).toBeTruthy();
   await page.goto("/conta/dieta");
+  await expect(
+    page.getByRole("link", { name: "Recursos Premium", exact: true }),
+  ).toHaveCount(0);
+  const dateControl = page.getByLabel("Consultar dia", { exact: true });
+  await expect(dateControl).not.toBeVisible();
+  await page.getByText("Consultar outro dia", { exact: true }).click();
+  await expect(dateControl).toBeVisible();
+  const originalDate = await dateControl.inputValue();
+  const previous = new Date(originalDate + "T12:00:00Z");
+  previous.setUTCDate(previous.getUTCDate() - 1);
+  const previousDate = previous.toISOString().slice(0, 10);
+  const previousSchedule = page.waitForResponse(
+    (r) => r.url().includes("/api/schedule?date=" + previousDate) && r.ok(),
+  );
+  await dateControl.fill(previousDate);
+  await previousSchedule;
+  await dateControl.fill(originalDate);
+  await expect(page.locator(".daily-meal")).toHaveCount(5);
+  await page.getByText("Consultar outro dia", { exact: true }).click();
+  await expect(dateControl).not.toBeVisible();
   const card = page.getByRole("article", {
     name: "Café da manhã",
     exact: true,

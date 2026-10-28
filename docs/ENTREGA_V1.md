@@ -1,6 +1,6 @@
 # Dieta Fácil 1.0 — entrega local para avaliação
 
-Esta entrega permite demonstrar o fluxo de nutricionista e cliente com dados fictícios. Ainda não há um endereço público. O link 127.0.0.1 funciona no computador onde o projeto está executando. Não encaminhe esse link esperando acesso remoto pelo nutricionista.
+Esta entrega permite demonstrar o fluxo de nutricionista e cliente com dados fictícios. Não há hospedagem permanente. Para avaliação remota temporária, use o ambiente isolado descrito em [DESIGN_REVIEW.md](DESIGN_REVIEW.md). O endereço muda ao recriar o túnel e depende do computador ligado e conectado. O link 127.0.0.1 funciona somente no computador onde o projeto está executando.
 
 ## Escopo fechado para este teste
 

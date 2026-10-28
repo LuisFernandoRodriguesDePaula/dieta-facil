@@ -1,6 +1,6 @@
 # Dieta Fácil 1.0 — roteiro de validação com nutricionista
 
-Estado: demonstração local com dados fictícios. A publicação externa continua aguardando as contas do proprietário. Este roteiro valida o uso; não confirma prontidão para prontuário clínico ou operação pública.
+Estado: demonstração com dados fictícios, local ou por túnel temporário isolado conforme [DESIGN_REVIEW.md](DESIGN_REVIEW.md). A hospedagem permanente continua pendente. Este roteiro valida o uso; não confirma prontidão para prontuário clínico ou operação pública.
 
 ## Acessos de demonstração
 
@@ -17,10 +17,16 @@ Use navegadores/perfis separados para manter os dois acessos simultâneos. Troca
 2. Como cliente, abrir Meu nutricionista, conferir a autorização e aceitar. Antes do aceite o profissional não consegue abrir a dieta ou as avaliações.
 3. Como nutricionista, abrir o cliente: cadastrar os alimentos, montar refeições/horários/dias/porções e salvar a dieta. Em Alternativas autorizadas, configurar porções e permitir ou bloquear as trocas.
 4. Como cliente, consultar Minha dieta: sem editor, sem cadastro de alimentos e sem configuração de alternativas. Escolher uma opção liberada muda somente aquela refeição/data. Não altera a prescrição recorrente. Registrar Já comi é opcional e não pede quantidades no Básico.
+
+   Na interface atual, o progresso e a orientação de registro ficam ao final das refeições. Abra Consultar outro dia para selecionar uma data anterior e volte à data atual. O menu do cliente não apresenta Recursos Premium.
 5. Como nutricionista, registrar uma avaliação mensal: peso, altura/cintura opcionais, objetivo e observações. Há um registro por mês, editável com controle de versão. Dados de meses anteriores continuam no histórico.
 6. Como cliente, abrir Resultados e conferir os registros e seus autores. O cliente não preenche avaliações. Uma refeição sem registro não é interpretada como falta de adesão.
 7. Como cliente, revogar o vínculo. O nutricionista perde acesso; a dieta e os resultados continuam na conta do cliente.
 8. Opcional: em Recursos Premium da demonstração local, experimentar o plano, conferir os saldos e ativar estoque. Desativar congela saldos; reativar exige nova conferência. Não há desconto retroativo de refeições nem cobrança real.
+
+   Para acessar essa área opcional diretamente, use `/conta/premium`. Ela não faz parte do menu principal do cliente nem do roteiro prioritário com o nutricionista.
+
+9. No editor profissional, abrir Importar dieta: conferir o aviso de integração em planejamento e o campo de link desativado. Fechar por Escape e conferir retorno do foco ao botão. Nenhum link é enviado e a dieta não muda. Conferir também Expandir todas, Recolher todas e a abertura individual dos cartões.
 
 ## Perguntas para o feedback
 

@@ -213,3 +213,9 @@ Aplicado ao código o layout aprovado na prévia visual: removida a faixa de imp
 O botão abre um modal acessível reutilizando MealDialog (Escape, retenção e retorno do foco). O campo Link da dieta fica desativado e o painel informa que a integração está em planejamento. Não há envio, busca remota, armazenamento de URL nem aplicação de dieta externa. Essa etapa implementa a apresentação e o acesso à informação; parsers, formatos e integração continuam fora da versão 1.0. As outras áreas de importação reservadas permanecem como estavam.
 
 Validação: 25 testes de frontend em 7 arquivos aprovados, build TypeScript/Vite e lint. Conferência em Edge com dados fictícios em 1440, 390 e 320px: abertura/fechamento do modal, Escape com retorno do foco, campo desativado, expandir/recolher e ausência de requisições de gravação ou rolagem horizontal. Capturas reais do editor substituem a prévia na documentação e na pasta local de imagens para LinkedIn.
+
+## 2026-10-27 — Validação antes do teste do nutricionista
+
+Executada revisão técnica da base 6e1161a: 25 testes de interface, 48 de servidor em H2 e os mesmos 48 em PostgreSQL, build e lint aprovados. Jornadas completas com contas fictícias em banco exclusivo: primeira rodada 16/20; quatro expectativas antigas (campo de importação e texto de progresso) atualizadas. Reexecução das quatro jornadas afetadas e duas jornadas de teclado/data ampliadas: 6/6. Nenhuma alteração funcional da aplicação nesta rodada.
+
+Roteiro alinhado ao modal de importação, ao rodapé e ao acesso remoto temporário. Detalhes e limites em VALIDACAO_PRE_TESTE_2026-10-27.md. Validação em aparelho físico e feedback humano continuam pendentes. Bancos de testes distintos dos dados pessoais e da demonstração compartilhada; e-mail somente local. Não foi aberto novo túnel público.
