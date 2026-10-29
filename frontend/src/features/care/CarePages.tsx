@@ -703,6 +703,9 @@ function ClientWorkspace({
   const [date, setDate] = useState(today);
   const [tab, setTab] = useState("diet");
   const [meal, setMeal] = useState<Occurrence | null>(null);
+  const [toolbarTarget, setToolbarTarget] = useState<HTMLDivElement | null>(
+    null,
+  );
   const schedule = useQuery({
     queryKey: ["schedule", id, date],
     queryFn: () => api<Schedule>(prefix + "/schedule?date=" + date),
@@ -721,25 +724,30 @@ function ClientWorkspace({
           ←
         </Link>
       </header>
-      <div
-        className="care-tabs"
-        role="group"
-        aria-label="Acompanhamento do cliente"
-      >
-        {[
-          ["diet", "Dieta"],
-          ["foods", "Alimentos"],
-          ["results", "Avaliações mensais"],
-          ["reports", "Bioimpedância e relatórios"],
-        ].map(([key, text]) => (
-          <button
-            aria-pressed={tab === key}
-            key={key}
-            onClick={() => setTab(key)}
-          >
-            {text}
-          </button>
-        ))}
+      <div className="care-workspace-toolbar">
+        <div
+          className="care-tabs"
+          role="group"
+          aria-label="Acompanhamento do cliente"
+        >
+          {[
+            ["diet", "Dieta"],
+            ["foods", "Alimentos"],
+            ["results", "Avaliações mensais"],
+            ["reports", "Bioimpedância e relatórios"],
+          ].map(([key, text]) => (
+            <button
+              aria-pressed={tab === key}
+              key={key}
+              onClick={() => setTab(key)}
+            >
+              {text}
+            </button>
+          ))}
+        </div>
+        {tab === "diet" && (
+          <div className="care-diet-tools" ref={setToolbarTarget} />
+        )}
       </div>
       {tab === "diet" ? (
         <>
@@ -750,6 +758,7 @@ function ClientWorkspace({
             today={today}
             applyToday
             onDateChange={setDate}
+            toolbarTarget={toolbarTarget}
           />
           <section className="plan-meal">
             <h2>Alternativas autorizadas</h2>

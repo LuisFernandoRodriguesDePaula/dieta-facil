@@ -269,3 +269,31 @@
   border-radius: 50%;
   font-size: 1.5rem;
 }
+.care-workspace-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin: 24px 0 20px;
+}
+.care-workspace-toolbar .care-tabs {
+  margin: 0;
+  gap: 8px;
+}
+.care-diet-tools {
+  margin-left: auto;
+}
+.care-diet-tools:empty {
+  display: none;
+}
+.plan-editor-intro[hidden] {
+  display: none;
+}
+@media (max-width: 900px) {
+  .care-diet-tools {
+    flex-basis: 100%;
+  }
+  .care-diet-tools .plan-editor-tools {
+    justify-content: flex-start;
+  }
+}

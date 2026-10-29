@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import {
   Clock3,
   Utensils,
@@ -173,12 +174,14 @@ export function EditorLoader({
   today,
   applyToday = false,
   onDateChange,
+  toolbarTarget,
 }: {
   userId: string;
   date: string;
   today: string;
   applyToday?: boolean;
   onDateChange?: (date: string) => void;
+  toolbarTarget?: HTMLElement | null;
 }) {
   const prefix = useDietApi();
   const [notice, setNotice] = useState("");
@@ -223,6 +226,7 @@ export function EditorLoader({
         applyToday={applyToday}
         onDateChange={onDateChange}
         activeEffectiveFrom={active.data?.effectiveFrom}
+        toolbarTarget={toolbarTarget}
       />
       {notice && (
         <p role="status" className="form-success">
@@ -242,6 +246,7 @@ function Editor({
   applyToday,
   onDateChange,
   activeEffectiveFrom,
+  toolbarTarget,
 }: {
   initial: Plan;
   foods: Food[];
@@ -252,6 +257,7 @@ function Editor({
   applyToday?: boolean;
   onDateChange?: (date: string) => void;
   activeEffectiveFrom?: string | null;
+  toolbarTarget?: HTMLElement | null;
 }) {
   const prefix = useDietApi();
   const client = useQueryClient();
@@ -334,11 +340,41 @@ function Editor({
       setSaving(false);
     }
   };
+  const tools = (
+    <div className="plan-editor-tools">
+      <span className="plan-meal-count">
+        {meals.length} {meals.length === 1 ? "refeição" : "refeições"}
+      </span>
+      {!!initial.revisionDates.length && (
+        <button
+          type="button"
+          className="plan-history-icon"
+          aria-label="Informações e versões da dieta"
+          title="Informações e versões da dieta"
+          onClick={() => setHistory(true)}
+        >
+          <Info size={20} aria-hidden="true" />
+        </button>
+      )}
+      {applyToday && (
+        <button
+          type="button"
+          className="plan-import-button"
+          onClick={() => setImportOpen(true)}
+        >
+          <Upload size={18} aria-hidden="true" /> Importar dieta
+        </button>
+      )}
+    </div>
+  );
   return (
     <form onSubmit={save} noValidate className="plan-editor">
-      <div className="plan-editor-intro">
+      <div
+        className="plan-editor-intro"
+        hidden={!!toolbarTarget && !!meals.length}
+      >
         <div>
-          <h2>Dieta</h2>
+          {!applyToday && <h2>Dieta</h2>}
           {!meals.length && (
             <p>
               Defina o horário, escolha os dias e adicione as porções de cada
@@ -346,32 +382,9 @@ function Editor({
             </p>
           )}
         </div>
-        <div className="plan-editor-tools">
-          <span className="plan-meal-count">
-            {meals.length} {meals.length === 1 ? "refeição" : "refeições"}
-          </span>
-          {!!initial.revisionDates.length && (
-            <button
-              type="button"
-              className="plan-history-icon"
-              aria-label="Informações e versões da dieta"
-              title="Informações e versões da dieta"
-              onClick={() => setHistory(true)}
-            >
-              <Info size={20} aria-hidden="true" />
-            </button>
-          )}
-          {applyToday && (
-            <button
-              type="button"
-              className="plan-import-button"
-              onClick={() => setImportOpen(true)}
-            >
-              <Upload size={18} aria-hidden="true" /> Importar dieta
-            </button>
-          )}
-        </div>
+        {!toolbarTarget && tools}
       </div>
+      {toolbarTarget && createPortal(tools, toolbarTarget)}
       {importOpen && (
         <MealDialog title="Importar dieta" onClose={() => setImportOpen(false)}>
           <p>

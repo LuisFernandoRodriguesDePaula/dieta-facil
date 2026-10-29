@@ -219,3 +219,9 @@ Validação: 25 testes de frontend em 7 arquivos aprovados, build TypeScript/Vit
 Executada revisão técnica da base 6e1161a: 25 testes de interface, 48 de servidor em H2 e os mesmos 48 em PostgreSQL, build e lint aprovados. Jornadas completas com contas fictícias em banco exclusivo: primeira rodada 16/20; quatro expectativas antigas (campo de importação e texto de progresso) atualizadas. Reexecução das quatro jornadas afetadas e duas jornadas de teclado/data ampliadas: 6/6. Nenhuma alteração funcional da aplicação nesta rodada.
 
 Roteiro alinhado ao modal de importação, ao rodapé e ao acesso remoto temporário. Detalhes e limites em VALIDACAO_PRE_TESTE_2026-10-27.md. Validação em aparelho físico e feedback humano continuam pendentes. Bancos de testes distintos dos dados pessoais e da demonstração compartilhada; e-mail somente local. Não foi aberto novo túnel público.
+
+## 2026-10-29 — Ferramentas alinhadas às abas do acompanhamento
+
+Removido o título Dieta repetido abaixo da aba. Contagem, histórico e Importar dieta ficam à direita das abas no desktop e em linha separada no celular. Ferramentas continuam ligadas ao estado do editor via portal React, mantendo a informação de refeições e os diálogos atualizados; desaparecem nas outras abas. Nome da conta fictícia do ambiente de revisão alterado a pedido do proprietário para Luis Fernando Rodrigues, sem alteração de e-mail, senha ou dieta e sem alterar o banco pessoal. Mudança de nome é um dado local, não uma migração global.
+
+Validação: build, lint e 25 testes frontend aprovados. Edge em 1440, 390 e 320px: nome e ausência de título repetido, abertura do modal, troca entre Alimentos e Dieta e ausência de rolagem horizontal. Capturas reais atualizadas. Interface compilada atualizada no ambiente local 8081.
