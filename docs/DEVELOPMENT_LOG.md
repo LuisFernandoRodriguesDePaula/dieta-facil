@@ -247,3 +247,7 @@ Tema próprio em CareLayout: branco, verde profundo, turquesa, títulos sem seri
 ## 2026-10-29 — Tema compartilhado e 60/30/10
 
 Promovido tema localizado a global-theme.css, importado na raiz. Paleta de superfícies simplificada a branco, verde-claro e esmeralda conforme orientação; texto mantém legibilidade. Cobertura de áreas públicas, acesso, paciente e módulos existentes, com reflow e movimento reduzido. Verificados 20 caminhos em desktop/320px antes do ajuste final de paleta, axe nas telas principais e 25 testes; build/lint após ajuste final. Nenhuma regra de negócio alterada.
+
+## 2026-10-29 — Clareza de interação no menu
+
+Opções de módulos com fundo verde-claro, estado ativo esmeralda/branco, borda no hover e seta discreta. Reforçada especificidade do estado ativo para coexistir com estilos de navegação carregados por rota. Cards informativos continuam sem ação simulada. Validação em Edge nos dois perfis e larguras 1440/320px: Enter, aria-current, cor ativa, axe e ausência de overflow; build/lint aprovados. Ambiente 8081 atualizado.

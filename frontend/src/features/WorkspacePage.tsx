@@ -1,4 +1,5 @@
 import { Link, useParams } from "react-router-dom";
+import { ChevronRight } from "lucide-react";
 import { CareLayout } from "./care/CareAccess";
 import "./workspace.css";
 const modules = [
@@ -181,7 +182,8 @@ export default function WorkspacePage({
               to={prefix + id}
               aria-current={module === id ? "page" : undefined}
             >
-              {title}
+              <span>{title}</span>
+              <ChevronRight size={16} aria-hidden="true" />
             </Link>
           ))}
           <Link to={patient ? "/conta/dieta" : "/profissional"}>

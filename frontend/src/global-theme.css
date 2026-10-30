@@ -66,13 +66,26 @@
 }
 .dieta-themed .workspace-nav a {
   color: #375954;
+  background: var(--surface-support);
+  border: 1px solid transparent;
+  min-height: 44px;
+  justify-content: space-between;
+  gap: 10px;
 }
 .dieta-themed .workspace-nav a:hover {
-  background: #e6f7ef;
+  border-color: var(--brand-action);
 }
 .dieta-themed .workspace-nav a[aria-current="page"] {
-  background: #e6f7ef;
-  color: #075e54;
+  background: var(--brand-action);
+  border-color: var(--brand-action);
+  color: #fff;
+  font-weight: 700;
+}
+.dieta-themed .workspace-nav a svg {
+  flex-shrink: 0;
+}
+.dieta-themed .workspace-grid article {
+  cursor: default;
 }
 .dieta-themed .workspace-content > header {
   padding: 30px;
@@ -286,6 +299,34 @@ html.dieta-themed {
     padding: 24px 20px;
   }
 }
-.dieta-themed :is(.sidebar-note,.prep-card,.feature-icon,.meal-icon,.diet-summary,.diet-empty) {background:var(--surface-support);}
-.dieta-themed :is(.meal-card,.food-card,.progress-card,.info-panel,.sidebar,.access-main) {background:var(--surface-main);}
-.dieta-themed :is(.brand-mark,.button-primary) {background:var(--brand-action);color:#fff;}
+.dieta-themed
+  :is(
+    .sidebar-note,
+    .prep-card,
+    .feature-icon,
+    .meal-icon,
+    .diet-summary,
+    .diet-empty
+  ) {
+  background: var(--surface-support);
+}
+.dieta-themed
+  :is(
+    .meal-card,
+    .food-card,
+    .progress-card,
+    .info-panel,
+    .sidebar,
+    .access-main
+  ) {
+  background: var(--surface-main);
+}
+.dieta-themed :is(.brand-mark, .button-primary) {
+  background: var(--brand-action);
+  color: #fff;
+}
+.dieta-themed .workspace-shell nav.workspace-nav a[aria-current="page"] {
+  background: #08786c;
+  color: #fff;
+  border-color: #08786c;
+}
