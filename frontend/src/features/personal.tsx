@@ -9,11 +9,13 @@ export function PersonalNav() {
     ? [
         ["/conta/dieta", "Minha dieta"],
         ["/conta/resultados", "Resultados"],
+        ["/conta/acompanhamento/inicio", "Acompanhamento"],
         ["/conta/nutricionista", "Meu nutricionista"],
         ["/conta", "Conta"],
       ]
     : [
         ["/profissional", "Clientes"],
+        ["/profissional/painel/inicio", "Consultório"],
         ["/conta/inicio", "Início"],
         ["/conta", "Conta"],
         ["/conta/alimentos", "Alimentos"],
@@ -25,6 +27,7 @@ export function PersonalNav() {
       0,
       links.length,
       ["/profissional", "Clientes"],
+      ["/profissional/painel/inicio", "Consultório"],
       ["/conta", "Conta"],
       ["/conta/premium", "Recursos Premium"],
     );

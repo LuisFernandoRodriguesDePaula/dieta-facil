@@ -21,6 +21,7 @@ import { PersonalNav } from "../personal";
 import FoodsPage from "../foods/FoodsPage";
 
 const RecoveryPage = lazy(() => import("./RecoveryPage"));
+const WorkspacePage = lazy(() => import("../WorkspacePage"));
 const SecurityPage = lazy(() => import("./SecurityPage"));
 const PlansPage = lazy(() => import("../plans/PlansPage"));
 const InventoryPage = lazy(() => import("../inventory/InventoryPage"));
@@ -106,6 +107,8 @@ export default function AuthRoutes() {
       }
     >
       <Routes>
+        <Route path="/profissional/painel/:module" element={<WorkspacePage />} />
+        <Route path="/conta/acompanhamento/:module" element={<WorkspacePage patient />} />
         <Route path="/entrar" element={<AccessPage registerMode={false} />} />
         <Route path="/cadastro" element={<AccessPage registerMode />} />
         <Route path="/conta" element={<AccountPage />} />
