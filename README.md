@@ -4,7 +4,13 @@
 
 Aplicativo Full Stack de acompanhamento alimentar: o nutricionista prepara a dieta e registra avaliações; o cliente consulta refeições, alternativas autorizadas e resultados. Interface em português para computador e celular, com React/TypeScript, Java 21/Spring Boot e PostgreSQL.
 
-**Versão 1.0 em avaliação, com dados fictícios.** O fluxo principal está implementado e validado por testes automatizados. O teste humano com designer e nutricionista ainda está pendente. Existe compartilhamento temporário por HTTPS para revisão; a hospedagem permanente ainda não foi ativada. Este projeto não está apresentado como sistema clínico pronto para pacientes reais.
+**Versão 1.0 em avaliação, com dados fictícios.** O fluxo principal está implementado e validado por testes automatizados. A demonstração foi disponibilizada aos nutricionistas; o primeiro feedback recebido solicita nutrientes e totais por refeição. Existe compartilhamento temporário por HTTPS para revisão; a hospedagem permanente ainda não foi ativada. Este projeto não está apresentado como sistema clínico pronto para pacientes reais.
+
+## Próxima evolução: acompanhamento e atendimento assistido
+
+O [plano de evolução](docs/EVOLUCAO_PRODUTO.md) organiza nutrientes com cálculo determinístico, atendimento IA supervisionado com contexto da dieta, check-ins, CRM/jornada, agenda, financeiro, equipes e comunicação. Inspiração funcional na Wellts, identidade própria e direção visual branca/verde-água. Esses recursos são **planejados**, não funcionalidades disponíveis nesta versão.
+
+Documentos: [arquitetura da IA](docs/AI_ASSISTANT.md), [nutrientes](docs/NUTRIENTES.md), [direção visual](docs/DESIGN_SYSTEM.md), [feedback e dúvidas](docs/FEEDBACK_EVOLUCAO.md) e [ADR-003](docs/decisions/ADR-003-acompanhamento-e-ia.md). A estrutura de acompanhamento, os nutrientes e a caixa de dúvidas preparam um piloto de IA antes dos módulos de gestão mais amplos.
 
 ## Experiência dos dois perfis
 

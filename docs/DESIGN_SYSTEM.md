@@ -1,0 +1,37 @@
+# Direção visual — branco e verde-água
+
+Estado: proposta para F01, não tema já aplicado. Objetivo: aparência leve e acolhedora, com contraste e hierarquia suficientes para atendimento profissional. Manter os cards de refeições aprovados e a edição progressiva.
+
+## Tokens candidatos
+
+| Token | Valor proposto | Uso |
+|---|---|---|
+| background | #F8FBFA | Fundo geral quase branco |
+| surface | #FFFFFF | Cards e formulários |
+| accent-soft | #E6F4EF | Seleção discreta e agrupamentos |
+| primary | #256653 | Ações principais com texto branco |
+| text | #18332C | Texto principal |
+| text-muted | #4D665E | Texto secundário |
+| border | #CBDCD5 | Separação visual decorativa |
+| control-border | #718D82 | Candidato para limites de campos |
+
+Cores são candidatas: medir contraste nos componentes finais antes do aceite. Verde-água claro é superfície, não texto claro sobre branco. Garantir WCAG AA para texto normal (4,5:1), texto grande e elementos aplicáveis (3:1), foco visível e distinção sem depender de cor. Erro/sucesso precisam de texto e ícone. Bordas decorativas e limites essenciais de controle têm requisitos diferentes.
+
+## Composição
+
+- Escala de espaçamento 4/8/12/16/24/32px; cantos 12–16px e sombras mínimas.
+- Fonte de corpo legível, preferencialmente a pilha de sistema existente; experimentar uniformizar títulos após comparação com a versão atual, sem troca global arbitrária.
+- Uma ação primária por contexto. Campos avançados recolhidos; fonte dos nutrientes e histórico em detalhe. Avisos de erro e dados incompletos nunca escondidos por estética.
+- Profissional: Início, Clientes e Atendimento primeiro; módulos adicionais só quando funcionais. Dentro do cliente, nome e abas com ferramentas à direita no desktop; no móvel, quebra organizada sem sobreposição.
+- Atendimento: pergunta, origem da informação e encaminhamento visíveis; rascunho IA separado da mensagem enviada. Aprovar/editar/encaminhar no contexto, com confirmação quando necessário.
+- Paciente: refeições antes de resumos; dúvidas em linguagem comum; autor da resposta explícito. Conta e saída permanecem acessíveis no aplicativo (não reproduzir cortes usados somente em prints de divulgação).
+
+## Estados e acessibilidade
+
+Cada componente cobre carregando, vazio, erro recuperável, sem permissão, offline e sucesso. Carregamento não substitui formulário apagando alterações. Evitar layout móvel que transforma todas as ações em ícones sem nome. Alvos de toque preferencialmente 44×44px, rótulos persistentes, mensagens associadas aos campos, diálogos com foco contido/retornado e Escape.
+
+Respeitar prefers-reduced-motion; teclado e leitores de tela; zoom/reflow 320px e 200–400%; foco não encoberto. Abas, quando implementadas como tabs, seguem semântica e teclado completos; não adicionar role=tab só pela aparência. Gráficos têm resumo/tabela equivalente. Não usar notificações transitórias como única confirmação de ação.
+
+## Aceite da primeira aplicação do tema
+
+Capturas comparativas antes/depois em 1440, 390 e 320px, axe, teclado, contraste medido, sem rolagem lateral e sem perda de ações. Testar aparelho físico/TalkBack ou VoiceOver quando disponível; registrar explicitamente se pendente. Só substituir screenshots no README por capturas da implementação, identificando mockups como propostas. Não publicar dados reais de pacientes.

@@ -1,5 +1,7 @@
 # Arquitetura — Dieta Fácil
 
+Este documento descreve a base implementada. A evolução planejada em 29/10/2026 está em [EVOLUCAO_PRODUTO.md](EVOLUCAO_PRODUTO.md) e [ADR-003](decisions/ADR-003-acompanhamento-e-ia.md): manter monólito modular, cálculo determinístico de nutrientes, contexto autorizado por vínculo/organização e IA supervisionada. Contratos e tabelas dos documentos de evolução são propostas, não APIs/migrações existentes.
+
 Monorepositório com React/TypeScript/Vite na interface, Spring Boot 4/Java 21 na API e PostgreSQL 17. O domínio é um monólito dividido por funcionalidade; não há microserviços nem IA nos cálculos.
 
 ## Interface

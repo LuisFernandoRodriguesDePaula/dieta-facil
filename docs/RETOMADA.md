@@ -1,5 +1,9 @@
 # Ponto de retorno — 2026-10-18
 
+## Atualização vigente — 29/10/2026
+
+Prioridade: executar o [plano F00–F13](EVOLUCAO_PRODUTO.md), iniciando estrutura visual de acompanhamento, nutrientes manuais e caixa de dúvidas/orientações, com piloto IA supervisionado antecipado. A versão compartilhada usa a base d47081e; nutricionistas já receberam acesso e há feedback parcial sobre macros. Planejamento e dúvidas documentados, sem implementação de IA, macros ou novos módulos nesta revisão. Ler FEEDBACK_EVOLUCAO.md e ADR-003 antes de implementar. O histórico abaixo não define a próxima ação vigente. Validação técnica anterior: VALIDACAO_PRE_TESTE_2026-10-27.md; não confundir resultados antigos com nova execução de testes.
+
 ## Estado
 
 Dieta Fácil tem versão demonstrável local: dieta versionada, agenda, estoque por lotes, compras por cobertura e validade, recebimentos parciais, preparo medido, consumo e estornos. A pasta física é C:\Users\Usuario\Documents\ChatGPT\Dieta Fácil; o caminho antigo Nutri Fácil não existe mais.

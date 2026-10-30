@@ -1,16 +1,17 @@
 # Plano de evolução do Dieta Fácil
 
-Revisão de 2026-10-20. A prioridade da versão 1.0 é a avaliação do fluxo nutricionista–cliente. Estoque, compras e preparo permanecem implementados como extras opcionais; não ampliar esses módulos antes do feedback.
+Revisão de 2026-10-29. A demonstração foi disponibilizada aos nutricionistas e há feedback parcial sobre nutrientes. O plano vigente é [EVOLUCAO_PRODUTO.md](EVOLUCAO_PRODUTO.md), com fases F00–F13, IA antecipada e critérios de aceite. Estoque, compras e preparo permanecem extras opcionais.
 
 ## Próximos marcos da versão 1.0
 
-1. Designer e proprietário avaliarem a cópia temporária e registrarem dificuldades em FEEDBACK_V1.md.
-2. Nutricionista executar V1_VALIDATION.md com dados fictícios.
-3. Corrigir os problemas do fluxo principal e fechar a apresentação da versão avaliada.
-4. Quando as contas externas estiverem disponíveis, ativar e validar hospedagem permanente, e-mail e backup.
-5. Integrar ao Portfólio separado após validar o endereço definitivo.
+1. Consolidar retornos em FEEDBACK_EVOLUCAO.md e manter correções da versão 1.0 em paralelo.
+2. Implementar F01: tokens branco/verde-água, navegação e painel de acompanhamento.
+3. Implementar F02 e F03: nutrientes determinísticos, orientações publicadas e caixa humana de dúvidas.
+4. Preparar o piloto IA supervisionado F04 antes de ampliar gestão; chamadas reais dependem de chave e orçamento.
+5. Liberar F05 somente após critérios de qualidade/segurança e evoluir F06–F13 conforme as dependências do plano.
+6. Preparar hospedagem, e-mail, backup e operação de dados antes de pacientes reais. Portfólio permanece separado.
 
-Importações continuam somente como espaços reservados. O feedback humano ainda não foi recebido. Este backlog conserva abaixo o histórico das entregas; itens implementados não significam prontidão para uso com pacientes reais.
+Importações continuam reservadas. Macros, IA e módulos de expansão estão planejados, não implementados. O backlog abaixo conserva o histórico das entregas; itens implementados não significam prontidão para uso com pacientes reais.
 
 ## Forma de trabalhar
 

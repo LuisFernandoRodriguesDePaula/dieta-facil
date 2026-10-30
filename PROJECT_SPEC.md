@@ -1,5 +1,7 @@
 # Dieta Fácil — Documento mestre do projeto
 
+> **Direção vigente — 29/10/2026:** o escopo evoluiu para acompanhamento nutricionista–cliente. O plano de implementação atual está em [docs/EVOLUCAO_PRODUTO.md](docs/EVOLUCAO_PRODUTO.md), complementado por [ADR-003](docs/decisions/ADR-003-acompanhamento-e-ia.md), nutrientes, IA, direção visual e feedback. A visão doméstica e os marcos abaixo permanecem como histórico; estoque/compras/preparo são extras opcionais. Recursos da expansão estão planejados, não implementados.
+
 > **Objetivo deste arquivo:** servir como contexto inicial para um projeto no ChatGPT e como especificação viva para desenvolver o Dieta Fácil. Ao iniciar uma nova conversa, anexe este arquivo e peça para a IA seguir as instruções da seção **Como a IA deve colaborar**.
 
 ## 1. Visão do produto
