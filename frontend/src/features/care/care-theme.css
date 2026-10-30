@@ -1,0 +1,143 @@
+/* Direção própria inspirada na paleta e no respiro da LP de referência. */
+.care-themed {
+  --care-ink: #102a28;
+  --care-muted: #506763;
+  --care-accent: #08786c;
+  --care-mint: #20d6bd;
+  --care-line: #dce9e5;
+  color: var(--care-ink);
+}
+.care-themed .access-brand {
+  color: #075e54;
+  letter-spacing: -0.04em;
+}
+.care-themed > nav {
+  border-bottom-color: var(--care-line);
+}
+.care-themed h1 {
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+}
+.care-themed .care-focused-header {
+  border-color: var(--care-line);
+}
+.care-themed .plan-meal {
+  border-color: var(--care-line);
+  background: #fff;
+  box-shadow: 0 6px 24px #12382b05;
+  border-radius: 16px;
+}
+.care-themed .plan-meal-editor {
+  border-top-color: #299e8b;
+}
+.care-themed .button,
+.care-themed .care-tabs button[aria-pressed="true"] {
+  background: #08786c;
+  border-color: #08786c;
+  color: #fff;
+}
+.care-themed .care-client-open {
+  background: #d8f7ef;
+  color: #075e54;
+}
+.care-themed .plan-time-badge,
+.care-themed .plan-meal-symbol,
+.care-themed .plan-meal-count {
+  background: #eaf8f3;
+  color: #075e54;
+}
+.care-themed .care-tabs button {
+  border-radius: 10px;
+}
+.care-themed :is(button, a, input, select):focus-visible {
+  outline: 3px solid #08786c;
+  outline-offset: 3px;
+}
+.care-themed .workspace-shell {
+  gap: 32px;
+}
+.care-themed .workspace-nav {
+  padding: 12px;
+  border: 1px solid var(--care-line);
+  border-radius: 16px;
+  background: #fff;
+}
+.care-themed .workspace-nav a {
+  color: #375954;
+}
+.care-themed .workspace-nav a:hover {
+  background: #f0faf6;
+}
+.care-themed .workspace-nav a[aria-current="page"] {
+  background: #d8f7ef;
+  color: #075e54;
+}
+.care-themed .workspace-content > header {
+  padding: 30px;
+  border-radius: 20px;
+  background: linear-gradient(120deg, #effbf5, #fff);
+  border: 1px solid var(--care-line);
+}
+.care-themed .workspace-content h1 {
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  margin: 14px 0;
+}
+.care-themed .workspace-content > header p {
+  line-height: 1.7;
+  color: var(--care-muted);
+  max-width: 58ch;
+}
+.care-themed .workspace-status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 24px;
+  background: #e0f7ed;
+  color: #075e54;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.care-themed .workspace-note {
+  background: #f1faf6;
+  border: 1px solid var(--care-line);
+  margin: 20px 0;
+}
+.care-themed .workspace-grid {
+  gap: 20px;
+}
+.care-themed .workspace-grid article {
+  border-color: var(--care-line);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 30px #12382b04;
+}
+.care-themed .workspace-grid h2 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.care-themed .workspace-grid p {
+  margin: 12px 0 20px;
+}
+.care-themed .workspace-shortcuts a {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 18px;
+  min-height: 44px;
+  border-radius: 10px;
+  background: #20d6bd;
+  color: #10332d;
+  font-weight: 600;
+}
+@media (max-width: 800px) {
+  .care-themed .workspace-content > header {
+    padding: 22px;
+  }
+  .care-themed .workspace-nav {
+    padding: 8px;
+    gap: 6px;
+  }
+  .care-themed .workspace-nav a {
+    padding: 10px;
+  }
+}

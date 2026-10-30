@@ -5,6 +5,7 @@ import { useSession } from "../auth/session";
 import { PersonalNav } from "../personal";
 import { useFeatures } from "./features";
 import "../plans/plans.css";
+import "./care-theme.css";
 const failure = (e: unknown) =>
   e instanceof ApiError
     ? e.message
@@ -34,7 +35,7 @@ export function CareLayout({
     );
   if (!session.data) return <Navigate to="/entrar" replace />;
   return (
-    <main className="plan-page">
+    <main className="plan-page care-themed">
       {!focused && <PersonalNav />}
       {professional && session.data.role !== "NUTRITIONIST" ? (
         <>

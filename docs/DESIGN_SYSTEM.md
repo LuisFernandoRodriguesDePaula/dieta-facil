@@ -35,3 +35,9 @@ Respeitar prefers-reduced-motion; teclado e leitores de tela; zoom/reflow 320px 
 ## Aceite da primeira aplicação do tema
 
 Capturas comparativas antes/depois em 1440, 390 e 320px, axe, teclado, contraste medido, sem rolagem lateral e sem perda de ações. Testar aparelho físico/TalkBack ou VoiceOver quando disponível; registrar explicitamente se pendente. Só substituir screenshots no README por capturas da implementação, identificando mockups como propostas. Não publicar dados reais de pacientes.
+
+## Primeira aplicação — referência visual Wellts
+
+Aplicado tema inicial próprio nos painéis CareLayout em 29/10/2026. Referência analisada visualmente e por estilos públicos: https://nutricaosemfronteiras.com.br/wellts . Aproveitados princípios de fundo branco, tipografia escura forte, verde profundo e turquesa nas ações, com cards leves e respiro. Não foram copiados logo, ilustrações, textos promocionais, depoimentos, dados comerciais ou templates de código. O tema é localizado aos painéis, sem redesenhar a landing pública antiga nesta entrega. Tokens anteriores continuam como proposta; a primeira aplicação usa primary #08786c, ação turquesa #20d6bd e superfícies #f1faf6. Próximas revisões devem consolidar os tokens antes de ampliar o tema.
+
+Validação: build, lint, ausência de overflow e axe nas telas Clientes, Início e Atendimento em 1440 e 320px. Não substitui validação em aparelho físico.
