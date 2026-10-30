@@ -5,9 +5,9 @@
   margin: 24px 0;
 }
 .care-tabs button[aria-pressed="true"] {
-  background: #284e3d;
+  background: var(--brand-action, #08786c);
   color: #fff;
-  border-color: #284e3d;
+  border-color: var(--brand-action, #08786c);
 }
 .care-client-grid {
   display: grid;
@@ -49,7 +49,7 @@
 .care-chart {
   margin: 30px 0;
   padding: 24px;
-  background: #edf3e8;
+  background: var(--surface-support, #e6f7ef);
   border-radius: 18px;
   border: 1px solid #d8e2d7;
 }
@@ -134,7 +134,7 @@
   margin: 20px 0;
   border: 1px dashed #aab9a7;
   border-radius: 12px;
-  background: #f4f7f1;
+  background: var(--surface-support, #e6f7ef);
   overflow-wrap: anywhere;
 }
 .care-import label {
@@ -227,11 +227,11 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #284e3d;
+  background: var(--brand-action, #08786c);
   color: #fff;
 }
 .care-client-grid a.care-client-open:hover {
-  background: #1d3c2e;
+  background: var(--brand-action, #08786c);
 }
 .care-import summary {
   cursor: pointer;

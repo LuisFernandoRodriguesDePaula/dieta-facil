@@ -251,3 +251,7 @@ Promovido tema localizado a global-theme.css, importado na raiz. Paleta de super
 ## 2026-10-29 — Clareza de interação no menu
 
 Opções de módulos com fundo verde-claro, estado ativo esmeralda/branco, borda no hover e seta discreta. Reforçada especificidade do estado ativo para coexistir com estilos de navegação carregados por rota. Cards informativos continuam sem ação simulada. Validação em Edge nos dois perfis e larguras 1440/320px: Enter, aria-current, cor ativa, axe e ausência de overflow; build/lint aprovados. Ambiente 8081 atualizado.
+
+## 2026-10-29 — Correção de cor na página de clientes
+
+Estilos específicos dos cards de clientes ainda fixavam o verde antigo e prevaleciam sobre o tema. Substituídos fundos e bordas de ação por tokens globais esmeralda/verde-claro, incluindo hover e abas. Build/lint aprovados; navegador confirmou a seta do cliente em #08786C com texto branco. Layout preservado e ambiente 8081 atualizado.
