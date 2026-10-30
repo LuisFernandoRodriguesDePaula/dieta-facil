@@ -8,7 +8,7 @@ Aplicativo Full Stack de acompanhamento alimentar: o nutricionista prepara a die
 
 ## Próxima evolução: acompanhamento e atendimento assistido
 
-O [plano de evolução](docs/EVOLUCAO_PRODUTO.md) organiza nutrientes com cálculo determinístico, atendimento IA supervisionado com contexto da dieta, check-ins, CRM/jornada, agenda, financeiro, equipes e comunicação. Inspiração funcional na Wellts, identidade própria e direção visual branca/verde-água. Esses recursos são **planejados**, não funcionalidades disponíveis nesta versão.
+O [plano de evolução](docs/EVOLUCAO_PRODUTO.md) organiza nutrientes com cálculo determinístico, atendimento IA supervisionado com contexto da dieta, check-ins, CRM/jornada, agenda, financeiro, equipes e comunicação. Inspiração funcional na Wellts, identidade própria e direção visual branca/verde-água. A primeira fatia de nutrientes manuais e prévia está disponível; os demais módulos da expansão continuam planejados ou com estrutura inicial, sem suas integrações.
 
 Documentos: [arquitetura da IA](docs/AI_ASSISTANT.md), [nutrientes](docs/NUTRIENTES.md), [direção visual](docs/DESIGN_SYSTEM.md), [feedback e dúvidas](docs/FEEDBACK_EVOLUCAO.md) e [ADR-003](docs/decisions/ADR-003-acompanhamento-e-ia.md). A estrutura de acompanhamento, os nutrientes e a caixa de dúvidas preparam um piloto de IA antes dos módulos de gestão mais amplos.
 
@@ -141,6 +141,6 @@ Consulte [arquitetura](docs/ARCHITECTURE.md), [API](docs/API.md), [regras de est
 
 Recuperação, confirmação de e-mail e exclusão estão implementadas. Na execução local, os links ficam em .local/mail; envio real requer configuração do provedor. Publicação permanente, TLS na hospedagem definitiva, entrega real de e-mail e backup externo aguardam ativação e validação. O túnel de revisão já usa HTTPS, mas é temporário. Sessões expiram após 30 minutos sem atividade e são perdidas ao reiniciar a API.
 
-Cru, preparado e como vendido permanecem separados. Rendimento e validade são informados explicitamente; não há estimativa por IA. Receitas compostas, importação de dieta, nutrientes e embalagens/arredondamento comercial ficam para evolução posterior. O cálculo não reserva estoque. O histórico da tela mostra as 100 operações mais recentes, preservadas integralmente no banco.
+Cru, preparado e como vendido permanecem separados. Rendimento e validade são informados explicitamente; não há estimativa por IA. Há cadastro manual de nutrientes e prévia por refeição/dia com composição atual em Cliente → Alimentos; dados ausentes tornam o subtotal parcial. Snapshots nutricionais do plano, receitas compostas, importação de dieta e embalagens/arredondamento comercial ficam para evolução posterior. O cálculo não reserva estoque. O histórico da tela mostra as 100 operações mais recentes, preservadas integralmente no banco.
 
 O perfil profissional é autodeclarado. Identidade profissional, auditoria e operação/retenção de dados ainda precisam de definição antes de pacientes reais. Importações e bioimpedância permanecem como campos reservados desativados. Não há chamada de API de IA, hospedagem contratada ou serviço pago na aplicação.

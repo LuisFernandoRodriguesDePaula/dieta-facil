@@ -1,6 +1,10 @@
 # Nutrientes — modelo e aceite propostos
 
-Estado: planejado, F02/F08 do [plano](EVOLUCAO_PRODUTO.md). O cadastro atual não calcula macros.
+Estado: F02 parcialmente implementada — cadastro manual versionado e prévia de composição atual por refeição/dia, em Cliente → Alimentos. Valores vazios são desconhecidos; zero informado é conhecido. Referência por dimensão compatível (sem densidade ou medida caseira automática). F08, catálogo externo, snapshots vinculados ao plano e totais nos cards da dieta permanecem futuros.
+
+### Primeira fatia entregue
+
+Migração V13 acrescenta revisões de composição por alimento/estado, sem preencher alimentos antigos. Profissional com vínculo ativo consulta/grava em `/api/professional/clients/{client}/foods/{food}/nutrients`; gravação exige a versão atual. `/api/professional/clients/{client}/nutrient-preview?date=AAAA-MM-DD` soma as porções e trocas do dia com a **composição atual**, retornando subtotais conhecidos e quantidade de itens sem dado por nutriente, além do total diário. Não representa consumo real nem snapshot histórico. Fonte manual obrigatória; não há busca automática ou IA. Abaixo está a arquitetura completa planejada, não integralmente implementada.
 
 ## Cadastro e preenchimento
 

@@ -40,3 +40,9 @@ POST /api/auth/reset-password recebe token e password; POST /api/auth/verify-ema
 GET /api/account/status retorna a situação da própria conta. DELETE /api/account exige senha atual e confirmation=EXCLUIR, remove os dados ativos e encerra a sessão. A proteção CSRF permanece obrigatória. Em prod, os endpoints de acesso têm limite básico de 20 tentativas por IP/rota a cada 15 minutos.
 
 A fila de e-mail é cifrada e persistida no PostgreSQL, com tentativas e expiração. Payload é apagado após envio. No ambiente local, a saída é arquivo privado; em produção, usa API HTTPS do Brevo. Ativação real está em DEPLOYMENT.md.
+
+## Nutrientes manuais — primeira fatia
+
+Profissional com vínculo ativo: GET /api/professional/clients/{client}/foods/{food}/nutrients?basis=AS_SOLD retorna lista vazia ou revisão atual. PUT no mesmo caminho recebe basis, referenceQuantity positiva, unit compatível, protein/carbs/fat/energy nullable e não negativos, source obrigatória até 250 caracteres e version (0 no primeiro cadastro). Campos numéricos até 12 dígitos inteiros e 6 decimais; unidades seguem regras existentes. Cria nova revisão; versão obsoleta retorna 409. Cliente não escreve; alimento de outra conta ou vínculo ausente/revogado não concede acesso.
+
+GET /api/professional/clients/{client}/nutrient-preview?date=AAAA-MM-DD retorna name, known (subtotais por nutriente) e missing (contagens por nutriente) por refeição, seguido do total do dia quando houver refeições. Usa composição atual e ocorrências com trocas; não é consumo nem snapshot histórico. Fonte externa e equivalência não são inferidas. Detalhes em NUTRIENTES.md.

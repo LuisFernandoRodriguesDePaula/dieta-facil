@@ -11,6 +11,7 @@ import type { Occurrence, Schedule } from "../plans/PlansPage";
 import { DietApiContext } from "../plans/DietApi";
 import SwapPanel from "../plans/SwapPanel";
 import MealDialog from "../plans/MealDialog";
+import NutrientPanel from "./NutrientPanel";
 import { useFoods } from "../foods/useFoods";
 import { units, categories } from "../foods/food-types";
 import type { Stock } from "../inventory/InventoryPage";
@@ -788,7 +789,7 @@ function ClientWorkspace({
             subject="alimentos"
             description="Espaço reservado para importar um catálogo de alimentos. O cadastro manual continua disponível abaixo."
           />
-          <ClientFoods id={id} prefix={prefix} />
+          <ClientFoods id={id} prefix={prefix} timezone={timezone} />
         </>
       ) : tab === "results" ? (
         <>
@@ -849,7 +850,15 @@ function ImportPlaceholder({
     </details>
   );
 }
-function ClientFoods({ id, prefix }: { id: string; prefix: string }) {
+function ClientFoods({
+  id,
+  prefix,
+  timezone,
+}: {
+  id: string;
+  prefix: string;
+  timezone: string;
+}) {
   const query = useFoods(id, prefix);
   const client = useQueryClient();
   const [error, setError] = useState("");
@@ -922,6 +931,11 @@ function ClientFoods({ id, prefix }: { id: string; prefix: string }) {
         </fieldset>
         {error && <p role="alert">{error}</p>}
       </form>
+      <NutrientPanel
+        foods={query.data ?? []}
+        prefix={prefix}
+        timezone={timezone}
+      />
       {showFoods && (
         <MealDialog
           title="Alimentos cadastrados"

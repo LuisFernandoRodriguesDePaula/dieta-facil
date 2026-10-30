@@ -103,3 +103,7 @@ Veja DESIGN_REVIEW.md. Start-DesignReview.ps1 cria/reutiliza banco dieta_facil_r
 ## Apresentação 1.0 atualizada — 2026-10-20
 
 Usuário respondeu Ainda não testamos ao perguntar sobre a revisão do designer. Não inventar feedback nem ampliar módulos para substituir essa avaliação. README e PROJECT_CASE agora apresentam o fluxo profissional/cliente, imagens atuais e limites; ROADMAP prioriza sessão humana, correções e depois ativação permanente quando houver contas. Portfólio separado não foi alterado. Conferência externa repetida sem renovar o link ou alterar dados de revisão; seguir o prazo original registrado em session.json. Capturas públicas v1-* são fictícias e não contêm credenciais. Próximo marco permanece o teste do designer e do nutricionista, com FEEDBACK_V1.md.
+
+## Continuação — nutrientes manuais
+
+Primeira fatia F02 disponível na aba Alimentos do cliente: composição manual versionada e prévia de refeições/dia usando catálogo atual. Não é histórico nutricional congelado. Próximo incremento: snapshots na revisão de dieta e totais nos cards; depois orientações/caixa humana F03. Consultar NUTRIENTES.md para limites. Reinício da API de revisão preservou o endereço do túnel e requer novo login. Fase completa ainda não concluída.

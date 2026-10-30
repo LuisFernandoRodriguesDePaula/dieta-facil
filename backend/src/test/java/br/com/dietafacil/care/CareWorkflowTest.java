@@ -456,4 +456,31 @@ class CareWorkflowTest {
                 "select count(*) from care_evaluations where user_id=?", Long.class, client.id))
         .isZero();
   }
+  @Test
+  void nutritionRequiresActiveCareAndValidatesWrites() throws Exception {
+    var pro=person("NUTRITIONIST");var client=person("CLIENT");
+    var food=foods.create(client.email,new FoodDtos.Create("Referência fictícia",Unit.G,Category.OTHER,Frequency.WEEKLY));
+    var path="/api/professional/clients/"+client.id+"/foods/"+food.id()+"/nutrients";
+    assertThat(request(pro.http,"GET",path+"?basis=COOKED",null).statusCode()).isEqualTo(404);
+    care.invite(pro.email,new CareService.Invitation(client.email,"Cliente fictício"));
+    var link=care.links(client.email,false).getFirst();care.accept(client.email,link.id());
+    var body=new HashMap<String,Object>();body.put("basis","COOKED");body.put("referenceQuantity",100);body.put("unit","G");body.put("protein",20);body.put("carbs",null);body.put("fat",0);body.put("energy",100);body.put("source","Teste fictício");body.put("version",0);
+    assertThat(request(pro.http,"PUT",path,body).statusCode()).isEqualTo(200);
+    var today=LocalDate.now(ZoneOffset.UTC);
+    var plan=new PlanDtos.Save(0L,today,List.of(new PlanDtos.MealInput(UUID.randomUUID(),"Refeição teste",LocalTime.of(8,0),Set.of(1,2,3,4,5,6,7),List.of(new PlanDtos.ItemInput(food.id(),new BigDecimal("150"),Unit.G,Basis.COOKED)))));
+    var root="/api/professional/clients/"+client.id;
+    assertThat(request(pro.http,"PUT",root+"/plan",plan).statusCode()).isEqualTo(200);
+    var preview=request(pro.http,"GET",root+"/nutrient-preview?date="+today,null);
+    assertThat(preview.statusCode()).isEqualTo(200);
+    var totals=json.readTree(preview.body());
+    assertThat(totals.get(0).get("known").get("protein").decimalValue()).isEqualByComparingTo("30");
+    assertThat(totals.get(0).get("missing").get("carbs").asInt()).isEqualTo(1);
+    assertThat(totals.get(1).get("known").get("protein").decimalValue()).isEqualByComparingTo("30");
+    assertThat(request(pro.http,"PUT",path,body).statusCode()).isEqualTo(409);
+    body.put("version",1);body.put("protein",-1);
+    assertThat(request(pro.http,"PUT",path,body).statusCode()).isEqualTo(400);
+    assertThat(request(client.http,"PUT",path,body).statusCode()).isIn(403,404);
+    care.revoke(client.email,link.id());
+    assertThat(request(pro.http,"GET",path+"?basis=COOKED",null).statusCode()).isEqualTo(404);
+  }
 }

@@ -255,3 +255,11 @@ Opções de módulos com fundo verde-claro, estado ativo esmeralda/branco, borda
 ## 2026-10-29 — Correção de cor na página de clientes
 
 Estilos específicos dos cards de clientes ainda fixavam o verde antigo e prevaleciam sobre o tema. Substituídos fundos e bordas de ação por tokens globais esmeralda/verde-claro, incluindo hover e abas. Build/lint aprovados; navegador confirmou a seta do cliente em #08786C com texto branco. Layout preservado e ambiente 8081 atualizado.
+
+## 2026-10-29 — Primeira entrega funcional de nutrientes
+
+V13 armazena revisões manuais de composição por alimento/estado e fonte obrigatória. Cadastro em Cliente → Alimentos, com referência e proteínas/carboidratos/gorduras/energia opcionais. Prévia no servidor soma refeições e dia com composição atual e trocas; retorna informação incompleta explicitamente. Unidade compatível, sem conversão de densidade ou equivalência inventada. Vínculo profissional ativo, escopo de proprietário e controle de versão preservados. Migração não altera alimentos antigos ou estoque.
+
+F02 permanece parcial: faltam snapshots ligados ao plano, totais nos próprios cards e revisão de medidas/fontes externas. Nenhum macro foi fabricado para os dados fictícios existentes. Código atualizado no servidor de revisão com o túnel preservado; reinício encerra sessões.
+
+Validação: suíte H2 inicial 51 testes aprovados; após ampliar a cobertura de prévia, nove testes de nutrientes/vínculo/cálculo aprovados em H2 e PostgreSQL; 25 testes frontend, build e lint aprovados. Testes novos cobrem proporcionalidade, null/zero, dimensões, revisões, edição obsoleta, payload negativo, leitura/gravação sem autorização e revogação; prévia HTTP confirma 150g/100g, subtotal desconhecido e total diário. Navegador por HTTPS em 1440/320px: formulário, prévia, ausência de overflow e axe aprovados. Banco de testes isolado; sem dados reais.

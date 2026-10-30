@@ -12,7 +12,7 @@ Princípios mantidos: português; desktop e celular; poucos campos obrigatórios
 
 ## Situação real e retorno recebido
 
-Já existem contas e vínculos profissional–cliente, dieta versionada, alternativas autorizadas, avaliações mensais, extras de estoque e compartilhamento temporário HTTPS. Ainda não há macros, atendimento por IA, agenda de consultas, check-ins de acompanhamento, financeiro, CRM ou operação de clínica multiusuário.
+Já existem contas e vínculos profissional–cliente, dieta versionada, alternativas autorizadas, avaliações mensais, extras de estoque e compartilhamento temporário HTTPS. A primeira fatia de nutrientes manuais e prévia por refeição/dia foi implementada; veja NUTRIENTES.md para limites. Ainda não há IA, agenda de consultas, check-ins de acompanhamento, financeiro, CRM ou operação de clínica multiusuário. Os painéis desses módulos são estruturas navegáveis.
 
 O proprietário informou que disponibilizou a demonstração aos nutricionistas. O feedback recebido solicita nutrientes no alimento e totais na refeição. Atendimento por IA e a expansão inspirada na Wellts são pedidos do proprietário; não são necessidades validadas por todos os avaliadores. Ver [registro de feedback](FEEDBACK_EVOLUCAO.md).
 
@@ -38,7 +38,7 @@ Também entram no backlog completo, em ondas posteriores: relatórios do consult
 
 ## Passo a passo e critérios de saída
 
-Todas as entregas abaixo começam pendentes. Não há prazo prometido sem estimativa e validação do escopo. Uma fase só é concluída com código, migrações, autorização, estados de erro/vazio, testes proporcionais, captura e documentação no mesmo commit/PR.
+F01 possui estrutura navegável/tema, mas pendências reais ainda não estão integradas; F02 possui uma primeira fatia manual com prévia, sem snapshots do plano. Demais entregas funcionais continuam pendentes. Não há prazo prometido sem estimativa e validação do escopo. Uma fase só é concluída com código, migrações, autorização, estados de erro/vazio, testes proporcionais, captura e documentação no mesmo commit/PR.
 
 | ID | Entrega | Dependências | Critério de saída |
 |---|---|---|---|
