@@ -1,0 +1,291 @@
+/* Direção própria inspirada na paleta e no respiro da LP de referência. */
+.dieta-themed {
+  --care-ink: #102a28;
+  --care-muted: #506763;
+  --care-accent: #08786c;
+  --care-mint: #08786c;
+  --care-line: #dce9e5;
+  color: var(--care-ink);
+}
+.dieta-themed .access-brand {
+  color: #075e54;
+  letter-spacing: -0.04em;
+}
+.dieta-themed > nav {
+  border-bottom-color: var(--care-line);
+}
+.dieta-themed h1 {
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+}
+.dieta-themed .care-focused-header {
+  border-color: var(--care-line);
+}
+.dieta-themed .plan-meal {
+  border-color: var(--care-line);
+  background: #fff;
+  box-shadow: 0 6px 24px #12382b05;
+  border-radius: 16px;
+}
+.dieta-themed .plan-meal-editor {
+  border-top-color: #299e8b;
+}
+.dieta-themed .button,
+.dieta-themed .care-tabs button[aria-pressed="true"] {
+  background: #08786c;
+  border-color: #08786c;
+  color: #fff;
+}
+.dieta-themed .care-client-open {
+  background: #e6f7ef;
+  color: #075e54;
+}
+.dieta-themed .plan-time-badge,
+.dieta-themed .plan-meal-symbol,
+.dieta-themed .plan-meal-count {
+  background: #e6f7ef;
+  color: #075e54;
+}
+.dieta-themed .care-tabs button {
+  border-radius: 10px;
+}
+.dieta-themed :is(button, a, input, select):focus-visible {
+  outline: 3px solid #08786c;
+  outline-offset: 3px;
+}
+.dieta-themed .workspace-shell {
+  gap: 32px;
+}
+.dieta-themed .workspace-nav {
+  padding: 12px;
+  border: 1px solid var(--care-line);
+  border-radius: 16px;
+  background: #fff;
+}
+.dieta-themed .workspace-nav a {
+  color: #375954;
+}
+.dieta-themed .workspace-nav a:hover {
+  background: #e6f7ef;
+}
+.dieta-themed .workspace-nav a[aria-current="page"] {
+  background: #e6f7ef;
+  color: #075e54;
+}
+.dieta-themed .workspace-content > header {
+  padding: 30px;
+  border-radius: 20px;
+  background: #e6f7ef;
+  border: 1px solid var(--care-line);
+}
+.dieta-themed .workspace-content h1 {
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  margin: 14px 0;
+}
+.dieta-themed .workspace-content > header p {
+  line-height: 1.7;
+  color: var(--care-muted);
+  max-width: 58ch;
+}
+.dieta-themed .workspace-status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 24px;
+  background: #e6f7ef;
+  color: #075e54;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.dieta-themed .workspace-note {
+  background: #e6f7ef;
+  border: 1px solid var(--care-line);
+  margin: 20px 0;
+}
+.dieta-themed .workspace-grid {
+  gap: 20px;
+}
+.dieta-themed .workspace-grid article {
+  border-color: var(--care-line);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 30px #12382b04;
+}
+.dieta-themed .workspace-grid h2 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.dieta-themed .workspace-grid p {
+  margin: 12px 0 20px;
+}
+.dieta-themed .workspace-shortcuts a {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 18px;
+  min-height: 44px;
+  border-radius: 10px;
+  background: #08786c;
+  color: #10332d;
+  font-weight: 600;
+}
+@media (max-width: 800px) {
+  .dieta-themed .workspace-content > header {
+    padding: 22px;
+  }
+  .dieta-themed .workspace-nav {
+    padding: 8px;
+    gap: 6px;
+  }
+  .dieta-themed .workspace-nav a {
+    padding: 10px;
+  }
+}
+/* Identidade compartilhada: acesso, demonstração e áreas autenticadas. */
+html.dieta-themed {
+  --ink: #102a28;
+  color: #102a28;
+  background: #ffffff;
+}
+.dieta-themed body {
+  background: #ffffff;
+}
+.dieta-themed :is(h1, h2, h3) {
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+.dieta-themed ::selection {
+  background: #e6f7ef;
+  color: #102a28;
+}
+.dieta-themed :is(input, select, textarea) {
+  border-color: #718d82;
+  accent-color: #08786c;
+}
+.dieta-themed .access-layout {
+  background: #fff;
+}
+.dieta-themed .access-intro {
+  background: #e6f7ef;
+  color: #075e54;
+}
+.dieta-themed .access-intro :is(p, small) {
+  color: #405f57;
+}
+.dieta-themed .access-intro h1 {
+  font-weight: 700;
+}
+.dieta-themed .access-card {
+  min-width: 0;
+}
+.dieta-themed :is(.brand-mark, .button-primary) {
+  background: #08786c;
+  color: #fff;
+}
+.dieta-themed :is(.sidebar-note, .diet-summary, .diet-empty) {
+  background: #e6f7ef;
+  color: #294f45;
+}
+.dieta-themed nav a.active {
+  background: #e6f7ef;
+  color: #075e54;
+}
+.dieta-themed nav a.active:after {
+  background: #08786c;
+}
+.dieta-themed
+  :is(.daily-meal, .meal-dialog, .access-card input, .access-card select) {
+  border-color: #cbdcd5;
+}
+.dieta-themed .daily-meal.is-next {
+  border-color: #08786c;
+}
+.dieta-themed .plan-page button.button {
+  background: #08786c;
+  color: white;
+}
+.dieta-themed .plan-page :is(input, select, textarea) {
+  border-color: #718d82;
+}
+.dieta-themed .plan-page nav a {
+  min-height: 44px;
+}
+.dieta-themed :is(.plan-page, .access-main, .main-shell, .workspace-content) {
+  min-width: 0;
+}
+.dieta-themed :is(.plan-page, .access-layout, .app-shell) {
+  overflow-wrap: anywhere;
+}
+.dieta-themed .meal-dialog {
+  max-width: min(680px, calc(100vw - 24px));
+}
+.dieta-themed img {
+  max-width: 100%;
+}
+@media (max-width: 600px) {
+  .dieta-themed .plan-page {
+    padding: 24px 16px 48px;
+  }
+  .dieta-themed .plan-page nav {
+    gap: 4px;
+    padding: 16px 0;
+    margin-bottom: 24px;
+  }
+  .dieta-themed .plan-page nav a {
+    padding: 10px;
+  }
+  .dieta-themed .access-main {
+    padding: 24px 16px;
+  }
+  .dieta-themed .access-intro {
+    padding: 28px 20px;
+  }
+  .dieta-themed .workspace-nav {
+    max-height: 240px;
+    overflow-y: auto;
+  }
+  .dieta-themed .workspace-nav:focus-within {
+    outline-offset: 2px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dieta-themed *,
+  .dieta-themed *::before,
+  .dieta-themed *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+/* Regra 60/30/10: distribuição visual aproximada, não quota por pixel. */
+.dieta-themed {
+  --surface-main: #fff;
+  --surface-support: #e6f7ef;
+  --brand-action: #08786c;
+}
+.dieta-themed .workspace-content > header,
+.dieta-themed .access-intro {
+  background: var(--surface-support);
+}
+.dieta-themed .workspace-shortcuts a {
+  background: var(--brand-action);
+  color: #fff;
+}
+.dieta-themed .workspace-nav,
+.dieta-themed .workspace-grid article {
+  background: var(--surface-main);
+}
+.dieta-themed .workspace-note {
+  background: var(--surface-main);
+}
+@media (max-width: 600px) {
+  .dieta-themed .access-layout {
+    grid-template-rows: auto 1fr;
+  }
+  .dieta-themed .access-intro {
+    min-height: 0;
+    padding: 24px 20px;
+  }
+}
+.dieta-themed :is(.sidebar-note,.prep-card,.feature-icon,.meal-icon,.diet-summary,.diet-empty) {background:var(--surface-support);}
+.dieta-themed :is(.meal-card,.food-card,.progress-card,.info-panel,.sidebar,.access-main) {background:var(--surface-main);}
+.dieta-themed :is(.brand-mark,.button-primary) {background:var(--brand-action);color:#fff;}

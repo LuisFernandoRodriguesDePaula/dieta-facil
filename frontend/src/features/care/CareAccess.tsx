@@ -5,7 +5,6 @@ import { useSession } from "../auth/session";
 import { PersonalNav } from "../personal";
 import { useFeatures } from "./features";
 import "../plans/plans.css";
-import "./care-theme.css";
 const failure = (e: unknown) =>
   e instanceof ApiError
     ? e.message

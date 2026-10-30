@@ -243,3 +243,7 @@ Validação: build, lint e 25 testes frontend aprovados. Novos painéis conferid
 ## 2026-10-29 — Direção visual inspirada na LP de referência
 
 Tema próprio em CareLayout: branco, verde profundo, turquesa, títulos sem serifa, cards suaves e destaque para cabeçalho/atalhos dos novos painéis. Fonte de inspiração registrada em DESIGN_SYSTEM.md. Sem copiar marca, mídia ou promessas comerciais. Build e lint aprovados; axe e reflow nas telas de clientes/início/atendimento em 1440 e 320px aprovados. Interface compilada atualizada no ambiente de revisão 8081.
+
+## 2026-10-29 — Tema compartilhado e 60/30/10
+
+Promovido tema localizado a global-theme.css, importado na raiz. Paleta de superfícies simplificada a branco, verde-claro e esmeralda conforme orientação; texto mantém legibilidade. Cobertura de áreas públicas, acesso, paciente e módulos existentes, com reflow e movimento reduzido. Verificados 20 caminhos em desktop/320px antes do ajuste final de paleta, axe nas telas principais e 25 testes; build/lint após ajuste final. Nenhuma regra de negócio alterada.
